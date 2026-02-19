@@ -1,0 +1,250 @@
+{
+  "id": "estatica_supervisor_she",
+  "titulo": "Electricidad Estática (Supervisor SHE)",
+  "norma": "NOM-022-STPS-2015",
+  "nivel": "supervisor_she",
+  "nivel_nombre": "Supervisor SHE",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "La NOM-022 obliga al patrón a:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Señalizar",
+        "Capacitar",
+        "Identificar y controlar riesgos por electricidad estática",
+        "Supervisar"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "Desde SHE, la electricidad estática se clasifica como riesgo:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Mecánico",
+        "Térmico",
+        "Físico-químico",
+        "Biológico"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "El análisis de riesgo debe considerar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Personal",
+        "Turnos",
+        "Procesos y materiales",
+        "Costos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 4,
+      "texto": "Las áreas con atmósferas explosivas requieren:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Señales",
+        "Capacitación general",
+        "Controles estrictos de estática",
+        "Supervisión ocasional"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 5,
+      "texto": "La puesta a tierra debe verificarse:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Visualmente",
+        "Anualmente",
+        "Periódicamente",
+        "Solo al instalar"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "El control de humedad es una medida:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Correctiva",
+        "Administrativa",
+        "Preventiva",
+        "Reactiva"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "Desde SHE, la ropa del trabajador debe:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ser cómoda",
+        "Ser reflectante",
+        "Reducir acumulación estática",
+        "Ser gruesa"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "La NOM-022 se aplica principalmente en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Oficinas",
+        "Escuelas",
+        "Procesos industriales",
+        "Hospitales"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "Un sistema de puesta a tierra defectuoso es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Observación",
+        "Falla menor",
+        "Condición crítica",
+        "Riesgo aceptable"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 10,
+      "texto": "La electricidad estática puede detonar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Vibraciones",
+        "Fugas",
+        "Atmósferas inflamables",
+        "Temperatura"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "SHE debe asegurar que existan:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Manuales",
+        "Instructivos",
+        "Procedimientos documentados",
+        "Reportes"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "La capacitación debe enfocarse en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Teoría",
+        "Normas",
+        "Reconocimiento del riesgo y control",
+        "Auditoría"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "Un incidente por estática indica falla en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Producción",
+        "Planeación",
+        "Gestión de riesgos",
+        "Mantenimiento"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 14,
+      "texto": "La NOM-022 se complementa con:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "NOM-017",
+        "NOM-004",
+        "NOM-029",
+        "NOM-025"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "El control jerárquico prioritario es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "EPP",
+        "Señales",
+        "Ingeniería (puesta a tierra)",
+        "Capacitación"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 16,
+      "texto": "SHE debe evaluar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Costos",
+        "Tiempos",
+        "Probabilidad de ignición",
+        "Turnos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "La electricidad estática es especialmente crítica en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Oficinas",
+        "Talleres",
+        "Áreas con vapores inflamables",
+        "Almacenes secos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "El incumplimiento de NOM-022 puede provocar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Multas",
+        "Retrasos",
+        "Explosiones e incendios",
+        "Daños menores"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "Un programa de control de estática debe incluir:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Señales",
+        "Reportes",
+        "Mantenimiento y verificación",
+        "Auditorías externas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "Objetivo final de la NOM-022:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Control documental",
+        "Cumplimiento legal",
+        "Prevenir accidentes mayores",
+        "Productividad"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}

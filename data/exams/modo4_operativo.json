@@ -1,0 +1,250 @@
+{
+  "id": "modo4_operativo",
+  "titulo": "Modos Seguros 0-4 (Operativo)",
+  "norma": "Procedimiento Interno",
+  "nivel": "operativo",
+  "nivel_nombre": "Operativo",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "Un operador realiza producción normal con todas las guardas colocadas y sin intervenir la máquina. ¿En qué modo seguro se encuentra?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 1",
+        "Modo 2",
+        "Modo 0",
+        "Modo 3"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "¿Cuál es el requisito mínimo en el Modo 0?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Bloqueo total de energías",
+        "Autorización escrita",
+        "Uso del EPP estándar",
+        "Candados personales"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "Un operador introduce la mano por una abertura sin enclavamiento para retirar un residuo. ¿En qué modo está trabajando?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 1",
+        "Modo 2",
+        "Modo 4"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 4,
+      "texto": "¿Qué acción es OBLIGATORIA en el Modo 1?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo señalización visual",
+        "Uso de guantes dieléctricos",
+        "Bloqueo para evitar arranque imprevisto",
+        "Operar a velocidad reducida"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 5,
+      "texto": "Una guarda tiene sensor que detiene la máquina al abrirse. Este sistema corresponde a:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 1",
+        "Modo 2",
+        "Modo 3"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "¿Cuál es la principal ventaja del Modo 2?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Elimina el uso de EPP",
+        "Permite mantenimiento completo",
+        "Previene la puesta en marcha involuntaria",
+        "Aumenta la velocidad de producción"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "Se retira un componente mecánico para reparación interna. ¿Modo aplicable?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 1",
+        "Modo 2",
+        "Modo 3",
+        "Modo 0"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "El Modo 3 se caracteriza principalmente por:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Operación normal",
+        "Ajustes menores",
+        "Intervención mecánica directa",
+        "Uso exclusivo de HMI"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "Un operador drena presión neumática antes de intervenir un cilindro. ¿En qué modo se encuentra?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 2",
+        "Modo 3",
+        "Modo 4",
+        "Modo 1"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 10,
+      "texto": "¿Qué tipo de energía está asociada al Modo 4?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo mecánica",
+        "Térmica",
+        "Energías peligrosas remanentes",
+        "Energía cinética baja"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "¿Quién debe intervenir equipos en Modo 4?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cualquier operador",
+        "Personal nuevo",
+        "Personal altamente capacitado y autorizado",
+        "Visitantes"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "¿Cuál es el mayor riesgo en el Modo 4?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ruido",
+        "Golpes",
+        "Liberación inesperada de energía",
+        "Caídas al mismo nivel"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "El procedimiento LOTO es CRÍTICO principalmente en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 2",
+        "Modo 4",
+        "Modo 1"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 14,
+      "texto": "Seleccionar un modo incorrecto puede provocar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Retrasos operativos",
+        "Multas administrativas",
+        "Accidentes graves o fatales",
+        "Desgaste del equipo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "Un operador sin autorización realiza un ajuste interno. ¿Qué error cometió?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Error de proceso",
+        "Error documental",
+        "Violación del modo seguro",
+        "Falta de EPP"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 16,
+      "texto": "¿Dónde suele seleccionarse el modo seguro en maquinaria moderna?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Interruptor general",
+        "Manual impreso",
+        "HMI o selector dedicado",
+        "Tablero eléctrico externo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "¿Qué modo NO permite intervención directa?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 1",
+        "Modo 2",
+        "Modo 3"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "La capacitación del operador es más crítica a partir de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 1",
+        "Modo 3",
+        "Solo Modo 4"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "¿Qué documento define cómo aplicar los modos seguros?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Orden de trabajo",
+        "Manual del proveedor",
+        "Procedimientos Operativos Estándar (SOP)",
+        "Bitácora"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "El objetivo principal de los modos seguros es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cumplir auditorías",
+        "Aumentar productividad",
+        "Controlar el riesgo durante la intervención",
+        "Reducir mantenimiento"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}

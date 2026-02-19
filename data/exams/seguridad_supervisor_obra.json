@@ -1,0 +1,250 @@
+{
+  "id": "seguridad_supervisor_obra",
+  "titulo": "Condiciones de Seguridad (Supervisor de Obra)",
+  "norma": "NOM-031-STPS-2011",
+  "nivel": "supervisor_obra",
+  "nivel_nombre": "Supervisor de Obra",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "¿Cuál es la principal responsabilidad del supervisor de obra según la NOM-031?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ejecutar trabajos manuales",
+        "Supervisar la productividad",
+        "Verificar condiciones seguras de trabajo",
+        "Autorizar pagos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "Antes de iniciar una obra, el supervisor debe asegurar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Contratación del personal",
+        "Existencia de análisis de riesgos",
+        "Compra de materiales",
+        "Programa de pagos"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 3,
+      "texto": "¿Qué documento debe revisarse previo a trabajos en altura?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Orden de compra",
+        "Análisis de riesgo específico",
+        "Bitácora de obra",
+        "Contrato colectivo"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 4,
+      "texto": "El supervisor debe suspender trabajos cuando:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El avance es lento",
+        "No hay EPP adecuado",
+        "Falta material",
+        "Hay visitas externas"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 5,
+      "texto": "¿Quién es responsable de vigilar el uso correcto del EPP en obra?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El trabajador",
+        "El proveedor",
+        "El supervisor de obra",
+        "El cliente"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "En excavaciones, el supervisor debe verificar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Tipo de suelo",
+        "Método de entibado",
+        "Señalización perimetral",
+        "Todas las anteriores"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 7,
+      "texto": "Las áreas de riesgo deben estar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Limpias",
+        "Iluminadas",
+        "Señalizadas",
+        "Pintadas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "¿Qué acción corresponde ante un acto inseguro?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ignorarlo",
+        "Reportarlo al final del día",
+        "Corregirlo de inmediato",
+        "Registrar solo si hay accidente"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "El supervisor debe conocer los procedimientos de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ventas",
+        "Emergencias",
+        "Compras",
+        "Nómina"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 10,
+      "texto": "¿Cuándo se debe capacitar al personal en seguridad?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo al inicio de obra",
+        "Cada año",
+        "Antes de realizar trabajos riesgosos",
+        "Solo si hay accidentes"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "El orden y limpieza en obra son responsabilidad de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El cliente",
+        "El personal de limpieza",
+        "El supervisor y trabajadores",
+        "El proveedor"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "¿Qué debe hacerse con materiales peligrosos?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Guardarlos en cualquier área",
+        "Identificarlos y almacenarlos adecuadamente",
+        "Usarlos rápidamente",
+        "Dejarlos al aire libre"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 13,
+      "texto": "El acceso a zonas peligrosas debe:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ser libre",
+        "Restringirse",
+        "Permitirse con autorización verbal",
+        "Evitarse solo de noche"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 14,
+      "texto": "¿Qué debe verificar el supervisor en andamios?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Color",
+        "Altura únicamente",
+        "Condiciones estructurales",
+        "Marca comercial"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "Los pasillos de circulación deben estar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ocupados",
+        "Libres de obstáculos",
+        "Marcados solo al inicio",
+        "Sin iluminación"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 16,
+      "texto": "¿Qué registro es clave para evidenciar cumplimiento de seguridad?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Facturas",
+        "Listas de asistencia",
+        "Bitácoras de seguridad",
+        "Contratos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "El supervisor debe fomentar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Rapidez",
+        "Disciplina de seguridad",
+        "Competencia entre cuadrillas",
+        "Reducción de costos"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 18,
+      "texto": "¿Qué se hace ante condiciones climatológicas peligrosas?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Continuar",
+        "Reducir personal",
+        "Suspender actividades",
+        "Aumentar ritmo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "La señalización debe cumplir con:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Preferencias del cliente",
+        "Normas aplicables",
+        "Colores corporativos",
+        "Disponibilidad del proveedor"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 20,
+      "texto": "El objetivo principal de la NOM-031 es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Aumentar producción",
+        "Reducir costos",
+        "Prevenir accidentes y enfermedades",
+        "Controlar horarios"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}

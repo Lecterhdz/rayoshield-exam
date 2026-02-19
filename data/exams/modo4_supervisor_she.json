@@ -1,0 +1,250 @@
+{
+  "id": "modo4_supervisor_she",
+  "titulo": "Modos Seguros 0-4 (Supervisor SHE)",
+  "norma": "Procedimiento Interno",
+  "nivel": "supervisor_she",
+  "nivel_nombre": "Supervisor SHE",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "¿Quién define oficialmente los modos seguros en una empresa?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Operadores",
+        "Proveedor del equipo",
+        "Sistema de Gestión de Seguridad",
+        "Producción"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "La incorrecta aplicación del modo seguro representa:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Riesgo administrativo",
+        "Riesgo menor",
+        "Riesgo crítico no tolerable",
+        "Riesgo aceptable"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "¿Qué modo requiere controles de ingeniería y administrativos reforzados?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 1",
+        "Modo 2",
+        "Modo 4",
+        "Modo 0"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 4,
+      "texto": "El uso de LOTO es un control de tipo:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Conductual",
+        "Ingeniería y administrativo",
+        "Reactivo",
+        "Correctivo"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 5,
+      "texto": "Permitir acceso sin enclavamiento incrementa el riesgo en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 0",
+        "Modo 1",
+        "Modo 2",
+        "Modo 3"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 6,
+      "texto": "Desde SHE, ¿qué modo tiene mayor probabilidad de fatalidad?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Modo 1",
+        "Modo 2",
+        "Modo 3",
+        "Modo 4"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 7,
+      "texto": "¿Qué evidencia debe verificar SHE antes de un trabajo en Modo 4?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "EPP",
+        "Permiso verbal",
+        "Procedimiento LOTO aplicado",
+        "Bitácora diaria"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "Los modos seguros están directamente relacionados con:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Productividad",
+        "Calidad",
+        "Análisis de Riesgos",
+        "Inventarios"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "Una falla en el enclavamiento implica:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Riesgo aceptable",
+        "Reclasificar el modo de trabajo",
+        "Continuar operación",
+        "Avisar al operador"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 10,
+      "texto": "El Modo 2 es eficaz solo si:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Hay supervisión",
+        "El operador es experto",
+        "Los sensores funcionan correctamente",
+        "Existe señalización"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "¿Quién autoriza cambios de modo seguro?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Operador",
+        "Mantenimiento",
+        "SHE / Ingeniería / Producción",
+        "Visitantes"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "Desde SHE, el Modo 3 exige:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "EPP básico",
+        "Solo señalización",
+        "Procedimiento escrito y autorizado",
+        "Registro fotográfico"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "La omisión del modo seguro correcto puede generar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Retrabajo",
+        "Incidente grave",
+        "Fallas menores",
+        "Solo observación"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 14,
+      "texto": "¿Cuál es un control preventivo clave?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Investigación posterior",
+        "Auditoría anual",
+        "Capacitación específica por modo",
+        "Reporte mensual"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "Un modo seguro mal definido indica falla en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Producción",
+        "Operación",
+        "Gestión del riesgo",
+        "Limpieza"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 16,
+      "texto": "SHE debe verificar que los modos estén:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "En carteles",
+        "En manual del proveedor",
+        "Integrados al SOP",
+        "En la bitácora"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "¿Cuál es el enfoque principal de SHE en modos seguros?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cumplimiento documental",
+        "Reducción de costos",
+        "Prevención de accidentes graves",
+        "Control de producción"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "La selección incorrecta del modo suele originarse por:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Falta de tiempo",
+        "Presión productiva",
+        "Desconocimiento del riesgo",
+        "Error de equipo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "Un equipo con múltiples energías requiere:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Un solo candado",
+        "Un solo responsable",
+        "LOTO por cada fuente de energía",
+        "Señalización adicional"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "El objetivo final del sistema de modos seguros es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cumplir la NOM",
+        "Facilitar auditorías",
+        "Eliminar o controlar energías peligrosas",
+        "Mejorar mantenimiento"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}
