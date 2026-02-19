@@ -1,0 +1,250 @@
+{
+  "id": "epp_operativo",
+  "titulo": "EPP (Operativo)",
+  "norma": "NOM-017-STPS-2008",
+  "nivel": "operativo",
+  "nivel_nombre": "Operativo",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "¿Para qué sirve la NOM-017-STPS-2008?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Definir sanciones",
+        "Regular maquinaria",
+        "Establecer el uso de Equipo de Protección Personal",
+        "Controlar procesos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "El EPP debe usarse cuando:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El supervisor lo indique",
+        "El trabajador lo decida",
+        "El riesgo no puede eliminarse",
+        "Sea cómodo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "¿Quién debe usar EPP en un área de riesgo?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo operadores",
+        "Visitantes",
+        "Supervisores",
+        "Toda persona expuesta al riesgo"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 4,
+      "texto": "El casco de seguridad protege principalmente contra:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ruido",
+        "Quemaduras",
+        "Golpes y caída de objetos",
+        "Descargas eléctricas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 5,
+      "texto": "Los lentes de seguridad se utilizan para proteger:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Oídos",
+        "Cara",
+        "Ojos contra partículas o radiación",
+        "Cabeza"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "Un guante inadecuado puede provocar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Multas",
+        "Incomodidad",
+        "Accidentes y lesiones",
+        "Retrasos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "El EPP debe ser:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Compartido",
+        "Prestado",
+        "Asignado de forma personal",
+        "Guardado en bodega"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "El trabajador debe revisar su EPP:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Al final del turno",
+        "Semanalmente",
+        "Antes de usarlo",
+        "Solo si está dañado"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "Un casco con grietas debe:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Repararse",
+        "Pintarse",
+        "Retirarse de servicio",
+        "Usarse solo en interiores"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 10,
+      "texto": "El calzado de seguridad protege contra:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ruido",
+        "Caídas de altura",
+        "Golpes, perforaciones y aplastamientos",
+        "Radiación"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "¿Quién proporciona el EPP?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El trabajador",
+        "El cliente",
+        "El patrón",
+        "El supervisor"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "El EPP debe usarse:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo en auditorías",
+        "Solo en áreas críticas",
+        "Durante toda la exposición al riesgo",
+        "Solo al inicio"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "El uso incorrecto del EPP puede causar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Multas",
+        "Retrasos",
+        "Falsa sensación de seguridad",
+        "Daño al equipo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 14,
+      "texto": "La protección auditiva se usa cuando hay:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Vibración",
+        "Polvo",
+        "Niveles elevados de ruido",
+        "Iluminación deficiente"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "El arnés de seguridad se usa en trabajos:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Eléctricos",
+        "En caliente",
+        "En altura con riesgo de caída",
+        "Con químicos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 16,
+      "texto": "El EPP debe mantenerse:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Guardado",
+        "Limpio",
+        "En condiciones adecuadas de uso",
+        "Sellado"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "Un respirador protege contra:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ruido",
+        "Golpes",
+        "Contaminantes del aire",
+        "Caídas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "El trabajador tiene obligación de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Comprar su EPP",
+        "Elegir modelo",
+        "Usar y cuidar su EPP",
+        "Autorizar su uso"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "Si el EPP no es adecuado al riesgo, se debe:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Usar de todos modos",
+        "Adaptar",
+        "Solicitar reemplazo",
+        "Ignorar"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "El EPP NO sustituye:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Señalización",
+        "Capacitación",
+        "Las medidas de control del riesgo",
+        "Supervisión"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}

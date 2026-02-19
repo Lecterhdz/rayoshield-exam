@@ -1,0 +1,250 @@
+{
+  "id": "seguridad_supervisor_she",
+  "titulo": "Condiciones de Seguridad (Supervisor SHE)",
+  "norma": "NOM-031-STPS-2011",
+  "nivel": "supervisor_she",
+  "nivel_nombre": "Supervisor SHE",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "La NOM-031 exige que el patrón implemente:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Señalización básica",
+        "Supervisión ocasional",
+        "Sistema de seguridad y salud en obra",
+        "Solo capacitación inicial"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "El análisis de riesgos debe realizarse:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Al finalizar la obra",
+        "Solo en trabajos críticos",
+        "Antes de iniciar cada actividad",
+        "Anualmente"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "¿Quién es responsable de verificar el cumplimiento de la NOM-031?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Trabajador",
+        "Cliente",
+        "Patrón y supervisión de seguridad",
+        "Visitantes"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 4,
+      "texto": "Desde SHE, un riesgo no controlado se clasifica como:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Aceptable",
+        "Menor",
+        "No tolerable",
+        "Administrativo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 5,
+      "texto": "La capacitación debe documentarse para:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Auditoría",
+        "Archivo",
+        "Evidencia legal y preventiva",
+        "Recursos humanos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "Un accidente en obra indica falla en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Producción",
+        "Operación",
+        "Gestión de riesgos",
+        "Planeación financiera"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "La NOM-031 aplica también a:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Visitantes",
+        "Subcontratistas",
+        "Todo personal en la obra",
+        "Solo empleados directos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 8,
+      "texto": "El control más efectivo en obra es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "EPP",
+        "Señalización",
+        "Eliminación del riesgo",
+        "Advertencias verbales"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 9,
+      "texto": "Trabajos en altura requieren:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Permiso verbal",
+        "Supervisión visual",
+        "Procedimiento y autorización",
+        "Solo EPP"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 10,
+      "texto": "Desde SHE, el orden y limpieza es un control:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Correctivo",
+        "Reactivo",
+        "Preventivo",
+        "Administrativo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 11,
+      "texto": "El incumplimiento de la NOM-031 puede generar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Retrasos",
+        "Observaciones",
+        "Sanciones y accidentes graves",
+        "Ajustes menores"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 12,
+      "texto": "Los equipos de emergencia deben estar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Almacenados",
+        "Bajo llave",
+        "Disponibles y señalizados",
+        "En oficina"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "SHE debe verificar que los procedimientos estén:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Firmados",
+        "Archivados",
+        "Aplicados en campo",
+        "Digitalizados"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 14,
+      "texto": "Una excavación profunda sin estudio previo es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Riesgo medio",
+        "Riesgo aceptable",
+        "Riesgo crítico",
+        "Riesgo controlado"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "La supervisión efectiva reduce:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Costos",
+        "Tiempos",
+        "Incidentes y actos inseguros",
+        "Inventarios"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 16,
+      "texto": "Los permisos de trabajo sirven para:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Control administrativo",
+        "Registro",
+        "Autorizar trabajos de alto riesgo",
+        "Auditoría"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "Desde SHE, el EPP es considerado:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Control principal",
+        "Control ideal",
+        "Última barrera de protección",
+        "Control administrativo"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "La investigación de accidentes permite:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Sancionar",
+        "Culpar",
+        "Prevenir recurrencias",
+        "Cumplir auditoría"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "Una obra segura requiere coordinación entre:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cliente y proveedor",
+        "Operadores",
+        "Producción, seguridad y supervisión",
+        "Administración"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "El objetivo final de la NOM-031 es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cumplir la STPS",
+        "Reducir multas",
+        "Proteger la vida y salud del trabajador",
+        "Controlar procesos"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}

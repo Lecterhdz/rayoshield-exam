@@ -1,0 +1,250 @@
+{
+  "id": "epp_supervisor_obra",
+  "titulo": "EPP (Supervisor de Obra)",
+  "norma": "NOM-017-STPS-2008",
+  "nivel": "supervisor_obra",
+  "nivel_nombre": "Supervisor de Obra",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "¿Quién define el EPP necesario según riesgos?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El trabajador",
+        "El supervisor",
+        "El proveedor",
+        "El cliente"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 2,
+      "texto": "El EPP debe seleccionarse con base en:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Precio",
+        "Comodidad",
+        "Análisis de riesgos",
+        "Marca"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "El supervisor debe verificar que el EPP:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Sea nuevo",
+        "Sea cómodo",
+        "Se use correctamente",
+        "Sea económico"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 4,
+      "texto": "¿Cuándo debe reemplazarse el EPP?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Al ensuciarse",
+        "Al dañarse o perder eficacia",
+        "Cada mes",
+        "Cuando el trabajador lo decida"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 5,
+      "texto": "El casco protege contra:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ruido",
+        "Caídas al mismo nivel",
+        "Golpes y objetos en caída",
+        "Sustancias químicas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "El uso de EPP es:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Opcional",
+        "Recomendado",
+        "Obligatorio",
+        "Temporal"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "¿Quién capacita sobre uso de EPP?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El proveedor",
+        "El supervisor o la empresa",
+        "El cliente",
+        "El trabajador"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 8,
+      "texto": "El EPP no sustituye:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Capacitación",
+        "Medidas de control",
+        "Supervisión",
+        "Todas las anteriores"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 9,
+      "texto": "La falta de EPP puede provocar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Multas",
+        "Accidentes",
+        "Sanciones",
+        "Todas las anteriores"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 10,
+      "texto": "¿Qué EPP se usa en riesgo eléctrico?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Guantes dieléctricos",
+        "Guantes de carnaza",
+        "Casco de obra",
+        "Chaleco"
+      ],
+      "correcta_idx": 0
+    },
+    {
+      "id": 11,
+      "texto": "El supervisor debe llevar registro de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Ventas",
+        "Entrega de EPP",
+        "Horas extras",
+        "Inventario general"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 12,
+      "texto": "El trabajador debe:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Comprar su EPP",
+        "Negarse a usarlo",
+        "Usarlo conforme a instrucciones",
+        "Cambiarlo sin aviso"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 13,
+      "texto": "El EPP debe cumplir con:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "NOM aplicables",
+        "Preferencias personales",
+        "Color corporativo",
+        "Disponibilidad"
+      ],
+      "correcta_idx": 0
+    },
+    {
+      "id": 14,
+      "texto": "¿Qué protege el arnés?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Manos",
+        "Cabeza",
+        "Caídas de altura",
+        "Oídos"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "El supervisor debe corregir:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Uso incorrecto del EPP",
+        "Retrasos",
+        "Falta de herramientas",
+        "Errores administrativos"
+      ],
+      "correcta_idx": 0
+    },
+    {
+      "id": 16,
+      "texto": "El EPP debe almacenarse:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "En cualquier lugar",
+        "En condiciones adecuadas",
+        "Al aire libre",
+        "En áreas de paso"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 17,
+      "texto": "¿Quién es responsable final del cumplimiento?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El trabajador",
+        "El proveedor",
+        "El supervisor",
+        "El cliente"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "El EPP debe ser compatible con:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Uniforme",
+        "Otros EPP",
+        "Clima",
+        "Marca"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 19,
+      "texto": "El uso de EPP reduce:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Productividad",
+        "Accidentes",
+        "Costos iniciales",
+        "Supervisión"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 20,
+      "texto": "La NOM-017 busca:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Controlar inventarios",
+        "Proteger la integridad del trabajador",
+        "Reducir tiempos",
+        "Estandarizar colores"
+      ],
+      "correcta_idx": 1
+    }
+  ]
+}

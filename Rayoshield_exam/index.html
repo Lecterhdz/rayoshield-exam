@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="RayoShield Exam - Capacitación en Normas STPS">
+    <title>RayoShield Exam - Capacitación STPS</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Ícono -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/logo.png" alt="RayoShield" class="logo">
+            <h1>RayoShield Exam</h1>
+            <p>Capacitación en Normas STPS</p>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="container">
+        
+        <!-- Pantalla: HOME -->
+        <section id="home-screen" class="screen active">
+            <div class="card">
+                <h2>🛡️ Bienvenido a RayoShield Exam</h2>
+                <p>Evalúa tus conocimientos en normas de seguridad industrial STPS</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number">21</span>
+                        <span class="stat-label">Exámenes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">420</span>
+                        <span class="stat-label">Preguntas</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Niveles</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="app.irASeleccionarExamen()">
+                        📚 Comenzar Examen
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.mostrarHistorial()">
+                        📋 Historial
+                    </button>
+                    <button class="btn btn-info" onclick="app.mostrarInfo()">
+                        ℹ️ Información
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: SELECCIÓN DE EXAMEN -->
+        <section id="select-exam-screen" class="screen">
+            <div class="card">
+                <h2>📚 Selecciona un Examen</h2>
+                <div id="exam-list" class="exam-list">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+
+        <!-- Pantalla: EXAMEN -->
+        <section id="exam-screen" class="screen">
+            <div class="card">
+                <div class="exam-header">
+                    <h3 id="exam-title">Título del Examen</h3>
+                    <p id="exam-norma" class="norma">Norma</p>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                    <p class="progress-text" id="progress-text">Pregunta 1 de 20</p>
+                </div>
+                
+                <div class="question-container">
+                    <h4 id="question-text" class="question-text">¿Pregunta?</h4>
+                    
+                    <div id="options-container" class="options-container">
+                        <!-- Opciones se generan dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="app.volverHome()">
+                        Salir
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: RESULTADO -->
+        <section id="result-screen" class="screen">
+            <div class="card result-card">
+                <div class="result-icon" id="result-icon">🏆</div>
+                <h2 id="result-title">Resultado</h2>
+                
+                <div class="score-display">
+                    <span class="score-number" id="score-number">0%</span>
+                    <span class="score-label">Calificación</span>
+                </div>
+                
+                <div class="result-details">
+                    <p><strong>Aciertos:</strong> <span id="aciertos">0</span> de <span id="total">0</span></p>
+                    <p><strong>Mínimo requerido:</strong> <span id="min-score">80</span>%</p>
+                    <p><strong>Estado:</strong> <span id="result-status">-</span></p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="app.descargarCertificado()" id="btn-certificado">
+                        📄 Descargar Certificado
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.volverHome()">
+                        🏠 Volver al Inicio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: HISTORIAL -->
+        <section id="history-screen" class="screen">
+            <div class="card">
+                <h2>📋 Historial de Exámenes</h2>
+                <div id="history-list" class="history-list">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+
+        <!-- Pantalla: INFORMACIÓN -->
+        <section id="info-screen" class="screen">
+            <div class="card">
+                <h2>ℹ️ Información</h2>
+                <div class="info-content">
+                    <h3>RayoShield Exam</h3>
+                    <p><strong>Versión:</strong> 1.0.0</p>
+                    <p><strong>Plataforma:</strong> Web (PWA)</p>
+                    
+                    <h3>Exámenes Disponibles</h3>
+                    <ul class="exam-normas">
+                        <li>🔒 LOTO (NOM-004-STPS-2008)</li>
+                        <li>⚠️ Seguridad (NOM-031-STPS-2011)</li>
+                        <li>🦺 EPP (NOM-017-STPS-2008)</li>
+                        <li>⚡ Eléctricos (NOM-029-STPS-2011)</li>
+                        <li>🔥 Estática (NOM-022-STPS-2015)</li>
+                        <li>💡 Iluminación (NOM-025-STPS-2008)</li>
+                    </ul>
+                    
+                    <h3>Niveles</h3>
+                    <ul>
+                        <li>👷 Operativo</li>
+                        <li>👨‍💼 Supervisor de Obra</li>
+                        <li>👮 Supervisor SHE</li>
+                    </ul>
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 RayoShield. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/exams.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/certificate.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

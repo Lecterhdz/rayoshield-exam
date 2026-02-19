@@ -1,0 +1,250 @@
+{
+  "id": "estatica_supervisor_obra",
+  "titulo": "Electricidad Estática (Supervisor de Obra)",
+  "norma": "NOM-022-STPS-2015",
+  "nivel": "supervisor_obra",
+  "nivel_nombre": "Supervisor de Obra",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "La electricidad estática puede provocar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Incendios",
+        "Explosiones",
+        "Daños a equipos",
+        "Todas las anteriores"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 2,
+      "texto": "El supervisor debe identificar áreas con riesgo de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Vibración",
+        "Estática",
+        "Iluminación",
+        "Ruido"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 3,
+      "texto": "La conexión a tierra sirve para:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Decoración",
+        "Descargar electricidad estática",
+        "Aumentar potencia",
+        "Aislar equipos"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 4,
+      "texto": "¿Dónde es común la electricidad estática?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Áreas húmedas",
+        "Ambientes secos",
+        "Zonas abiertas",
+        "Oficinas"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 5,
+      "texto": "El supervisor debe verificar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Colores",
+        "Sistemas de puesta a tierra",
+        "Horarios",
+        "Inventarios"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 6,
+      "texto": "La NOM-022 aplica en presencia de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Gases",
+        "Vapores inflamables",
+        "Polvos combustibles",
+        "Todas las anteriores"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 7,
+      "texto": "¿Qué acción reduce la estática?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Aislamiento",
+        "Humidificación",
+        "Aceleración",
+        "Presión"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 8,
+      "texto": "El calzado debe ser:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Aislante",
+        "Antiestático",
+        "Metálico",
+        "Abierto"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 9,
+      "texto": "El supervisor debe capacitar sobre:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Producción",
+        "Riesgos de estática",
+        "Ventas",
+        "Compras"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 10,
+      "texto": "La señalización debe indicar:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Riesgo eléctrico",
+        "Riesgo de estática",
+        "Rutas",
+        "Extintores"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 11,
+      "texto": "¿Qué material genera más estática?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Metal",
+        "Plástico",
+        "Agua",
+        "Concreto"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 12,
+      "texto": "El mantenimiento preventivo evita:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Fallas",
+        "Acumulación de carga",
+        "Accidentes",
+        "Todas"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 13,
+      "texto": "El supervisor debe verificar continuidad de:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Cableado",
+        "Tierra física",
+        "Estructura",
+        "Pintura"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 14,
+      "texto": "La NOM-022 es preventiva porque:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Reduce costos",
+        "Evita igniciones",
+        "Mejora imagen",
+        "Controla inventarios"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 15,
+      "texto": "Las herramientas deben ser:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Antiestáticas",
+        "Metálicas",
+        "Pesadas",
+        "Nuevas"
+      ],
+      "correcta_idx": 0
+    },
+    {
+      "id": 16,
+      "texto": "El riesgo aumenta cuando hay:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Humedad",
+        "Movimiento de materiales",
+        "Concreto",
+        "Agua"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 17,
+      "texto": "El supervisor debe suspender actividades si:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Falta señalización",
+        "No hay tierra física",
+        "Hay visita",
+        "Hay retraso"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 18,
+      "texto": "La NOM-022 protege contra:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Golpes",
+        "Descargas electrostáticas",
+        "Caídas",
+        "Ruido"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 19,
+      "texto": "La puesta a tierra debe ser:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Opcional",
+        "Temporal",
+        "Permanente",
+        "Visual"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 20,
+      "texto": "Objetivo principal:",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Control eléctrico",
+        "Prevención de incendios y explosiones",
+        "Ahorro energético",
+        "Estética"
+      ],
+      "correcta_idx": 1
+    }
+  ]
+}

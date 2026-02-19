@@ -1,0 +1,250 @@
+{
+  "id": "loto_operativo",
+  "titulo": "LOTO (Operativo)",
+  "norma": "NOM-004-STPS-1999",
+  "nivel": "operativo",
+  "nivel_nombre": "Operativo",
+  "min_score": 80,
+  "preguntas": [
+    {
+      "id": 1,
+      "texto": "¿Cuál es el objetivo principal del LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Aumentar la producción",
+        "Evitar fallas eléctricas",
+        "Prevenir arranques inesperados de equipos",
+        "Reducir costos de mantenimiento"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 2,
+      "texto": "¿Cuándo debe aplicarse un procedimiento LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo en mantenimiento mayor",
+        "Antes de operar maquinaria",
+        "Durante cualquier actividad de servicio o mantenimiento",
+        "Solo en fallas eléctricas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 3,
+      "texto": "¿Qué significa \"bloqueo\" en LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Apagar el equipo",
+        "Colocar un dispositivo físico que impida la energización",
+        "Señalizar con un aviso",
+        "Retirar fusibles"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 4,
+      "texto": "¿Qué elemento identifica al trabajador que aplicó el bloqueo?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Candado genérico",
+        "Etiqueta con nombre",
+        "Color del tablero",
+        "Manual del equipo"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 5,
+      "texto": "¿Quién puede retirar su candado LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "El supervisor",
+        "Cualquier trabajador",
+        "El mismo trabajador que lo colocó",
+        "Mantenimiento"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 6,
+      "texto": "¿Qué tipo de energía debe considerarse en LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo eléctrica",
+        "Eléctrica y mecánica",
+        "Todas las energías peligrosas",
+        "Solo hidráulica"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 7,
+      "texto": "¿Cuál es un ejemplo de energía residual?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Energía apagada",
+        "Presión acumulada",
+        "Energía inexistente",
+        "Voltaje cero"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 8,
+      "texto": "¿Qué se debe hacer antes de iniciar el trabajo tras el bloqueo?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Avisar al supervisor",
+        "Probar que el equipo no arranca",
+        "Firmar un formato",
+        "Retirar etiquetas"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 9,
+      "texto": "¿Qué indica una etiqueta LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Fecha de mantenimiento",
+        "Equipo fuera de servicio y responsable",
+        "Tipo de herramienta",
+        "Nivel de voltaje"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 10,
+      "texto": "¿El LOTO sustituye el uso de EPP?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Sí",
+        "No",
+        "Solo en eléctricos",
+        "Solo en mecánicos"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 11,
+      "texto": "¿Qué pasa si no se aplica LOTO correctamente?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Nada",
+        "Riesgo de arranque inesperado",
+        "Ahorro de tiempo",
+        "Mejor rendimiento"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 12,
+      "texto": "¿Qué hacer si un equipo tiene más de una fuente de energía?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Bloquear solo la principal",
+        "Bloquear todas las fuentes",
+        "Apagar el tablero",
+        "Usar EPP extra"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 13,
+      "texto": "¿Qué color es común en candados LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Negro",
+        "Rojo",
+        "Blanco",
+        "Verde"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 14,
+      "texto": "¿La NOM-004 aplica a qué tipo de equipos?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo eléctricos",
+        "Solo industriales",
+        "Maquinaria y equipo en general",
+        "Solo portátiles"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 15,
+      "texto": "¿Qué acción es incorrecta en LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Bloquear",
+        "Etiquetar",
+        "Probar ausencia de energía",
+        "Confiar solo en apagado"
+      ],
+      "correcta_idx": 3
+    },
+    {
+      "id": 16,
+      "texto": "¿Quién debe recibir capacitación en LOTO?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Solo supervisores",
+        "Solo mantenimiento",
+        "Todo trabajador expuesto",
+        "Solo ingenieros"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 17,
+      "texto": "¿Qué se debe hacer al terminar el trabajo?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Retirar candado sin avisar",
+        "Encender equipo",
+        "Retirar bloqueo siguiendo procedimiento",
+        "Dejar etiquetas"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 18,
+      "texto": "¿Qué tipo de dispositivo se usa para bloquear interruptores?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Multímetro",
+        "Candado",
+        "Dispositivo de bloqueo específico",
+        "Fusible"
+      ],
+      "correcta_idx": 2
+    },
+    {
+      "id": 19,
+      "texto": "¿Una etiqueta sin candado es suficiente?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Sí",
+        "No",
+        "Solo en pruebas",
+        "Solo temporal"
+      ],
+      "correcta_idx": 1
+    },
+    {
+      "id": 20,
+      "texto": "¿El LOTO es obligatorio según NOM-004?",
+      "tipo": "opcion_multiple",
+      "opciones": [
+        "Opcional",
+        "Solo recomendado",
+        "Obligatorio",
+        "Solo en auditorías"
+      ],
+      "correcta_idx": 2
+    }
+  ]
+}
