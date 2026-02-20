@@ -421,14 +421,18 @@ const app = {
     mostrarLicencia: function() {
         var el = document.getElementById('licencia-info-detail');
         if (el) {
-            if (this.licencia.tipo === 'DEMO') { el.textContent = '📋 DEMO: ' + this.licencia.examenesRestantes + '/3 hoy'; }
-            else { var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración'; el.textContent = '✅ ' + this.licencia.tipo + '\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp; }
+            if (this.licencia.tipo === 'DEMO') {
+                el.textContent = '📋 DEMO: ' + this.licencia.examenesRestantes + '/3 exámenes hoy';
+            } else if (this.licencia.tipo === 'FULL') {
+                var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
+                el.textContent = '✅ FULL\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
+            } else if (this.licencia.tipo === 'EMPRESARIAL') {
+                var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
+                el.textContent = '🏢 EMPRESARIAL\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp + '\n⚠️ Sin control de dispositivos (honesto)';
+            }
         }
         this.mostrarPantalla('license-screen');
     },
-    mostrarInfo: function() { this.mostrarPantalla('info-screen'); },
-
-
 
     // ─────────────────────────────────────────────────────────────────────
     // CASOS CRÍTICOS - INVESTIGACIÓN MASTER
@@ -785,6 +789,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
