@@ -774,8 +774,34 @@ const app = {
         this.casoActual = null;
         this.respuestasCaso = {};
     },    
-
     
+    // ─────────────────────────────────────────────────────────────────────
+    // Certificado master
+    // ─────────────────────────────────────────────────────────────────────
+    
+    descargarCertificadoMaster: function() {
+    if (!this.casoActual || !this.resultadoCaso) {
+        alert('❌ No hay certificado disponible');
+        return;
+    }
+    
+    if (!this.resultadoCaso.aprobado) {
+        alert('⚠️ Debes aprobar el caso para obtener el certificado');
+        return;
+    }
+    
+    var self = this;
+    generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso)
+        .then(function(url) {
+            var a = document.createElement('a');
+            a.download = 'RayoShield_MASTER_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.href = url;
+            a.click();
+        })
+        .catch(function() {
+            alert('❌ Error generando certificado');
+        });
+}
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
     // ─────────────────────────────────────────────────────────────────────
@@ -806,6 +832,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
