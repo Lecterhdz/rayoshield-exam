@@ -722,71 +722,57 @@ const app = {
         this.mostrarResultadoCaso(resultado);
     },
 
-    mostrarResultadoCaso: function(resultado) {
-        var resultadoEl = document.getElementById('caso-resultado');
-        resultadoEl.style.display = 'block';
-        resultadoEl.scrollIntoView({ behavior: 'smooth' });
+mostrarResultadoCaso: function(resultado) {
+    var resultadoEl = document.getElementById('caso-resultado');
+    resultadoEl.style.display = 'block';
+    resultadoEl.scrollIntoView({ behavior: 'smooth' });
     
-        var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
-        var icono = resultado.aprobado ? '✅' : '📚';
-        var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
+    var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
+    var icono = resultado.aprobado ? '✅' : '📚';
+    var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
     
-        // Botones condicionales (SEPARADOS del ternario)
-        var botonesHTML = '';
-        if (resultado.aprobado) {
-            botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
-                '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
-                '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
-                '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-                '</div>';
-        } else {
-            botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
-                '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
-                '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-                '</div>';
-        }
+    // Botones condicionales (VARIABLE: botonesHTML)
+    var botonesHTML = '';
+    if (resultado.aprobado) {
+        botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
+            '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+            '</div>';
+    } else {
+        botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
+            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+            '</div>';
+    }
     
-        resultadoEl.innerHTML = `
-            <div class="resultado-investigacion ${claseEstado}">
-                <h2>${icono} Resultado de la Investigación</h2>
-                <div class="puntaje-master">${resultado.porcentaje}%</div>
-                <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
-                <p><strong>Estado:</strong> ${estadoTexto}</p>
-            </div>
-        
-            ${resultado.feedback.length > 0 ? `
-            <div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;">
-                <strong>💡 Retroalimentación:</strong>
-                <ul style="margin-top:10px;">
-                    ${resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('')}
-                </ul>
-            </div>` : ''}
-        
-            <div class="leccion-master">
-                <strong>🎓 Lección Aprendida:</strong>
-                <p style="margin-top:10px;">${resultado.leccion}</p>
-            </div>
-        
-            <div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;">
-                <strong>📋 Conclusión Oficial:</strong>
-                <p style="margin-top:10px;line-height:1.6;">${resultado.conclusion}</p>
-            </div>
-        
-            ${botonesCertificado}
-        `;
+    resultadoEl.innerHTML = `
+        <div class="resultado-investigacion ${claseEstado}">
+            <h2>${icono} Resultado de la Investigación</h2>
+            <div class="puntaje-master">${resultado.porcentaje}%</div>
+            <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
+            <p><strong>Estado:</strong> ${estadoTexto}</p>
+        </div>
+        ${resultado.feedback.length > 0 ? `
+        <div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;">
+            <strong>💡 Retroalimentación:</strong>
+            <ul style="margin-top:10px;">
+                ${resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('')}
+            </ul>
+        </div>` : ''}
+        <div class="leccion-master">
+            <strong>🎓 Lección Aprendida:</strong>
+            <p style="margin-top:10px;">${resultado.leccion}</p>
+        </div>
+        <div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;">
+            <strong>📋 Conclusión Oficial:</strong>
+            <p style="margin-top:10px;line-height:1.6;">${resultado.conclusion}</p>
+        </div>
+        ${botonesHTML}
+    `;
     
-        // Ocultar botón de enviar
-        document.getElementById('btn-enviar-caso').style.display = 'none';
-    },
-
-    volverAListaCasos: function() {
-        document.getElementById('casos-list').style.display = 'block';
-        document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('casos-main-buttons').style.display = 'block';
-        document.getElementById('caso-resultado').style.display = 'none';
-        this.casoActual = null;
-        this.respuestasCaso = {};
-    },    
+    document.getElementById('btn-enviar-caso').style.display = 'none';
+},    
     
     // ─────────────────────────────────────────────────────────────────────
     // Certificado master
@@ -845,6 +831,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
