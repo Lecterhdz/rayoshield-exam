@@ -9,7 +9,7 @@ const ASSETS = [
     '/js/exams.js', 
     '/js/scoring.js',
     '/js/certificate.js',
-    '/manifest.json'
+    '/manifest.json',
     '/assets/logo.png'
 ];
 
@@ -44,3 +44,4 @@ self.addEventListener('fetch', (e) => {
         )
     );
 });
+
