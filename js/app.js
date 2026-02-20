@@ -32,14 +32,14 @@ const app = {
     // ─────────────────────────────────────────────────────────────────────
     init: function() {
         console.log('RayoShield iniciado');
-        this.cargarLicencia();
+        this.cargar();
         this.cargarDatosUsuario();
         this.cargarHistorial();
         this.cargarExamenGuardado();
         this.initPWAInstall();
         this.actualizarUI();
         this.mostrarPantalla('home-screen');
-        this.verificarExpiracionLicencia();
+        this.verificarExpiracion();
     },
 
     mostrarPantalla: function(id) {
@@ -55,9 +55,9 @@ const app = {
     },
 
     actualizarUI: function() {
-        var infoLic = document.getElementById('licencia-info');
+        var infoLic = document.getElementById('-info');
         if (infoLic) {
-            if (this.licencia.tipo === 'DEMO') {
+            if (this..tipo === 'DEMO') {
                 infoLic.textContent = 'DEMO: ' + this.licencia.examenesRestantes + '/3 hoy';
                 infoLic.style.color = '#FF9800';
             } else {
@@ -78,13 +78,22 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // LICENCIAS (Formato RS-XXXX-YYYY-ZZZZ)
+    // LICENCIAS CON ID + CLAVE
     // ─────────────────────────────────────────────────────────────────────
+
     cargarLicencia: function() {
         try {
             var s = localStorage.getItem('rayoshield_licencia');
-            if (s) this.licencia = JSON.parse(s);
-        } catch(e) {}
+            if (s) {
+                var parsed = JSON.parse(s);
+                // Validar estructura
+                if (parsed.tipo && parsed.clave !== undefined && parsed.clienteId !== undefined) {
+                    this.licencia = parsed;
+                }
+            }
+        } catch(e) {
+            console.log('Licencia por defecto: DEMO');
+        }
     },
 
     guardarLicencia: function() {
@@ -93,59 +102,197 @@ const app = {
     },
 
     verificarExpiracionLicencia: function() {
-        if (this.licencia.expiracion) {
+        if (this.licencia.expiracion && this.licencia.tipo !== 'DEMO') {
             var ahora = new Date();
             var expiracion = new Date(this.licencia.expiracion);
-            if (ahora > expiracion && this.licencia.tipo !== 'DEMO') {
+            if (ahora > expiracion) {
                 console.log('Licencia expirada');
-                this.licencia = { tipo: 'DEMO', clave: '', expiracion: null, examenesRestantes: 3 };
+                this.licencia = { 
+                    tipo: 'DEMO', 
+                    clave: '', 
+                    clienteId: '',
+                    expiracion: null, 
+                    examenesRestantes: 3 
+                };
                 this.guardarLicencia();
-                alert('Tu licencia ha expirado. Has vuelto a DEMO.');
+                alert('⚠️ Tu licencia ha expirado.\n\nHas vuelto a la versión DEMO.\n\nPara renovar, contacta: tu@email.com');
             }
         }
     },
 
-    validarLicencia: function(clave) {
-        // Validar formato RS-XXXX-YYYY-ZZZZ
+    // Validar licencia con ID + Clave (formato local)
+    validarLicencia: function(clienteId, clave) {
+        // Validar formato de clave: RS-XXXX-YYYY-ZZZZ
         if (!/^RS-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clave)) {
-            return Promise.resolve({ valido: false, error: 'Formato: RS-XXXX-YYYY-ZZZZ' });
+            return Promise.resolve({ 
+                valido: false, 
+                error: 'Formato de clave inválido.\n\nDebe ser: RS-XXXX-YYYY-ZZZZ\n(Ejemplo: RS-A3F8-C2E9-B1D4)' 
+            });
         }
-        // Licencias válidas (AGREGA LAS TUYAS AQUÍ)
-        var validas = {
-            'RS-A3F8-C2E9-B1D4': { tipo: 'FULL', duracion: 365 },
-            'RS-2D5F-8A1C-4E7B': { tipo: 'EMPRESARIAL', duracion: 365 },
-            'RS-9C2E-5B8D-1F4A': { tipo: 'FULL', duracion: 180 }
+    
+        // Validar formato de ID (mínimo 5 caracteres, solo letras, números y guiones)
+        if (!/^[A-Z0-9_-]{5,}$/i.test(clienteId)) {
+            return Promise.resolve({ 
+                valido: false, 
+                error: 'Formato de ID inválido.\n\nMínimo 5 caracteres, solo letras, números y guiones' 
+            });
+        }
+    
+        // ─────────────────────────────────────────────────────────────────
+        // LICENCIAS VÁLIDAS - AGREGA TUS CLIENTES AQUÍ
+        // Formato: 'CLAVE' → { clienteId: 'ID', tipo: 'FULL|EMPRESARIAL', duracion: días }
+        // ─────────────────────────────────────────────────────────────────
+        var licenciasValidas = {
+            // Ejemplo 1: Constructora Azteca - FULL anual
+            'RS-A3F8-C2E9-B1D4': { 
+                clienteId: 'CONSTRUCTORA_AZTECA_001',
+                tipo: 'FULL', 
+                duracion: 365 
+            },
+        
+            // Ejemplo 2: Seguridad Industrial MX - EMPRESARIAL anual
+            'RS-2D5F-8A1C-4E7B': { 
+                clienteId: 'SEGURIDAD_INDUSTRIAL_MX',
+                tipo: 'EMPRESARIAL', 
+                duracion: 365 
+            },
+        
+            // Ejemplo 3: Capacitación Pro - FULL semestral
+            'RS-9C2E-5B8D-1F4A': { 
+                clienteId: 'CAPACITACION_PRO_2026',
+                tipo: 'FULL', 
+                duracion: 180 
+            }
+        
+        // ─────────────────────────────────────────────────────────────
+        // PARA AGREGAR MÁS CLIENTES:
+        // 'RS-XXXX-YYYY-ZZZZ': { clienteId: 'ID_DEL_CLIENTE', tipo: 'FULL|EMPRESARIAL', duracion: 365 },
+        // ─────────────────────────────────────────────────────────────
         };
-        var lic = validas[clave.toUpperCase()];
-        if (lic) {
-            var exp = new Date();
-            exp.setDate(exp.getDate() + lic.duracion);
-            return Promise.resolve({ valido: true, tipo: lic.tipo, expiracion: exp.toISOString() });
+    // ─────────────────────────────────────────────────────────────────
+    
+        var licencia = licenciasValidas[clave.toUpperCase()];
+    
+        if (!licencia) {
+            return Promise.resolve({ valido: false, error: 'Clave inválida.\n\nVerifica tu clave o contacta a soporte:\ntu@email.com' });
         }
-        return Promise.resolve({ valido: false, error: 'Clave inválida' });
+    
+        // Verificar que el ID coincide
+        if (licencia.clienteId.toUpperCase() !== clienteId.toUpperCase()) {
+            return Promise.resolve({ 
+                valido: false, 
+                error: 'ID de cliente no coincide con esta clave.\n\nVerifica tus credenciales o contacta a soporte.' 
+            });
+        }
+    
+        // Calcular fecha de expiración
+        var expiracion = new Date();
+        expiracion.setDate(expiracion.getDate() + licencia.duracion);
+    
+        return Promise.resolve({
+            valido: true,
+            tipo: licencia.tipo,
+            clienteId: licencia.clienteId,
+            expiracion: expiracion.toISOString()
+        });
     },
 
     activarLicencia: function() {
         var self = this;
-        var el = document.getElementById('license-code');
-        var clave = el ? el.value.trim() : '';
-        if (!clave) { alert('Ingresa una clave'); return; }
+        var idEl = document.getElementById('license-id');
+        var keyEl = document.getElementById('license-key');
+    
+        var clienteId = idEl ? idEl.value.trim().toUpperCase() : '';
+        var clave = keyEl ? keyEl.value.trim().toUpperCase() : '';
+    
+        if (!clienteId || !clave) {
+            alert('⚠️ Ingresa tanto el ID de cliente como la clave de licencia');
+            return;
+        }
+    
+        // Mostrar loading
         var btn = document.querySelector('#license-screen .btn-primary');
-        if (btn) { btn.disabled = true; btn.textContent = 'Validando...'; }
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Validando...';
+        }
+    
+        // Validar licencia
+        this.validarLicencia(clienteId, clave).then(function(resultado) {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🔓 Activar Licencia';
+            }
         
-        this.validarLicencia(clave).then(function(res) {
-            if (btn) { btn.disabled = false; btn.textContent = 'Activar Licencia'; }
-            if (res.valido) {
-                self.licencia = { tipo: res.tipo, clave: clave, expiracion: res.expiracion, examenesRestantes: 9999 };
+            if (resultado.valido) {
+                // Activar licencia
+                self.licencia = {
+                    tipo: resultado.tipo,
+                    clave: clave,
+                    clienteId: resultado.clienteId,
+                    expiracion: resultado.expiracion,
+                    examenesRestantes: 9999
+                };
                 self.guardarLicencia();
-                var fecha = new Date(res.expiracion).toLocaleDateString('es-MX');
-                alert('Licencia ' + res.tipo + ' activada\nVálida hasta: ' + fecha);
-                if (el) el.value = '';
+            
+                var fechaExp = new Date(resultado.expiracion).toLocaleDateString('es-MX');
+                alert('✅ ¡Licencia ' + resultado.tipo + ' activada!\n\nCliente: ' + resultado.clienteId + '\nVálida hasta: ' + fechaExp + '\n\nGracias por tu compra.');
+            
+                // Limpiar campos
+                if (idEl) idEl.value = '';
+                if (keyEl) keyEl.value = '';
+            
+                self.actualizarUI();
             } else {
-                alert(res.error);
+                alert('❌ ' + resultado.error);
             }
         });
     },
+
+// ─────────────────────────────────────────────────────────────────────
+// ACTUALIZAR UI PARA MOSTRAR INFO DE LICENCIA CON ID
+// ─────────────────────────────────────────────────────────────────────
+    actualizarUI: function() {
+        // Info de licencia (home)
+        var infoLic = document.getElementById('licencia-info');
+        if (infoLic) {
+            if (this.licencia.tipo === 'DEMO') {
+                infoLic.textContent = '📋 DEMO: ' + this.licencia.examenesRestantes + '/3 hoy';
+                infoLic.style.color = '#FF9800';
+            } else {
+                var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : '∞';
+                infoLic.textContent = '✅ ' + this.licencia.tipo + ': ' + this.licencia.clienteId + ' (exp: ' + exp + ')';
+                infoLic.style.color = '#4CAF50';
+            }
+        }
+    
+        // Info de licencia (pantalla licencia)
+        var infoLicDetail = document.getElementById('licencia-info-detail');
+        if (infoLicDetail) {
+            if (this.licencia.tipo === 'DEMO') {
+                infoLicDetail.textContent = '📋 Licencia DEMO - ' + this.licencia.examenesRestantes + ' exámenes hoy';
+            } else {
+                var exp = this.licencia.expiracion ? new     Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
+                infoLicDetail.textContent = '✅ ' + this.licencia.tipo + '\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
+            }
+        }
+    
+        // Info de usuario
+        var infoUser = document.getElementById('usuario-info');
+        if (infoUser && this.userData.nombre) {
+            infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + (this.userData.empresa || '') + ' • ' + (this.userData.puesto || '');
+        }
+    
+        // Habilitar botón de examen
+        var btnExamen = document.getElementById('btn-comenzar');
+        if (btnExamen) {
+            var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
+            btnExamen.disabled = !datosOk;
+            btnExamen.style.opacity = datosOk ? '1' : '0.5';
+        }
+    }
+
+
 
     // ─────────────────────────────────────────────────────────────────────
     // DATOS DE USUARIO
@@ -563,3 +710,4 @@ window.addEventListener('beforeunload', function() {
         clearInterval(app.timerExamen);
     }
 });
+
