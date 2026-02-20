@@ -162,31 +162,55 @@
             </div>
         </section>
 
-        <!-- LICENCIA ✅ CON ID CORRECTO -->
+        <!-- LICENCIA (actualizado con ID + Clave) -->
         <section id="license-screen" class="screen">
             <div class="card">
-                <h2>🔑 Licencia</h2>
+                <h2>🔑 Activar Licencia</h2>
+        
                 <div id="licencia-info-detail" style="padding:20px;background:#f5f5f5;border-radius:10px;margin:20px 0;text-align:center;font-weight:bold;">
-                    <!-- Se actualiza con JS -->
+                    📋 Licencia DEMO - 3 exámenes hoy
                 </div>
+        
                 <div class="license-content">
-                    <h3>¿Tienes un código de licencia?</h3>
-                    <p style="color:#666;margin:10px 0;">Ingresa tu código para activar la versión FULL</p>
-                    <input type="text" id="license-code" placeholder="Ej: FULL2026" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:15px 0;">
-                    <button class="btn btn-primary" onclick="app.activarLicencia()" style="width:100%;">🔓 Activar Licencia</button>
+                    <p style="color:#666;margin-bottom:20px;">Ingresa tus credenciales de licencia</p>
+            
+                    <!-- Campo ID de Cliente -->
+                    <div class="form-group">
+                        <label for="license-id">🆔 ID de Cliente</label>
+                        <input type="text" id="license-id" placeholder="Ej: CONSTRUCTORA_AZTECA_001" 
+                       style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;text-transform:uppercase;">
+                    </div>
+            
+                    <!-- Campo Clave de Licencia -->
+                    <div class="form-group">
+                        <label for="license-key">🔐 Clave de Licencia</label>
+                        <input type="text" id="license-key" placeholder="Ej: RS-XXXX-YYYY-ZZZZ" 
+                       style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;text-transform:uppercase;letter-spacing:2px;font-family:monospace;">
+                    </div>
+            
+                    <button class="btn btn-primary" onclick="app.activarLicencia()" style="width:100%;margin-top:10px;">
+                        🔓 Activar Licencia
+                    </button>
+            
+                    <!-- Información de planes -->
                     <div style="margin-top:30px;padding:20px;background:#E3F2FD;border-radius:10px;">
                         <h4 style="color:#1976D2;margin-bottom:10px;">💰 Planes Disponibles</h4>
                         <p><strong>Individual:</strong> $499 MXN/año</p>
                         <p><strong>Equipo (10):</strong> $2,999 MXN/año</p>
                         <p><strong>Empresa (50+):</strong> $9,999 MXN/año</p>
-                        <p style="margin-top:15px;color:#666;font-size:14px;">Contacto: tu@email.com</p>
+                        <p style="margin-top:15px;color:#666;font-size:14px;">
+                    Contacto: tu@email.com<br>
+                            <small>Te enviaremos tu ID y Clave única después del pago</small>
+                        </p>
                     </div>
                 </div>
+        
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
                 </div>
             </div>
         </section>
+
 
         <!-- INFORMACIÓN -->
         <section id="info-screen" class="screen">
@@ -234,6 +258,7 @@
     </script>
 </body>
 </html>
+
 
 
 
