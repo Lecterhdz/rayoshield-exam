@@ -350,6 +350,53 @@ const app = {
         var ok = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
         if (!ok) { alert('Completa tus datos primero'); this.mostrarDatosUsuario(); return; }
         if (!this.verificarLicenciaExamen()) return;
+
+
+        // Resetear vistas
+        document.getElementById('categorias-view').style.display = 'block';
+        document.getElementById('niveles-view').style.display = 'none';
+        // Mostrar categorías
+        var list = document.getElementById('categorias-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        CATEGORIAS.forEach(function(cat) {
+            var item = document.createElement('div');
+            item.className = 'exam-item';
+            item.innerHTML = '<h4>' + cat.icono + ' ' + cat.nombre + '</h4><p>' + cat.norma + '</p><small>' + cat.descripcion + '</small>';
+            item.onclick = function() { self.mostrarNiveles(cat); };
+            list.appendChild(item);
+        });
+        this.mostrarPantalla('select-exam-screen');
+    },
+    mostrarNiveles: function(categoria) {
+        var self = this;
+    
+        // Ocultar categorías, mostrar niveles
+        document.getElementById('categorias-view').style.display = 'none';
+        document.getElementById('niveles-view').style.display = 'block';
+    
+        // Actualizar título
+        document.getElementById('categoria-titulo').textContent = categoria.icono + ' ' + categoria.nombre;
+        document.getElementById('categoria-norma').textContent = categoria.norma;
+    
+        // Mostrar niveles
+        var list = document.getElementById('niveles-list');
+        list.innerHTML = '';
+    
+        categoria.niveles.forEach(function(nivel) {
+            var item = document.createElement('div');
+            item.className = 'exam-item';
+            item.innerHTML = '<h4>👤 ' + nivel.nombre + '</h4><p>Examen de ' + categoria.nombre.toLowerCase() + '</p>';
+            item.onclick = function() { self.iniciarExamen(nivel.examId); };
+            list.appendChild(item);
+        });
+    },
+
+    volverACategorias: function() {
+        document.getElementById('categorias-view').style.display = 'block';
+        document.getElementById('niveles-view').style.display = 'none';
+    }
         
         if (this.examenGuardado) {
             if (!confirm('Tienes un examen guardado. ¿Continuar?')) {
@@ -710,4 +757,5 @@ window.addEventListener('beforeunload', function() {
         clearInterval(app.timerExamen);
     }
 });
+
 
