@@ -1,11 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - CARGA DE EXÁMENES
+// RAYOSHIELD EXAM - CATEGORÍAS DE EXÁMENES
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Lista de exámenes disponibles
- * Agrega aquí tus 21 exámenes
- */
 const CATEGORIAS = [
     {
         id: 'loto',
@@ -93,80 +89,31 @@ const CATEGORIAS = [
     }
 ];
 
-/**
- * Carga un examen desde archivo JSON
- * @param {string} examId - ID del examen
- * @returns {Promise<Object>} - Datos del examen
- */
+// Función para cargar examen por ID (usada por app.js)
 async function cargarExamen(examId) {
     try {
         const response = await fetch(`data/exams/${examId}.json`);
-        if (!response.ok) {
-            throw new Error(`Examen no encontrado: ${examId}`);
-        }
-        const examen = await response.json();
-        return examen;
+        if (!response.ok) throw new Error(`Examen no encontrado: ${examId}`);
+        return await response.json();
     } catch (error) {
         console.error('Error cargando examen:', error);
-        // Examen de fallback para pruebas
-        return obtenerExamenDemo();
+        // Fallback para pruebas
+        return obtenerExamenDemo(examId);
     }
 }
 
-/**
- * Examen demo para pruebas (si los JSONs no están disponibles)
- */
-function obtenerExamenDemo() {
+// Examen demo para pruebas
+function obtenerExamenDemo(examId) {
     return {
-        id: 'demo',
+        id: examId || 'demo',
         titulo: 'Examen de Prueba',
         norma: 'Demo',
         nivel: 'Operativo',
         min_score: 80,
         preguntas: [
-            {
-                id: 1,
-                texto: '¿Qué significa LOTO?',
-                opciones: [
-                    'Lock Out - Tag Out',
-                    'Lock On - Tag On',
-                    'Lock Out - Take Out',
-                    'Long Out - Tag Out'
-                ],
-                correcta_idx: 0
-            },
-            {
-                id: 2,
-                texto: '¿Cuál es el objetivo de LOTO?',
-                opciones: [
-                    'Ahorrar energía',
-                    'Prevenir liberación de energía peligrosa',
-                    'Aumentar producción',
-                    'Reducir costos'
-                ],
-                correcta_idx: 1
-            },
-            {
-                id: 3,
-                texto: '¿Quién puede retirar un dispositivo LOTO?',
-                opciones: [
-                    'Cualquier trabajador',
-                    'El supervisor',
-                    'Solo quien lo colocó',
-                    'El gerente'
-                ],
-                correcta_idx: 2
-            }
+            { id: 1, texto: '¿Qué significa LOTO?', opciones: ['Lock Out - Tag Out', 'Lock On - Tag On', 'Lock Out - Take Out', 'Long Out - Tag Out'], correcta_idx: 0 },
+            { id: 2, texto: '¿Cuál es el objetivo de LOTO?', opciones: ['Ahorrar energía', 'Prevenir liberación de energía peligrosa', 'Aumentar producción', 'Reducir costos'], correcta_idx: 1 },
+            { id: 3, texto: '¿Quién puede retirar un dispositivo LOTO?', opciones: ['Cualquier trabajador', 'El supervisor', 'Solo quien lo colocó', 'El gerente'], correcta_idx: 2 }
         ]
     };
-}
-
-/**
- * Obtiene información de un examen por ID
- * @param {string} examId - ID del examen
- * @returns {Object|undefined} - Información del examen
- */
-function getInfoExamen(examId) {
-    return EXAMENES.find(e => e.id === examId);
-
 }
