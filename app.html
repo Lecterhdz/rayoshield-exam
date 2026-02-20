@@ -96,25 +96,37 @@
             </div>
         </section>
 
-        <!-- EXAMEN -->
+        <!-- EXAMEN (actualizado con timer y sin botón salir) -->
         <section id="exam-screen" class="screen">
             <div class="card">
                 <div class="exam-header">
                     <h3 id="exam-title">Título del Examen</h3>
                     <p id="exam-norma" class="norma">Norma</p>
                 </div>
+        
+                <!-- Timer de examen -->
+                <div id="exam-timer" style="text-align: center; font-size: 24px; font-weight: bold; color: #666; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 10px;">
+                    ⏱️ 30:00
+                </div>
+        
                 <div class="progress-container">
                     <div class="progress-bar" id="progress-bar"></div>
                     <p class="progress-text" id="progress-text">Pregunta 1 de 20</p>
                 </div>
+        
                 <div class="question-container">
                     <h4 id="question-text" class="question-text">¿Pregunta?</h4>
                     <div id="options-container" class="options-container"></div>
                 </div>
+        
                 <div class="button-group">
-                    <button class="btn btn-secondary" onclick="app.salirExamen()">🚪 Salir y Guardar</button>
+                    <!-- Botón de salir eliminado - el examen tiene timer -->
                     <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
                 </div>
+        
+                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 10px;">
+                    ⏰ El examen tiene un límite de 30 minutos. Se enviará automáticamente al terminar.
+                </p>
             </div>
         </section>
 
@@ -222,4 +234,5 @@
     </script>
 </body>
 </html>
+
 
