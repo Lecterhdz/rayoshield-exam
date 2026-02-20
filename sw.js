@@ -5,32 +5,61 @@ const ASSETS = [
     '/app.html',
     '/css/styles.css',
     '/js/app.js',
-    '/js/exams.js',
+    '/js/exams.js', 
     '/js/scoring.js',
     '/js/certificate.js',
-    '/manifest.json',
+    '/manifest.json'
     '/assets/logo.png'
 ];
 
-// Instalar Service Worker
 self.addEventListener('install', (e) => {
     e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                // Cachear solo lo que existe, ignorar errores
+                return Promise.all(
+                    ASSETS.map(url => 
+                        fetch(url)
+                            .then(response => {
+                                if (response.ok) {
+                                    return cache.put(url, response);
+                                }
+                                // Ignorar 404s
+                                return Promise.resolve();
+                            })
+                            .catch(() => Promise.resolve()) // Ignorar errores de red
+                    )
+                );
+            })
     );
 });
 
-// Activar Service Worker
 self.addEventListener('activate', (e) => {
     e.waitUntil(
-        caches.keys().then((keys) => Promise.all(
-            keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-        ))
+        caches.keys().then(keys => 
+            Promise.all(
+                keys.filter(k => k !== CACHE_NAME)
+                    .map(k => caches.delete(k))
+            )
+        )
     );
 });
 
-// Interceptar peticiones
 self.addEventListener('fetch', (e) => {
     e.respondWith(
-        caches.match(e.request).then((response) => response || fetch(e.request))
+        caches.match(e.request)
+            .then(cached => cached || fetch(e.request)
+                .then(response => {
+                    // Cachear nuevas peticiones exitosas
+                    if (response.ok && e.request.method === 'GET') {
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.put(e.request, clone))
+                            .catch(() => {});
+                    }
+                    return response;
+                })
+                .catch(() => caches.match('/index.html')) // Fallback
+            )
     );
 });
