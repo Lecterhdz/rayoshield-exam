@@ -1,17 +1,38 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - app.js (CON VALIDACIONES DE ELEMENTOS)
+// RAYOSHIELD EXAM - app.js (LICENCIAS + TIMER)
 // ─────────────────────────────────────────────────────────────────────────────
 
 const app = {
+    // Estado general
     examenActual: null,
     respuestasUsuario: [],
     preguntaActual: 0,
     resultadoActual: null,
     respuestaTemporal: null,
+    
+    // Datos de usuario
     userData: { empresa: '', nombre: '', curp: '', puesto: '' },
-    licencia: { tipo: 'DEMO', examenesRestantes: 3 },
+    
+    // Sistema de licencias
+    licencia: {
+        tipo: 'DEMO',           // DEMO | FULL | EMPRESARIAL
+        clave: '',              // Clave de licencia (hash)
+        expiracion: null,       // Fecha de expiración (ISO string)
+        examenesRestantes: 3    // Solo para DEMO
+    },
+    
+    // Timer de examen
+    timerExamen: null,
+    tiempoLimite: 30 * 60 * 1000,  // 30 minutos en milisegundos
+    tiempoInicio: null,
+    tiempoRestante: null,
+    
+    // Progreso guardado
     examenGuardado: null,
 
+    // ───────────────────────────────────────────────────────────────────────
+    // INICIALIZACIÓN
+    // ───────────────────────────────────────────────────────────────────────
     init() {
         console.log('✅ RayoShield Exam iniciado');
         this.cargarLicencia();
@@ -20,27 +41,44 @@ const app = {
         this.cargarExamenGuardado();
         this.actualizarUI();
         this.mostrarPantalla('home-screen');
+        this.verificarExpiracionLicencia();
     },
 
     mostrarPantalla(id) {
+        // Detener timer si cambiamos de pantalla de examen
+        if (id !== 'exam-screen' && this.timerExamen) {
+            clearInterval(this.timerExamen);
+            this.timerExamen = null;
+        }
+        
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const screen = document.getElementById(id);
         if (screen) screen.classList.add('active');
     },
 
     actualizarUI() {
+        // Info de licencia
         const infoLic = document.getElementById('licencia-info');
         if (infoLic) {
-            infoLic.textContent = this.licencia.tipo === 'DEMO' 
-                ? `📋 Licencia DEMO - ${this.licencia.examenesRestantes} exámenes restantes`
-                : '✅ Licencia FULL - Exámenes ilimitados';
+            if (this.licencia.tipo === 'DEMO') {
+                infoLic.textContent = `📋 DEMO - ${this.licencia.examenesRestantes} exámenes`;
+                infoLic.style.color = '#FF9800';
+            } else if (this.licencia.tipo === 'FULL') {
+                infoLic.textContent = '✅ FULL - Ilimitado';
+                infoLic.style.color = '#4CAF50';
+            } else if (this.licencia.tipo === 'EMPRESARIAL') {
+                infoLic.textContent = '🏢 EMPRESARIAL - Equipo';
+                infoLic.style.color = '#2196F3';
+            }
         }
         
+        // Info de usuario
         const infoUser = document.getElementById('usuario-info');
         if (infoUser && this.userData.nombre) {
             infoUser.innerHTML = `<strong>👤 ${this.userData.nombre}</strong><br>${this.userData.empresa || ''} • ${this.userData.puesto || ''}`;
         }
         
+        // Habilitar botón de examen
         const btnExamen = document.getElementById('btn-comenzar');
         if (btnExamen) {
             const datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -49,11 +87,21 @@ const app = {
         }
     },
 
+    // ───────────────────────────────────────────────────────────────────────
+    // SISTEMA DE LICENCIAS PROFESIONAL
+    // ───────────────────────────────────────────────────────────────────────
+    
     cargarLicencia() {
         try {
             const saved = localStorage.getItem('rayoshield_licencia');
-            if (saved) this.licencia = JSON.parse(saved);
-        } catch(e) {}
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Validar que tenga la estructura correcta
+                if (parsed.tipo && parsed.clave !== undefined) {
+                    this.licencia = parsed;
+                }
+            }
+        } catch(e) { console.log('Licencia por defecto: DEMO'); }
     },
 
     guardarLicencia() {
@@ -61,6 +109,182 @@ const app = {
         this.actualizarUI();
     },
 
+    verificarExpiracionLicencia() {
+        if (this.licencia.expiracion) {
+            const ahora = new Date();
+            const expiracion = new Date(this.licencia.expiracion);
+            
+            if (ahora > expiracion && this.licencia.tipo !== 'DEMO') {
+                // Licencia expirada → volver a DEMO
+                console.log('⚠️ Licencia expirada');
+                this.licencia = { tipo: 'DEMO', clave: '', expiracion: null, examenesRestantes: 3 };
+                this.guardarLicencia();
+                alert('⚠️ Tu licencia ha expirado.\n\nHas vuelto a la versión DEMO.\n\nPara renovar, contacta: tu@email.com');
+            }
+        }
+    },
+
+    // Validar licencia por clave (hash seguro)
+    async validarLicencia(clave) {
+        // En producción, esto debería validar contra un servidor
+        // Por ahora, usamos validación local con hash
+        
+        try {
+            // Generar hash de la clave ingresada
+            const encoder = new TextEncoder();
+            const data = encoder.encode(`rayoshield_secret_2026_${clave}`);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // Claves válidas (en producción, esto vendría de un servidor)
+            const licenciasValidas = {
+                // Formato: hash → { tipo, duracion_dias }
+                'a1b2c3d4e5f6...': { tipo: 'FULL', duracion: 365 },      // Ejemplo
+                // Agrega aquí las claves que generes para tus clientes
+            };
+            
+            if (licenciasValidas[hashHex]) {
+                const config = licenciasValidas[hashHex];
+                const expiracion = new Date();
+                expiracion.setDate(expiracion.getDate() + config.duracion);
+                
+                return {
+                    valido: true,
+                    tipo: config.tipo,
+                    expiracion: expiracion.toISOString()
+                };
+            }
+            
+            return { valido: false, error: 'Clave inválida' };
+            
+        } catch(e) {
+            console.error('Error validando licencia:', e);
+            return { valido: false, error: 'Error de validación' };
+        }
+    },
+
+    activarLicencia() {
+        const codeEl = document.getElementById('license-code');
+        const clave = codeEl ? codeEl.value.trim() : '';
+        
+        if (!clave) {
+            alert('⚠️ Ingresa una clave de licencia');
+            return;
+        }
+        
+        // Mostrar loading
+        const btnActivar = document.querySelector('#license-screen .btn-primary');
+        if (btnActivar) {
+            btnActivar.disabled = true;
+            btnActivar.textContent = '⏳ Validando...';
+        }
+        
+        // Validar licencia
+        this.validarLicencia(clave).then(resultado => {
+            if (btnActivar) {
+                btnActivar.disabled = false;
+                btnActivar.textContent = '🔓 Activar Licencia';
+            }
+            
+            if (resultado.valido) {
+                this.licencia = {
+                    tipo: resultado.tipo,
+                    clave: clave,
+                    expiracion: resultado.expiracion,
+                    examenesRestantes: 9999
+                };
+                this.guardarLicencia();
+                
+                const fechaExp = new Date(resultado.expiracion).toLocaleDateString('es-MX');
+                alert(`✅ ¡Licencia ${resultado.tipo} activada!\n\nVálida hasta: ${fechaExp}\n\nGracias por tu compra.`);
+                
+                if (codeEl) codeEl.value = '';
+                this.actualizarUI();
+            } else {
+                alert(`❌ ${resultado.error}\n\nVerifica tu clave o contacta a soporte:\ntu@email.com`);
+            }
+        });
+    },
+
+    // Para generar claves (solo para ti, el administrador)
+    // Ejecuta esto en la consola del navegador para generar una clave:
+    /*
+    async function generarClaveLicencia(clienteId, tipo, dias) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(`rayoshield_secret_2026_${clienteId}_${tipo}_${dias}`);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    // Uso: generarClaveLicencia('cliente123', 'FULL', 365).then(console.log);
+    */
+
+    // ───────────────────────────────────────────────────────────────────────
+    // TIMER DE EXAMEN
+    // ───────────────────────────────────────────────────────────────────────
+    
+    iniciarTimerExamen() {
+        this.tiempoInicio = Date.now();
+        this.tiempoRestante = this.tiempoLimite;
+        
+        // Actualizar UI cada segundo
+        this.timerExamen = setInterval(() => {
+            this.tiempoRestante = this.tiempoLimite - (Date.now() - this.tiempoInicio);
+            
+            if (this.tiempoRestante <= 0) {
+                // Tiempo agotado → finalizar examen automáticamente
+                clearInterval(this.timerExamen);
+                this.timerExamen = null;
+                alert('⏰ Tiempo agotado\n\nEl examen se enviará automáticamente.');
+                this.mostrarResultado();
+                this.eliminarExamenGuardado();
+                return;
+            }
+            
+            // Actualizar display del timer
+            this.actualizarTimerUI();
+            
+            // Advertencia cuando quedan 5 minutos
+            if (this.tiempoRestante <= 5 * 60 * 1000 && this.tiempoRestante > 4 * 60 * 1000) {
+                alert('⚠️ Quedan 5 minutos para finalizar el examen');
+            }
+            
+        }, 1000);
+    },
+    
+    actualizarTimerUI() {
+        const timerEl = document.getElementById('exam-timer');
+        if (!timerEl) return;
+        
+        const minutos = Math.floor(this.tiempoRestante / 60000);
+        const segundos = Math.floor((this.tiempoRestante % 60000) / 1000);
+        
+        timerEl.textContent = `⏱️ ${minutos}:${segundos.toString().padStart(2, '0')}`;
+        
+        // Cambiar color cuando queda poco tiempo
+        if (this.tiempoRestante <= 5 * 60 * 1000) {
+            timerEl.style.color = '#f44336';
+            timerEl.style.fontWeight = 'bold';
+        } else if (this.tiempoRestante <= 10 * 60 * 1000) {
+            timerEl.style.color = '#FF9800';
+        } else {
+            timerEl.style.color = '#666';
+            timerEl.style.fontWeight = 'normal';
+        }
+    },
+    
+    detenerTimer() {
+        if (this.timerExamen) {
+            clearInterval(this.timerExamen);
+            this.timerExamen = null;
+        }
+    },
+
+    // ───────────────────────────────────────────────────────────────────────
+    // GESTIÓN DE DATOS DE USUARIO
+    // ───────────────────────────────────────────────────────────────────────
+    
     cargarDatosUsuario() {
         try {
             const saved = localStorage.getItem('rayoshield_usuario');
@@ -100,9 +324,16 @@ const app = {
         this.volverHome();
     },
 
-    verificarLicencia() {
+    // ───────────────────────────────────────────────────────────────────────
+    // GESTIÓN DE EXÁMENES
+    // ───────────────────────────────────────────────────────────────────────
+    
+    verificarLicenciaExamen() {
+        // Verificar expiración primero
+        this.verificarExpiracionLicencia();
+        
         if (this.licencia.tipo === 'DEMO' && this.licencia.examenesRestantes <= 0) {
-            alert('⚠️ Límite DEMO alcanzado. Contacta: tu@email.com');
+            alert('⚠️ Has alcanzado el límite de exámenes DEMO.\n\nPara continuar, adquiere una licencia.\n\nContacto: tu@email.com');
             return false;
         }
         return true;
@@ -122,14 +353,25 @@ const app = {
             this.mostrarDatosUsuario();
             return;
         }
-        if (!this.verificarLicencia()) return;
+        if (!this.verificarLicenciaExamen()) return;
         
+        // Si hay examen guardado, preguntar si continuar (solo si no ha expirado)
         if (this.examenGuardado) {
-            if (!confirm('📋 Tienes un examen guardado. ¿Continuar donde lo dejaste?')) {
-                this.examenGuardado = null;
+            const guardadoHace = Date.now() - new Date(this.examenGuardado.fecha).getTime();
+            const maxTiempoGuardado = 24 * 60 * 60 * 1000; // 24 horas
+            
+            if (guardadoHace < maxTiempoGuardado) {
+                if (!confirm('📋 Tienes un examen guardado. ¿Continuar donde lo dejaste?')) {
+                    this.examenGuardado = null;
+                    localStorage.removeItem('rayoshield_progreso');
+                } else {
+                    this.restaurarExamenGuardado();
+                    return;
+                }
             } else {
-                this.restaurarExamenGuardado();
-                return;
+                // Examen guardado muy antiguo, descartar
+                this.examenGuardado = null;
+                localStorage.removeItem('rayoshield_progreso');
             }
         }
         
@@ -156,17 +398,24 @@ const app = {
             this.resultadoActual = null;
             this.respuestaTemporal = null;
             
+            // Actualizar UI del examen
             const titleEl = document.getElementById('exam-title');
             const normaEl = document.getElementById('exam-norma');
             if (titleEl) titleEl.textContent = this.examenActual.titulo;
             if (normaEl) normaEl.textContent = this.examenActual.norma;
             
+            // Resetear y iniciar timer
+            this.detenerTimer();
+            this.iniciarTimerExamen();
+            
             this.mostrarPantalla('exam-screen');
             this.mostrarPregunta();
             this.guardarExamenProgreso();
+            
         } catch(e) {
             console.error('Error:', e);
             alert('❌ Error cargando examen');
+            this.detenerTimer();
         }
     },
 
@@ -211,9 +460,12 @@ const app = {
 
     confirmarRespuesta() {
         if (this.respuestaTemporal === null) return;
+        
+        // Confirmar si es la última pregunta
         if (this.preguntaActual === this.examenActual.preguntas.length - 1) {
             if (!confirm('📋 ¿Finalizar examen?')) return;
         }
+        
         this.respuestasUsuario.push(this.respuestaTemporal);
         this.respuestaTemporal = null;
         this.preguntaActual++;
@@ -222,11 +474,17 @@ const app = {
         if (this.preguntaActual < this.examenActual.preguntas.length) {
             this.mostrarPregunta();
         } else {
+            // Examen completado → mostrar resultado
+            this.detenerTimer();
             this.mostrarResultado();
             this.eliminarExamenGuardado();
         }
     },
 
+    // ───────────────────────────────────────────────────────────────────────
+    // PROGRESO GUARDADO
+    // ───────────────────────────────────────────────────────────────────────
+    
     guardarExamenProgreso() {
         if (this.examenActual) {
             this.examenGuardado = {
@@ -248,14 +506,21 @@ const app = {
 
     restaurarExamenGuardado() {
         if (!this.examenGuardado) return;
+        
         cargarExamen(this.examenGuardado.examenId).then(exam => {
             this.examenActual = exam;
             this.respuestasUsuario = this.examenGuardado.respuestas;
             this.preguntaActual = this.examenGuardado.preguntaActual;
+            
             const titleEl = document.getElementById('exam-title');
             const normaEl = document.getElementById('exam-norma');
             if (titleEl) titleEl.textContent = exam.titulo;
             if (normaEl) normaEl.textContent = exam.norma;
+            
+            // Reiniciar timer para el tiempo restante original (no el que llevaba)
+            this.detenerTimer();
+            this.iniciarTimerExamen();
+            
             this.mostrarPantalla('exam-screen');
             this.mostrarPregunta();
         });
@@ -266,8 +531,14 @@ const app = {
         localStorage.removeItem('rayoshield_progreso');
     },
 
+    // ───────────────────────────────────────────────────────────────────────
+    // RESULTADOS Y CERTIFICADOS
+    // ───────────────────────────────────────────────────────────────────────
+    
     mostrarResultado() {
         if (!this.examenActual) return;
+        
+        this.detenerTimer();
         this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
         
         const iconEl = document.getElementById('result-icon');
@@ -280,15 +551,22 @@ const app = {
         const btnCert = document.getElementById('btn-certificado');
         
         if (iconEl) iconEl.textContent = getIconoResultado(this.resultadoActual.estado);
-        if (titleEl) titleEl.textContent = (this.resultadoActual.estado === 'Aprobado' ? '✅ APROBADO' : '❌ REPROBADO') + (this.licencia.tipo === 'DEMO' ? ' (DEMO)' : '');
+        if (titleEl) {
+            let titulo = this.resultadoActual.estado === 'Aprobado' ? '✅ APROBADO' : '❌ REPROBADO';
+            if (this.licencia.tipo === 'DEMO') titulo += ' (DEMO)';
+            titleEl.textContent = titulo;
+        }
         if (scoreEl) scoreEl.textContent = `${this.resultadoActual.score}%`;
         if (aciertosEl) aciertosEl.textContent = this.resultadoActual.aciertos;
         if (totalEl) totalEl.textContent = this.resultadoActual.total;
         if (minEl) minEl.textContent = this.resultadoActual.minScore;
-        if (statusEl) { statusEl.textContent = this.resultadoActual.estado; statusEl.className = 'score ' + getColorEstado(this.resultadoActual.estado); }
+        if (statusEl) {
+            statusEl.textContent = this.resultadoActual.estado;
+            statusEl.className = 'score ' + getColorEstado(this.resultadoActual.estado);
+        }
         if (btnCert) {
             btnCert.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none';
-            btnCert.textContent = this.licencia.tipo === 'DEMO' ? '📄 Descargar Certificado (DEMO)' : '📄 Descargar Certificado';
+            btnCert.textContent = this.licencia.tipo === 'DEMO' ? '📄 Descargar (DEMO)' : '📄 Descargar Certificado';
         }
         
         this.mostrarPantalla('result-screen');
@@ -310,7 +588,12 @@ const app = {
         } catch(e) { alert('❌ Error generando certificado'); }
     },
 
+    // ───────────────────────────────────────────────────────────────────────
+    // NAVEGACIÓN
+    // ───────────────────────────────────────────────────────────────────────
+    
     volverHome() {
+        this.detenerTimer();
         this.examenActual = null;
         this.respuestasUsuario = [];
         this.preguntaActual = 0;
@@ -319,15 +602,7 @@ const app = {
         this.mostrarPantalla('home-screen');
     },
 
-    salirExamen() {
-        if (this.respuestasUsuario.length > 0) {
-            if (confirm('📋 ¿Guardar progreso para continuar después?')) {
-                this.guardarExamenProgreso();
-                alert('✅ Progreso guardado');
-            }
-        }
-        this.volverHome();
-    },
+    // NOTA: Eliminamos salirExamen() porque el examen tiene timer y no se puede guardar/salir
 
     mostrarDatosUsuario() {
         const empresaEl = document.getElementById('user-empresa');
@@ -365,30 +640,29 @@ const app = {
     mostrarLicencia() {
         const infoEl = document.getElementById('licencia-info-detail');
         if (infoEl) {
-            infoEl.textContent = this.licencia.tipo === 'DEMO' 
-                ? `📋 Licencia DEMO - ${this.licencia.examenesRestantes} exámenes restantes`
-                : '✅ Licencia FULL - Exámenes ilimitados';
+            let texto = '';
+            if (this.licencia.tipo === 'DEMO') {
+                texto = `📋 DEMO - ${this.licencia.examenesRestantes} exámenes`;
+            } else if (this.licencia.tipo === 'FULL') {
+                const exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
+                texto = `✅ FULL - Válido hasta: ${exp}`;
+            } else if (this.licencia.tipo === 'EMPRESARIAL') {
+                const exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
+                texto = `🏢 EMPRESARIAL - Válido hasta: ${exp}`;
+            }
+            infoEl.textContent = texto;
         }
         this.mostrarPantalla('license-screen');
-    },
-
-    activarLicencia() {
-        const codeEl = document.getElementById('license-code');
-        const code = codeEl ? codeEl.value.trim() : '';
-        if (code === 'FULL2026' || code === 'RAYOSHIELD2026') {
-            this.licencia = { tipo: 'FULL', examenesRestantes: 9999 };
-            this.guardarLicencia();
-            alert('✅ ¡Licencia FULL activada!');
-            if (codeEl) codeEl.value = '';
-        } else if (code) {
-            alert('❌ Código inválido. Contacta: tu@email.com');
-        }
     },
 
     mostrarInfo() {
         this.mostrarPantalla('info-screen');
     },
 
+    // ───────────────────────────────────────────────────────────────────────
+    // HISTORIAL
+    // ───────────────────────────────────────────────────────────────────────
+    
     guardarEnHistorial() {
         const historial = this.obtenerHistorial();
         historial.push({
@@ -397,7 +671,8 @@ const app = {
             score: this.resultadoActual?.score || 0,
             estado: this.resultadoActual?.estado || '',
             fecha: this.resultadoActual?.fecha || new Date().toISOString(),
-            usuario: this.userData.nombre
+            usuario: this.userData.nombre,
+            tiempoEmpleado: this.tiempoLimite - this.tiempoRestante
         });
         localStorage.setItem('rayoshield_historial', JSON.stringify(historial));
     },
@@ -414,7 +689,15 @@ const app = {
     }
 };
 
+// Iniciar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🔄 DOM listo, iniciando app...');
     app.init();
+});
+
+// Limpiar timer si el usuario cierra la pestaña
+window.addEventListener('beforeunload', () => {
+    if (app.timerExamen) {
+        clearInterval(app.timerExamen);
+    }
 });
