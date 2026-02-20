@@ -1,257 +1,263 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - LÓGICA PRINCIPAL DE LA APP
-// ─────────────────────────────────────────────────────────────────────────────
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- SEO Meta Tags -->
+<meta name="title" content="RayoShield Exam - Capacitación STPS">
+<meta name="description" content="Evalúa y certifica tus conocimientos en normas de seguridad industrial STPS. 21 exámenes, 420 preguntas, certificados automáticos.">
+<meta name="keywords" content="STPS, seguridad industrial, capacitación, exámenes, certificación, NOM-004, LOTO, EPP">
+<meta name="author" content="RayoShield">
+<meta name="robots" content="index, follow">
 
-/**
- * Aplicación principal RayoShield Exam
- */
-const app = {
-    examenActual: null,
-    respuestasUsuario: [],
-    preguntaActual: 0,
-    resultadoActual: null,
-    userData: { nombre: '', email: '' },
-    licencia: { tipo: 'DEMO', examenesRestantes: 3 },
-    
-    init() {
-        console.log('RayoShield Exam iniciado');
-        this.cargarLicencia();
-        this.cargarHistorial();
-        this.mostrarPantalla('home-screen');
-        this.actualizarInfoLicencia();
-    },
-    
-    mostrarPantalla(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    },
-    
-    cargarLicencia() {
-        const licenciaGuardada = localStorage.getItem('rayoshield_licencia');
-        if (licenciaGuardada) {
-            this.licencia = JSON.parse(licenciaGuardada);
-        }
-    },
-    
-    guardarLicencia() {
-        localStorage.setItem('rayoshield_licencia', JSON.stringify(this.licencia));
-        this.actualizarInfoLicencia();
-    },
-    
-    actualizarInfoLicencia() {
-        const infoEl = document.getElementById('licencia-info');
-        if (infoEl) {
-            if (this.licencia.tipo === 'DEMO') {
-                infoEl.textContent = `📋 Licencia DEMO - ${this.licencia.examenesRestantes} exámenes restantes`;
-                infoEl.style.color = '#FF9800';
-            } else {
-                infoEl.textContent = '✅ Licencia FULL - Exámenes ilimitados';
-                infoEl.style.color = '#4CAF50';
-            }
-        }
-    },
-    
-    verificarLicencia() {
-        if (this.licencia.tipo === 'DEMO' && this.licencia.examenesRestantes <= 0) {
-            alert('⚠️ Has alcanzado el límite de exámenes DEMO.\n\nPara continuar, adquiere una licencia FULL.\n\nContacto: tu@email.com');
-            return false;
-        }
-        return true;
-    },
-    
-    consumirExamen() {
-        if (this.licencia.tipo === 'DEMO') {
-            this.licencia.examenesRestantes--;
-            this.guardarLicencia();
-        }
-    },
-    
-    async irASeleccionarExamen() {
-        if (!this.verificarLicencia()) return;
-        
-        const examList = document.getElementById('exam-list');
-        examList.innerHTML = '';
-        
-        EXAMENES.forEach(exam => {
-            const item = document.createElement('div');
-            item.className = 'exam-item';
-            item.innerHTML = `<h4>${exam.icono} ${exam.titulo}</h4><p>${exam.norma} • ${exam.nivel}</p>`;
-            item.onclick = () => this.iniciarExamen(exam.id);
-            examList.appendChild(item);
-        });
-        
-        this.mostrarPantalla('select-exam-screen');
-    },
-    
-    async iniciarExamen(examId) {
-        try {
-            this.examenActual = await cargarExamen(examId);
-            this.respuestasUsuario = [];
-            this.preguntaActual = 0;
-            this.resultadoActual = null;
-            
-            document.getElementById('exam-title').textContent = this.examenActual.titulo;
-            document.getElementById('exam-norma').textContent = this.examenActual.norma;
-            
-            this.mostrarPantalla('exam-screen');
-            this.mostrarPregunta();
-        } catch (error) {
-            console.error('Error iniciando examen:', error);
-            alert('Error cargando el examen. Intente de nuevo.');
-        }
-    },
-    
-    mostrarPregunta() {
-        const pregunta = this.examenActual.preguntas[this.preguntaActual];
-        const progreso = ((this.preguntaActual + 1) / this.examenActual.preguntas.length) * 100;
-        
-        document.getElementById('progress-bar').innerHTML = `<div class="progress-bar-fill" style="width: ${progreso}%"></div>`;
-        document.getElementById('progress-text').textContent = `Pregunta ${this.preguntaActual + 1} de ${this.examenActual.preguntas.length}`;
-        document.getElementById('question-text').textContent = pregunta.texto;
-        
-        const optionsContainer = document.getElementById('options-container');
-        optionsContainer.innerHTML = '';
-        
-        pregunta.opciones.forEach((opcion, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = `${String.fromCharCode(65 + index)}) ${opcion}`;
-            btn.onclick = () => this.seleccionarRespuesta(index);
-            optionsContainer.appendChild(btn);
-        });
-    },
-    
-    seleccionarRespuesta(indice) {
-        this.respuestasUsuario.push(indice);
-        this.preguntaActual++;
-        
-        if (this.preguntaActual < this.examenActual.preguntas.length) {
-            this.mostrarPregunta();
-        } else {
-            this.mostrarResultado();
-        }
-    },
-    
-    mostrarResultado() {
-        this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
-    
-        const icono = getIconoResultado(this.resultadoActual.estado);
-        const colorClase = getColorEstado(this.resultadoActual.estado);
-    
-        document.getElementById('result-icon').textContent = icono;
-    
-        // Agregar marca DEMO en el título si aplica
-        let tituloResultado = this.resultadoActual.estado === 'Aprobado' ? '✅ APROBADO' : '❌     REPROBADO';
-        if (this.licencia.tipo === 'DEMO') {
-            tituloResultado += ' (DEMO)';
-        }
-        document.getElementById('result-title').textContent = tituloResultado;
-    
-        document.getElementById('score-number').textContent =     `${this.resultadoActual.score}%`;
-        document.getElementById('aciertos').textContent = this.resultadoActual.aciertos;
-        document.getElementById('total').textContent = this.resultadoActual.total;
-        document.getElementById('min-score').textContent = this.resultadoActual.minScore;
-    
-        const statusEl = document.getElementById('result-status');
-        statusEl.textContent = this.resultadoActual.estado;
-        statusEl.className = `score ${colorClase}`;
-    
-        const btnCertificado = document.getElementById('btn-certificado');
-        if (this.resultadoActual.estado === 'Aprobado') {
-            btnCertificado.style.display = 'inline-block';
-            if (this.licencia.tipo === 'DEMO') {
-                btnCertificado.textContent = '📄 Descargar Certificado (DEMO)';
-            } else {
-                btnCertificado.textContent = '📄 Descargar Certificado';
-            }
-        } else {
-            btnCertificado.style.display = 'none';
-        }
-    
-        this.mostrarPantalla('result-screen');
-        this.guardarEnHistorial();
-        this.consumirExamen();
-    },
-    
-    async descargarCertificado() {
-        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') {
-            alert('Solo se puede descargar certificado si aprobó el examen');
-            return;
-        }
-        
-        const imageUrl = await generarCertificado(this.userData, this.examenActual, this.resultadoActual);
-        const filename = `certificado_${this.examenActual.id}_${Date.now()}.png`;
-        descargarCertificado(imageUrl, filename);
-    },
-    
-    volverHome() {
-        this.examenActual = null;
-        this.respuestasUsuario = [];
-        this.preguntaActual = 0;
-        this.resultadoActual = null;
-        this.mostrarPantalla('home-screen');
-    },
-    
-    mostrarHistorial() {
-        const historyList = document.getElementById('history-list');
-        const historial = this.obtenerHistorial();
-        
-        if (historial.length === 0) {
-            historyList.innerHTML = '<p style="text-align: center; color: #666;">No hay exámenes registrados aún.</p>';
-        } else {
-            historyList.innerHTML = '';
-            historial.slice(-10).reverse().forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `<div class="info"><strong>${item.examen}</strong><br><small>${new Date(item.fecha).toLocaleDateString('es-MX')}</small></div><span class="score ${getColorEstado(item.estado)}">${item.score}%</span>`;
-                historyList.appendChild(div);
-            });
-        }
-        
-        this.mostrarPantalla('history-screen');
-    },
-    
-    mostrarInfo() {
-        this.mostrarPantalla('info-screen');
-    },
-    
-    mostrarLicencia() {
-        this.mostrarPantalla('license-screen');
-    },
-    
-    activarLicencia() {
-        const codigo = document.getElementById('license-code').value.trim();
-        
-        if (codigo === 'FULL2026' || codigo === 'RAYOSHIELD2026') {
-            this.licencia = { tipo: 'FULL', examenesRestantes: 9999 };
-            this.guardarLicencia();
-            alert('✅ ¡Licencia FULL activada exitosamente!\n\nAhora tienes acceso ilimitado a todos los exámenes.');
-            document.getElementById('license-code').value = '';
-        } else if (codigo) {
-            alert('❌ Código inválido.\n\nVerifica el código e intenta de nuevo.\n\nPara adquirir una licencia, contacta: tu@email.com');
-        }
-    },
-    
-    guardarEnHistorial() {
-        const historial = this.obtenerHistorial();
-        historial.push({
-            examen: this.examenActual.titulo,
-            norma: this.examenActual.norma,
-            score: this.resultadoActual.score,
-            estado: this.resultadoActual.estado,
-            fecha: this.resultadoActual.fecha
-        });
-        localStorage.setItem('rayoshield_historial', JSON.stringify(historial));
-    },
-    
-    obtenerHistorial() {
-        const h = localStorage.getItem('rayoshield_historial');
-        return h ? JSON.parse(h) : [];
-    },
-    
-    cargarHistorial() {
-        console.log('Historial cargado:', this.obtenerHistorial().length, 'exámenes');
-    }
-};
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://Lecterhdz.github.io/rayoshield-exam/">
+<meta property="og:title" content="RayoShield Exam - Capacitación STPS">
+<meta property="og:description" content="Evalúa y certifica tus conocimientos en normas de seguridad industrial STPS.">
+<meta property="og:image" content="https://Lecterhdz.github.io/rayoshield-exam/assets/logo.png">
 
-document.addEventListener('DOMContentLoaded', () => { app.init(); });
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://Lecterhdz.github.io/rayoshield-exam/">
+<meta property="twitter:title" content="RayoShield Exam - Capacitación STPS">
+<meta property="twitter:description" content="Evalúa y certifica tus conocimientos en normas de seguridad industrial STPS.">
+<meta property="twitter:image" content="https://Lecterhdz.github.io/rayoshield-exam/assets/logo.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" sizes="32x32" href="assets/logo.png">
+<link rel="apple-touch-icon" href="assets/logo.png">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="RayoShield Exam - Capacitación en Normas STPS">
+    <title>RayoShield Exam - Capacitación STPS</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Ícono -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <img src="assets/logo.png" alt="RayoShield" class="logo">
+            <h1>RayoShield Exam</h1>
+            <p>Capacitación en Normas STPS</p>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="container">
+        
+        <!-- Pantalla: HOME -->
+        <section id="home-screen" class="screen active">
+            <div class="card">
+                <h2>🛡️ Bienvenido a RayoShield Exam</h2>
+                <p>Evalúa tus conocimientos en normas de seguridad industrial STPS</p>
+                
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number">21</span>
+                        <span class="stat-label">Exámenes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">420</span>
+                        <span class="stat-label">Preguntas</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">3</span>
+                        <span class="stat-label">Niveles</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="app.irASeleccionarExamen()">
+                        📚 Comenzar Examen
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.mostrarHistorial()">
+                        📋 Historial
+                    </button>
+                    <button class="btn btn-info" onclick="app.mostrarInfo()">
+                        ℹ️ Información
+                    </button>
+                    <button class="btn btn-success" onclick="app.mostrarLicencia()">
+                        🔑 Licencia
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: SELECCIÓN DE EXAMEN -->
+        <section id="select-exam-screen" class="screen">
+            <div class="card">
+                <h2>📚 Selecciona un Examen</h2>
+                <div id="exam-list" class="exam-list">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+
+        <!-- Pantalla: EXAMEN -->
+        <section id="exam-screen" class="screen">
+            <div class="card">
+                <div class="exam-header">
+                    <h3 id="exam-title">Título del Examen</h3>
+                    <p id="exam-norma" class="norma">Norma</p>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                    <p class="progress-text" id="progress-text">Pregunta 1 de 20</p>
+                </div>
+                
+                <div class="question-container">
+                    <h4 id="question-text" class="question-text">¿Pregunta?</h4>
+                    
+                    <div id="options-container" class="options-container">
+                        <!-- Opciones se generan dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="app.volverHome()">
+                        Salir
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: RESULTADO -->
+        <section id="result-screen" class="screen">
+            <div class="card result-card">
+                <div class="result-icon" id="result-icon">🏆</div>
+                <h2 id="result-title">Resultado</h2>
+                
+                <div class="score-display">
+                    <span class="score-number" id="score-number">0%</span>
+                    <span class="score-label">Calificación</span>
+                </div>
+                
+                <div class="result-details">
+                    <p><strong>Aciertos:</strong> <span id="aciertos">0</span> de <span id="total">0</span></p>
+                    <p><strong>Mínimo requerido:</strong> <span id="min-score">80</span>%</p>
+                    <p><strong>Estado:</strong> <span id="result-status">-</span></p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="app.descargarCertificado()" id="btn-certificado">
+                        📄 Descargar Certificado
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.volverHome()">
+                        🏠 Volver al Inicio
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pantalla: HISTORIAL -->
+        <section id="history-screen" class="screen">
+            <div class="card">
+                <h2>📋 Historial de Exámenes</h2>
+                <div id="history-list" class="history-list">
+                    <!-- Se llena dinámicamente -->
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+
+        <!-- Pantalla: INFORMACIÓN -->
+        <section id="info-screen" class="screen">
+            <div class="card">
+                <h2>ℹ️ Información</h2>
+                <div class="info-content">
+                    <h3>RayoShield Exam</h3>
+                    <p><strong>Versión:</strong> 1.0.0</p>
+                    <p><strong>Plataforma:</strong> Web (PWA)</p>
+                    
+                    <h3>Exámenes Disponibles</h3>
+                    <ul class="exam-normas">
+                        <li>🔒 LOTO (NOM-004-STPS-2008)</li>
+                        <li>⚠️ Seguridad (NOM-031-STPS-2011)</li>
+                        <li>🦺 EPP (NOM-017-STPS-2008)</li>
+                        <li>⚡ Eléctricos (NOM-029-STPS-2011)</li>
+                        <li>🔥 Estática (NOM-022-STPS-2015)</li>
+                        <li>💡 Iluminación (NOM-025-STPS-2008)</li>
+                    </ul>
+                    
+                    <h3>Niveles</h3>
+                    <ul>
+                        <li>👷 Operativo</li>
+                        <li>👨‍💼 Supervisor de Obra</li>
+                        <li>👮 Supervisor SHE</li>
+                    </ul>
+                </div>
+                <button class="btn btn-secondary" onclick="app.volverHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </section>
+<!-- LICENCIA -->
+<section id="license-screen" class="screen">
+    <div class="card">
+        <h2>🔑 Licencia</h2>
+        
+        <div id="licencia-info" class="licencia-info" style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin: 20px 0; text-align: center;">
+            <!-- Se actualiza dinámicamente -->
+        </div>
+        
+        <div class="license-content">
+            <h3>¿Tienes un código de licencia?</h3>
+            <p style="color: #666; margin: 10px 0;">Ingresa tu código para activar la versión FULL</p>
+            
+            <input type="text" id="license-code" placeholder="Ej: FULL2026" 
+                   style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; margin: 15px 0;">
+            
+            <button class="btn btn-primary" onclick="app.activarLicencia()" style="width: 100%;">
+                🔓 Activar Licencia
+            </button>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #E3F2FD; border-radius: 10px;">
+                <h4 style="color: #1976D2; margin-bottom: 10px;">💰 Planes Disponibles</h4>
+                <p><strong>Individual:</strong> $499 MXN/año</p>
+                <p><strong>Equipo (10):</strong> $2,999 MXN/año</p>
+                <p><strong>Empresa (50+):</strong> $9,999 MXN/año</p>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">Contacto: tu@email.com</p>
+            </div>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="app.volverHome()" style="margin-top: 20px; width: 100%;">
+            ← Volver al Inicio
+        </button>
+    </div>
+</section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 RayoShield. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/exams.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/certificate.js"></script>
+    <script src="js/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ Service Worker registrado'))
+        .catch(err => console.log('❌ Error SW:', err));
+}
+</script>
+</body>
+</html>
