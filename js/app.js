@@ -223,22 +223,65 @@ const app = {
         if (this.licencia.tipo === 'DEMO') { this.licencia.examenesRestantes = Math.max(0, this.licencia.examenesRestantes - 1); this.guardarLicencia(); }
     },
 
+// ─────────────────────────────────────────────────────────────────────
+// NAVEGACIÓN: Categoría → Nivel → Examen
+// ─────────────────────────────────────────────────────────────────────
+
     irASeleccionarExamen: function() {
         var self = this;
-        var ok = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
-        if (!ok) { alert('Completa tus datos primero'); this.mostrarDatosUsuario(); return; }
+        var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
+        if (!datosOk) { alert('Completa tus datos primero'); this.mostrarDatosUsuario(); return; }
         if (!this.verificarLicenciaExamen()) return;
-        if (this.examenGuardado && confirm('Tienes un examen guardado. ¿Continuar?')) { this.restaurarExamenGuardado(); return; }
-        var list = document.getElementById('exam-list'); if (!list) return; list.innerHTML = '';
-        EXAMENES.forEach(function(exam) {
+    
+        // Resetear vistas
+        document.getElementById('categorias-view').style.display = 'block';
+        document.getElementById('niveles-view').style.display = 'none';
+    
+        // Mostrar categorías
+        var list = document.getElementById('categorias-list');
+        if (!list) return;
+        list.innerHTML = '';
+    
+        CATEGORIAS.forEach(function(cat) {
             var item = document.createElement('div');
             item.className = 'exam-item';
-            item.innerHTML = '<h4>' + exam.icono + ' ' + exam.titulo + '</h4><p>' + exam.norma + ' - ' + exam.nivel + '</p>';
-            item.onclick = function() { self.iniciarExamen(exam.id); };
+            item.innerHTML = '<h4>' + cat.icono + ' ' + cat.nombre + '</h4><p>' + cat.norma + '</p><small>' + cat.descripcion + '</small>';
+            item.onclick = function() { self.mostrarNiveles(cat); };
             list.appendChild(item);
         });
+    
         this.mostrarPantalla('select-exam-screen');
     },
+
+    mostrarNiveles: function(categoria) {
+        var self = this;
+    
+        // Ocultar categorías, mostrar niveles
+        document.getElementById('categorias-view').style.display = 'none';
+        document.getElementById('niveles-view').style.display = 'block';
+    
+        // Actualizar título
+        document.getElementById('categoria-titulo').textContent = categoria.icono + ' ' + categoria.nombre;
+        document.getElementById('categoria-norma').textContent = categoria.norma;
+    
+        // Mostrar niveles
+        var list = document.getElementById('niveles-list');
+        list.innerHTML = '';
+    
+        categoria.niveles.forEach(function(nivel) {
+            var item = document.createElement('div');
+            item.className = 'exam-item';
+            item.innerHTML = '<h4>👤 ' + nivel.nombre + '</h4><p>Examen de ' + categoria.nombre.toLowerCase() + '</p>';
+            item.onclick = function() { self.iniciarExamen(nivel.examId); };
+            list.appendChild(item);
+        });
+    },
+
+    volverACategorias: function() {
+        document.getElementById('categorias-view').style.display = 'block';
+        document.getElementById('niveles-view').style.display = 'none';
+    }
+
 
     iniciarExamen: function(examId) {
         var self = this;
@@ -415,3 +458,4 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
