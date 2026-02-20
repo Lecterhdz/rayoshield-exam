@@ -413,3 +413,31 @@ body {
 .screen.active {
     animation: fadeIn 0.3s ease-out;
 }
+/* Licencia */
+.licencia-info {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.license-content {
+    margin: 20px 0;
+}
+
+.license-content h3 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.license-content input {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    margin: 15px 0;
+}
+
+.license-content input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
