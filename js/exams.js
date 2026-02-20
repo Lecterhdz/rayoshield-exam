@@ -6,153 +6,90 @@
  * Lista de exámenes disponibles
  * Agrega aquí tus 21 exámenes
  */
-const EXAMENES = [
+const CATEGORIAS = [
     {
-        id: 'loto_operativo',
-        titulo: 'LOTO - Bloqueo y Etiquetado',
+        id: 'loto',
+        nombre: '🔒 LOTO',
         norma: 'NOM-004-STPS-2008',
-        nivel: 'Operativo',
-        icono: '🔒'
+        descripcion: 'Sistemas de protección y dispositivos de seguridad',
+        icono: '🔒',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'loto_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'loto_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'loto_supervisor_she' }
+        ]
     },
     {
-        id: 'loto_supervisor_obra',
-        titulo: 'LOTO - Supervisor de Obra',
-        norma: 'NOM-004-STPS-2008',
-        nivel: 'Supervisor Obra',
-        icono: '🔒'
-    },
-    {
-        id: 'loto_supervisor_she',
-        titulo: 'LOTO - Supervisor SHE',
-        norma: 'NOM-004-STPS-2008',
-        nivel: 'Supervisor SHE',
-        icono: '🔒'
-    },
-    {
-        id: 'seguridad_operativo',
-        titulo: 'Seguridad en Edificaciones',
+        id: 'seguridad',
+        nombre: '⚠️ Seguridad',
         norma: 'NOM-031-STPS-2011',
-        nivel: 'Operativo',
-        icono: '⚠️'
+        descripcion: 'Seguridad en edificaciones y áreas de trabajo',
+        icono: '⚠️',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'seguridad_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'seguridad_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'seguridad_supervisor_she' }
+        ]
     },
     {
-        id: 'seguridad_supervisor_obra',
-        titulo: 'Seguridad - Supervisor Obra',
-        norma: 'NOM-031-STPS-2011',
-        nivel: 'Supervisor Obra',
-        icono: '⚠️'
-    },
-    {
-        id: 'seguridad_supervisor_she',
-        titulo: 'Seguridad - Supervisor SHE',
-        norma: 'NOM-031-STPS-2011',
-        nivel: 'Supervisor SHE',
-        icono: '⚠️'
-    },
-    {
-        id: 'epp_operativo',
-        titulo: 'EPP - Operativo',
+        id: 'epp',
+        nombre: '🦺 EPP',
         norma: 'NOM-017-STPS-2008',
-        nivel: 'Operativo',
-        icono: '🦺'
+        descripcion: 'Equipo de protección personal',
+        icono: '🦺',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'epp_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'epp_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'epp_supervisor_she' }
+        ]
     },
     {
-        id: 'epp_supervisor_obra',
-        titulo: 'EPP - Supervisor Obra',
-        norma: 'NOM-017-STPS-2008',
-        nivel: 'Supervisor Obra',
-        icono: '🦺'
-    },
-    {
-        id: 'epp_supervisor_she',
-        titulo: 'EPP - Supervisor SHE',
-        norma: 'NOM-017-STPS-2008',
-        nivel: 'Supervisor SHE',
-        icono: '🦺'
-    },
-    {
-        id: 'electricos_operativo',
-        titulo: 'Trabajos Eléctricos - Operativo',
+        id: 'electricos',
+        nombre: '⚡ Eléctricos',
         norma: 'NOM-029-STPS-2011',
-        nivel: 'Operativo',
-        icono: '⚡'
+        descripcion: 'Trabajos en instalaciones eléctricas',
+        icono: '⚡',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'electricos_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'electricos_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'electricos_supervisor_she' }
+        ]
     },
     {
-        id: 'electricos_supervisor_obra',
-        titulo: 'Trabajos Eléctricos - Supervisor Obra',
-        norma: 'NOM-029-STPS-2011',
-        nivel: 'Supervisor Obra',
-        icono: '⚡'
-    },
-    {
-        id: 'electricos_supervisor_she',
-        titulo: 'Trabajos Eléctricos - Supervisor SHE',
-        norma: 'NOM-029-STPS-2011',
-        nivel: 'Supervisor SHE',
-        icono: '⚡'
-    },
-    {
-        id: 'estatica_operativo',
-        titulo: 'Electricidad Estática - Operativo',
+        id: 'estatica',
+        nombre: '🔥 Electricidad Estática',
         norma: 'NOM-022-STPS-2015',
-        nivel: 'Operativo',
-        icono: '🔥'
+        descripcion: 'Electricidad estática en centros de trabajo',
+        icono: '🔥',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'estatica_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'estatica_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'estatica_supervisor_she' }
+        ]
     },
     {
-        id: 'estatica_supervisor_obra',
-        titulo: 'Electricidad Estática - Supervisor Obra',
-        norma: 'NOM-022-STPS-2015',
-        nivel: 'Supervisor Obra',
-        icono: '🔥'
-    },
-    {
-        id: 'estatica_supervisor_she',
-        titulo: 'Electricidad Estática - Supervisor SHE',
-        norma: 'NOM-022-STPS-2015',
-        nivel: 'Supervisor SHE',
-        icono: '🔥'
-    },
-    {
-        id: 'iluminacion_operativo',
-        titulo: 'Iluminación - Operativo',
+        id: 'iluminacion',
+        nombre: '💡 Iluminación',
         norma: 'NOM-025-STPS-2008',
-        nivel: 'Operativo',
-        icono: '💡'
+        descripcion: 'Iluminación en centros de trabajo',
+        icono: '💡',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'iluminacion_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'iluminacion_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'iluminacion_supervisor_she' }
+        ]
     },
     {
-        id: 'iluminacion_supervisor_obra',
-        titulo: 'Iluminación - Supervisor Obra',
-        norma: 'NOM-025-STPS-2008',
-        nivel: 'Supervisor Obra',
-        icono: '💡'
-    },
-    {
-        id: 'iluminacion_supervisor_she',
-        titulo: 'Iluminación - Supervisor SHE',
-        norma: 'NOM-025-STPS-2008',
-        nivel: 'Supervisor SHE',
-        icono: '💡'
-    },
-    {
-        id: 'modo4_operativo',
-        titulo: 'MODO 4 - Operativo',
+        id: 'modo4',
+        nombre: '📋 MODO 4',
         norma: 'Procedimiento Interno',
-        nivel: 'Operativo',
-        icono: '📋'
-    },
-    {
-        id: 'modo4_supervisor_obra',
-        titulo: 'MODO 4 - Supervisor Obra',
-        norma: 'Procedimiento Interno',
-        nivel: 'Supervisor Obra',
-        icono: '📋'
-    },
-    {
-        id: 'modo4_supervisor_she',
-        titulo: 'MODO 4 - Supervisor SHE',
-        norma: 'Procedimiento Interno',
-        nivel: 'Supervisor SHE',
-        icono: '📋'
+        descripcion: 'Procedimiento interno de seguridad',
+        icono: '📋',
+        niveles: [
+            { id: 'operativo', nombre: 'Operativo', examId: 'modo4_operativo' },
+            { id: 'supervisor_obra', nombre: 'Supervisor de Obra', examId: 'modo4_supervisor_obra' },
+            { id: 'supervisor_she', nombre: 'Supervisor SHE', examId: 'modo4_supervisor_she' }
+        ]
     }
 ];
 
@@ -231,4 +168,5 @@ function obtenerExamenDemo() {
  */
 function getInfoExamen(examId) {
     return EXAMENES.find(e => e.id === examId);
+
 }
