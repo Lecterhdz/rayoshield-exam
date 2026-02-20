@@ -1,129 +1,261 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - GENERACIÓN DE CERTIFICADOS
-// (Usa Canvas API para generar PNG)
+// RAYOSHIELD EXAM - GENERADOR DE CERTIFICADOS PROFESIONAL
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Genera certificado como imagen PNG
- * @param {Object} userData - Datos del usuario
- * @param {Object} examen - Datos del examen
- * @param {Object} resultado - Resultado del examen
- * @returns {Promise<string>} - URL de la imagen generada
- */
 async function generarCertificado(userData, examen, resultado) {
-    // Crear canvas
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
-    // Dimensiones del certificado
-    canvas.width = 1200;
-    canvas.height = 800;
+    // Dimensiones (A4 horizontal en alta resolución)
+    canvas.width = 2480;
+    canvas.height = 1748;
+    
+    // ───────────────────────────────────────────────────────────────────────
+    // FONDO
+    // ───────────────────────────────────────────────────────────────────────
     
     // Fondo blanco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Borde decorativo
+    // Borde exterior decorativo
     ctx.strokeStyle = '#2196F3';
-    ctx.lineWidth = 10;
-    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+    ctx.lineWidth = 20;
+    ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
     
     ctx.strokeStyle = '#1976D2';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+    ctx.lineWidth = 8;
+    ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
     
-    // Título
-    ctx.font = 'bold 48px Arial';
+    // Esquinas decorativas
+    const cornerSize = 100;
+    ctx.fillStyle = '#2196F3';
+    // Esquina superior izquierda
+    ctx.beginPath();
+    ctx.moveTo(55, 155);
+    ctx.lineTo(55, 55);
+    ctx.lineTo(155, 55);
+    ctx.fill();
+    // Esquina superior derecha
+    ctx.beginPath();
+    ctx.moveTo(canvas.width - 155, 55);
+    ctx.lineTo(canvas.width - 55, 55);
+    ctx.lineTo(canvas.width - 55, 155);
+    ctx.fill();
+    // Esquina inferior izquierda
+    ctx.beginPath();
+    ctx.moveTo(55, canvas.height - 155);
+    ctx.lineTo(55, canvas.height - 55);
+    ctx.lineTo(155, canvas.height - 55);
+    ctx.fill();
+    // Esquina inferior derecha
+    ctx.beginPath();
+    ctx.moveTo(canvas.width - 155, canvas.height - 55);
+    ctx.lineTo(canvas.width - 55, canvas.height - 55);
+    ctx.lineTo(canvas.width - 55, canvas.height - 155);
+    ctx.fill();
+    
+    // ───────────────────────────────────────────────────────────────────────
+    // ENCABEZADO
+    // ───────────────────────────────────────────────────────────────────────
+    
+    // Logo (círculo con iniciales)
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, 280, 100, 0, Math.PI * 2);
+    ctx.fillStyle = '#2196F3';
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 80px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('RS', canvas.width / 2, 280);
+    
+    // Título principal
+    ctx.font = 'bold 90px Arial';
     ctx.fillStyle = '#1a1a1a';
     ctx.textAlign = 'center';
-    ctx.fillText('CERTIFICADO ORTOGADO A', canvas.width / 2, 150);
+    ctx.fillText('CERTIFICADO DE APROBACIÓN', canvas.width / 2, 450);
     
     // Subtítulo
-    ctx.font = '24px Arial';
+    ctx.font = 'italic 45px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText('RayoShield Exam - Capacitación STPS', canvas.width / 2, 200);
+    ctx.fillText('RayoShield Exam - Capacitación STPS', canvas.width / 2, 530);
     
     // Línea decorativa
     ctx.beginPath();
-    ctx.moveTo(200, 230);
-    ctx.lineTo(canvas.width - 200, 230);
+    ctx.moveTo(400, 580);
+    ctx.lineTo(canvas.width - 400, 580);
     ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    
+    // ───────────────────────────────────────────────────────────────────────
+    // DATOS DEL USUARIO
+    // ───────────────────────────────────────────────────────────────────────
+    
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'alphabetic';
+    
+    // Etiqueta
+    ctx.font = 'bold 40px Arial';
+    ctx.fillStyle = '#2196F3';
+    ctx.fillText('Este certificado se otorga a:', canvas.width / 2 - 600, 680);
+    
+    // Nombre
+    ctx.font = 'bold 70px Arial';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(userData.nombre || 'Participante', canvas.width / 2, 780);
+    
+    // Línea debajo del nombre
+    ctx.beginPath();
+    ctx.moveTo(canvas.width / 2 - 500, 810);
+    ctx.lineTo(canvas.width / 2 + 500, 810);
+    ctx.strokeStyle = '#ddd';
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Datos del usuario
-    ctx.font = '20px Arial';
+    // Datos adicionales (en dos columnas)
+    ctx.font = '35px Arial';
     ctx.fillStyle = '#666';
-    ctx.textAlign = 'left';
-    ctx.fillText(`Nombre: ${userData.nombre || 'N/A'}`, 100, 240);
-    ctx.fillText(`CURP: ${userData.curp || 'N/A'}`, 100, 280);
-    ctx.fillText(`Empresa: ${userData.empresa || 'N/A'}`, 100, 320);
-    ctx.fillText(`Puesto: ${userData.puesto || 'N/A'}`, 100, 360);
     
-    // Texto descriptivo
-    ctx.font = '20px Arial';
+    const startY = 920;
+    const lineHeight = 70;
+    const leftX = canvas.width / 2 - 500;
+    const rightX = canvas.width / 2 + 500;
+    
+    // Columna izquierda
+    ctx.fillText(`CURP:`, leftX, startY);
+    ctx.font = 'bold 35px Arial';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(userData.curp || 'N/A', leftX + 150, startY);
+    
+    ctx.font = '35px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText('Ha completado exitosamente el examen de:', canvas.width / 2, 380);
+    ctx.fillText(`Empresa:`, leftX, startY + lineHeight);
+    ctx.font = 'bold 35px Arial';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(userData.empresa || 'N/A', leftX + 180, startY + lineHeight);
     
-    // Nombre del examen
-    ctx.font = 'bold 28px Arial';
-    ctx.fillStyle = '#2196F3';
+    // Columna derecha
+    ctx.font = '35px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(`Puesto:`, rightX - 300, startY);
+    ctx.font = 'bold 35px Arial';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(userData.puesto || 'N/A', rightX - 100, startY);
+    
+    // ───────────────────────────────────────────────────────────────────────
+    // INFORMACIÓN DEL EXAMEN
+    // ───────────────────────────────────────────────────────────────────────
+    
+    // Recuadro del examen
+    ctx.fillStyle = '#E3F2FD';
+    ctx.fillRect(canvas.width / 2 - 600, 1050, 1200, 250);
+    ctx.strokeStyle = '#2196F3';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(canvas.width / 2 - 600, 1050, 1200, 250);
+    
+    // Título del examen
+    ctx.font = 'bold 45px Arial';
+    ctx.fillStyle = '#1976D2';
     ctx.textAlign = 'center';
-    ctx.fillText(examen.titulo, canvas.width / 2, 430);
+    ctx.fillText('Examen:', canvas.width / 2, 1120);
     
-    // Norma
-    ctx.font = '20px Arial';
+    ctx.font = 'bold 50px Arial';
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillText(examen.titulo, canvas.width / 2, 1200);
+    
+    ctx.font = '35px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText(examen.norma, canvas.width / 2, 470);
+    ctx.fillText(examen.norma, canvas.width / 2, 1260);
     
-    // Calificación
-    ctx.font = 'bold 32px Arial';
+    // ───────────────────────────────────────────────────────────────────────
+    // CALIFICACIÓN
+    // ───────────────────────────────────────────────────────────────────────
+    
+    // Círculo de calificación
+    const scoreX = canvas.width / 2;
+    const scoreY = 1450;
+    const scoreRadius = 150;
+    
+    // Fondo del círculo
+    ctx.beginPath();
+    ctx.arc(scoreX, scoreY, scoreRadius, 0, Math.PI * 2);
+    ctx.fillStyle = resultado.estado === 'Aprobado' ? '#E8F5E9' : '#FFEBEE';
+    ctx.fill();
+    ctx.strokeStyle = resultado.estado === 'Aprobado' ? '#4CAF50' : '#f44336';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    
+    // Porcentaje
+    ctx.font = 'bold 80px Arial';
     ctx.fillStyle = resultado.estado === 'Aprobado' ? '#4CAF50' : '#f44336';
-    ctx.fillText(`Calificación: ${resultado.score}%`, canvas.width / 2, 540);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${resultado.score}%`, scoreX, scoreY - 20);
     
-    // Fecha
-    const fecha = new Date(resultado.fecha).toLocaleDateString('es-MX', {
-        year: 'numeric', month: 'long', day: 'numeric'
-    });
-    ctx.font = '18px Arial';
+    ctx.font = '30px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText(`Fecha: ${fecha}`, canvas.width / 2, 590);
+    ctx.fillText('Calificación', scoreX, scoreY + 50);
     
-    // ID único (hash simple)
+    // ───────────────────────────────────────────────────────────────────────
+    // FECHA Y FIRMA
+    // ───────────────────────────────────────────────────────────────────────
+    
+    const fecha = new Date(resultado.fecha).toLocaleDateString('es-MX', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    
+    ctx.font = '35px Arial';
+    ctx.fillStyle = '#666';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Fecha de emisión: ${fecha}`, canvas.width / 2, 1620);
+    
+    // ID único del certificado
     const hash = await generarHash(`${userData.nombre || 'user'}:${examen.id}:${resultado.score}:${Date.now()}`);
-    ctx.font = '12px monospace';
+    ctx.font = '25px monospace';
     ctx.fillStyle = '#999';
-    ctx.fillText(`ID Certificado: ${hash.substring(0, 20)}...`, canvas.width / 2, 680);
+    ctx.fillText(`ID Certificado: ${hash.substring(0, 24).toUpperCase()}`, canvas.width / 2, 1670);
     
     // Firma
-    ctx.font = 'italic 16px Arial';
+    ctx.font = 'italic 35px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText('RayoShield - Seguridad Industrial', canvas.width / 2, 740);
+    ctx.fillText('RayoShield - Seguridad Industrial', canvas.width / 2, 1720);
     
-    // 🆕 MARCA DE AGUA DEMO (si aplica)
-    if (localStorage.getItem('rayoshield_licencia')) {
-        const licencia = JSON.parse(localStorage.getItem('rayoshield_licencia'));
-        if (licencia.tipo === 'DEMO') {
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.rotate(-Math.PI / 6);
-            ctx.font = 'bold 80px Arial';
-            ctx.fillStyle = 'rgba(255, 152, 0, 0.3)';
-            ctx.textAlign = 'center';
-            ctx.fillText('VERSIÓN DEMO', 0, 0);
-            ctx.restore();
+    // ───────────────────────────────────────────────────────────────────────
+    // MARCA DE AGUA DEMO (si aplica)
+    // ───────────────────────────────────────────────────────────────────────
+    
+    try {
+        const licenciaData = localStorage.getItem('rayoshield_licencia');
+        if (licenciaData) {
+            const licencia = JSON.parse(licenciaData);
+            if (licencia.tipo === 'DEMO') {
+                ctx.save();
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(-Math.PI / 8);
+                ctx.font = 'bold 120px Arial';
+                ctx.fillStyle = 'rgba(255, 152, 0, 0.25)';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('VERSIÓN DEMO', 0, 0);
+                ctx.restore();
+            }
         }
+    } catch(e) {
+        console.log('No se pudo verificar licencia para marca de agua');
     }
-
-    // Convertir a URL de imagen
-    return canvas.toDataURL('image/png');
+    
+    // ───────────────────────────────────────────────────────────────────────
+    // CONVERTIR A IMAGEN
+    // ───────────────────────────────────────────────────────────────────────
+    
+    return canvas.toDataURL('image/png', 1.0);
 }
 
-/**
- * Genera hash simple para ID único
- * @param {string} text - Texto para hashear
- * @returns {Promise<string>} - Hash en hexadecimal
- */
+// Generar hash para ID único
 async function generarHash(text) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
@@ -132,11 +264,7 @@ async function generarHash(text) {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-/**
- * Descarga el certificado como archivo PNG
- * @param {string} imageUrl - URL de la imagen
- * @param {string} filename - Nombre del archivo
- */
+// Descargar certificado
 function descargarCertificado(imageUrl, filename = 'certificado.png') {
     const link = document.createElement('a');
     link.download = filename;
