@@ -253,6 +253,73 @@
                 </div>
             </div>
         </section>
+
+        <!-- CASOS CRÍTICOS - INVESTIGACIÓN MASTER -->
+        <section id="casos-master-screen" class="screen">
+            <div class="card">
+                <div class="caso-header">
+                    <h2>⚠️ Casos Críticos de Obra</h2>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Investigación de incidentes - Nivel MASTER</p>
+                    <div style="margin-top: 10px;">
+                        <span class="badge">🔍 Enfoque sistémico</span>
+                        <span class="badge">📊 ICAM / 5 Porqués</span>
+                        <span class="badge badge-nivel master">MASTER</span>
+                    </div>
+                </div>
+        
+                <!-- Selector de casos -->
+                <div id="casos-list" class="exam-list"></div>
+        
+                <!-- Vista de caso seleccionado -->
+                <div id="caso-detalle" style="display: none;">
+                    <!-- Metadatos del caso -->
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px;">
+                        <strong>📋 Ficha del Caso:</strong>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+                            <div><strong>ID:</strong> <span id="caso-id"></span></div>
+                            <div><strong>Fecha:</strong> <span id="caso-fecha"></span></div>
+                            <div><strong>Industria:</strong> <span id="caso-industria"></span></div>
+                            <div><strong>Tiempo estimado:</strong> <span id="caso-tiempo"></span></div>
+                        </div>
+                    </div>
+            
+                    <!-- Descripción del evento -->
+                    <div style="margin: 20px 0;">
+                        <h3 style="color: #E65100; margin-bottom: 10px;">📝 Descripción del Evento</h3>
+                        <p id="caso-descripcion" style="line-height: 1.6;"></p>
+                    </div>
+            
+                    <!-- Timeline -->
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: #1a1a1a; margin-bottom: 10px;">⏱️ Línea de Tiempo</h4>
+                        <div class="timeline" id="caso-timeline"></div>
+                    </div>
+            
+                    <!-- Energías identificadas -->
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: #1a1a1a; margin-bottom: 10px;">⚡ Energías Peligrosas Identificadas</h4>
+                        <div class="energia-grid" id="caso-energias"></div>
+                    </div>
+            
+                    <!-- Preguntas de investigación -->
+                    <div id="caso-preguntas" style="margin: 30px 0;"></div>
+            
+                    <!-- Botones de navegación -->
+                    <div class="button-group" id="caso-botones">
+                        <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
+                        <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display: none;">✅ Enviar Respuestas</button>
+                    </div>
+            
+                    <!-- Resultado (oculto hasta enviar) -->
+                    <div id="caso-resultado" style="display: none; margin-top: 30px;"></div>
+                </div>
+        
+                <div class="button-group" id="casos-main-buttons">
+                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="footer">
@@ -276,6 +343,7 @@
     </script>
 </body>
 </html>
+
 
 
 
