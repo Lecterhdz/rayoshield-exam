@@ -280,7 +280,7 @@ const app = {
     volverACategorias: function() {
         document.getElementById('categorias-view').style.display = 'block';
         document.getElementById('niveles-view').style.display = 'none';
-    }
+    },
 
 
     iniciarExamen: function(examId) {
@@ -458,4 +458,5 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
