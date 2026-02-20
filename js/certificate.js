@@ -51,10 +51,14 @@ async function generarCertificado(userData, examen, resultado) {
     ctx.lineWidth = 2;
     ctx.stroke();
     
-    // Nombre del usuario
-    ctx.font = 'bold 36px Arial';
-    ctx.fillStyle = '#1a1a1a';
-    ctx.fillText(userData.nombre || 'Participante', canvas.width / 2, 320);
+    // Datos del usuario
+    ctx.font = '20px Arial';
+    ctx.fillStyle = '#666';
+    ctx.textAlign = 'left';
+    ctx.fillText(`Nombre: ${userData.nombre || 'N/A'}`, 100, 240);
+    ctx.fillText(`CURP: ${userData.curp || 'N/A'}`, 100, 280);
+    ctx.fillText(`Empresa: ${userData.empresa || 'N/A'}`, 100, 320);
+    ctx.fillText(`Puesto: ${userData.puesto || 'N/A'}`, 100, 360);
     
     // Texto descriptivo
     ctx.font = '20px Arial';
@@ -64,6 +68,7 @@ async function generarCertificado(userData, examen, resultado) {
     // Nombre del examen
     ctx.font = 'bold 28px Arial';
     ctx.fillStyle = '#2196F3';
+    ctx.textAlign = 'center';
     ctx.fillText(examen.titulo, canvas.width / 2, 430);
     
     // Norma
@@ -74,28 +79,26 @@ async function generarCertificado(userData, examen, resultado) {
     // Calificación
     ctx.font = 'bold 32px Arial';
     ctx.fillStyle = resultado.estado === 'Aprobado' ? '#4CAF50' : '#f44336';
-    ctx.fillText(`Calificación: ${resultado.score}%`, canvas.width / 2, 550);
+    ctx.fillText(`Calificación: ${resultado.score}%`, canvas.width / 2, 540);
     
     // Fecha
     const fecha = new Date(resultado.fecha).toLocaleDateString('es-MX', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: 'numeric', month: 'long', day: 'numeric'
     });
     ctx.font = '18px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText(`Fecha: ${fecha}`, canvas.width / 2, 600);
+    ctx.fillText(`Fecha: ${fecha}`, canvas.width / 2, 590);
     
     // ID único (hash simple)
     const hash = await generarHash(`${userData.nombre || 'user'}:${examen.id}:${resultado.score}:${Date.now()}`);
     ctx.font = '12px monospace';
     ctx.fillStyle = '#999';
-    ctx.fillText(`ID Certificado: ${hash.substring(0, 20)}...`, canvas.width / 2, 700);
+    ctx.fillText(`ID Certificado: ${hash.substring(0, 20)}...`, canvas.width / 2, 680);
     
     // Firma
     ctx.font = 'italic 16px Arial';
     ctx.fillStyle = '#666';
-    ctx.fillText('RayoShield - Seguridad Industrial', canvas.width / 2, 750);
+    ctx.fillText('RayoShield - Seguridad Industrial', canvas.width / 2, 740);
     
     // 🆕 MARCA DE AGUA DEMO (si aplica)
     if (localStorage.getItem('rayoshield_licencia')) {
