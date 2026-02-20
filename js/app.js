@@ -801,7 +801,7 @@ const app = {
         .catch(function() {
             alert('❌ Error generando certificado');
         });
-}
+    },
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
     // ─────────────────────────────────────────────────────────────────────
@@ -832,6 +832,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
