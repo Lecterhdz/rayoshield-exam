@@ -1,5 +1,5 @@
 {
-  "id": "ia-loto-energia-residual-hidraulica",
+  "id": "case-loto-energia-residual-hidraulica",
   "tipo": "investigacion_accidente",
   "nivel": "master",
   "clasificacion_evento": "Incidente grave / Casi accidente",
@@ -225,4 +225,5 @@
     "tiempo_estimado_minutos": 25,
     "requisitos_previos": ["Examen LOTO Supervisor SHE aprobado", "Curso de Investigación de Incidentes"]
   }
+
 }
