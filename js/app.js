@@ -714,7 +714,10 @@ const app = {
     
         // Evaluar
         var resultado = evaluarCasoInvestigacion(respuestasPorPregunta, this.casoActual);
-    
+       
+        // ✅ AGREGAR ESTA LÍNEA: Guardar resultado para el certificado
+        this.resultadoCaso = resultado;
+       
         // Mostrar resultado
         this.mostrarResultadoCaso(resultado);
     },
@@ -726,16 +729,26 @@ const app = {
     
         var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
         var icono = resultado.aprobado ? '✅' : '📚';
+        var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
+    
+        // Botones condicionales
+        var botonesCertificado = resultado.aprobado ? 
+            '<div class="button-group" style="margin-top:20px;">' +
+            '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+            '</div>' :
+            '<div class="button-group" style="margin-top:20px;">' +
+            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
+            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+            '</div>';
     
         resultadoEl.innerHTML = `
             <div class="resultado-investigacion ${claseEstado}">
                 <h2>${icono} Resultado de la Investigación</h2>
                 <div class="puntaje-master">${resultado.porcentaje}%</div>
                 <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
-                <p><strong>Estado:</strong> ${resultado.aprobado ? '✅ APROBADO - Nivel MASTER'<div class="button-group" style="margin-top:20px;">
-    <button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">
-        🏆 Descargar Certificado MASTER
-    </button> </div>: '📚 Requiere repaso'}</p>
+                <p><strong>Estado:</strong> ${estadoTexto}</p>
             </div>
         
             ${resultado.feedback.length > 0 ? `
@@ -756,10 +769,7 @@ const app = {
                 <p style="margin-top:10px;line-height:1.6;">${resultado.conclusion}</p>
             </div>
         
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>
-                <button class="btn btn-primary" onclick="app.volverHome()">🏠 Inicio</button>
-            </div>
+            ${botonesCertificado}
         `;
     
         // Ocultar botón de enviar
@@ -832,6 +842,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
