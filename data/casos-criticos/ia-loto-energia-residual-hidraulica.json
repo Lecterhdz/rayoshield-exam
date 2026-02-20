@@ -1,0 +1,228 @@
+{
+  "id": "ia-loto-energia-residual-hidraulica",
+  "tipo": "investigacion_accidente",
+  "nivel": "master",
+  "clasificacion_evento": "Incidente grave / Casi accidente",
+  "categoria": "Control de Energías Peligrosas (LOTO)",
+  "industria": "Industrial / Procesos",
+  "fecha_evento": "2026-01-18",
+  "investigador": "Comité SHE",
+  "confidencialidad": "Uso interno",
+  
+  "descripcion_evento": {
+    "actividad": "Mantenimiento correctivo en válvula hidráulica",
+    "equipo": "Válvula de control hidráulica con acumulador",
+    "sistema": "Circuito hidráulico presurizado",
+    "presion_nominal": "210 bar",
+    "condicion": "Sistema aparentemente aislado",
+    "evento": "Liberación súbita de fluido hidráulico a presión al aflojar brida",
+    "resultado": "Trabajador se retira a tiempo, sin lesión",
+    "clasificacion": "Casi accidente de alto potencial"
+  },
+  
+  "personas_involucradas": [
+    { "rol": "Técnico de mantenimiento", "experiencia": "8 años", "capacitacion_loto": "Sí", "lesiones": "Ninguna" },
+    { "rol": "Supervisor de mantenimiento", "experiencia": "12 años", "presencia_en_sitio": "No" }
+  ],
+  
+  "linea_tiempo": [
+    "07:30 – Inicio de turno",
+    "08:00 – Se autoriza mantenimiento",
+    "08:15 – Aplicación de LOTO a bomba principal",
+    "08:25 – Inicio de desmontaje de válvula",
+    "08:26 – Liberación súbita de fluido hidráulico",
+    "08:27 – Retiro del trabajador",
+    "08:40 – Suspensión del trabajo",
+    "09:30 – Notificación al área SHE"
+  ],
+  
+  "energias_identificadas": {
+    "electricas": "Aisladas",
+    "hidraulicas": "NO completamente aisladas",
+    "residuales": "Acumulador presurizado",
+    "gravitacionales": "No aplican",
+    "termicas": "No aplican",
+    "quimicas": "Fluido hidráulico"
+  },
+  
+  "analisis_causa_raiz": {
+    "causa_inmediata": "Liberación de energía hidráulica residual",
+    "causas_basicas": [
+      "No identificación del acumulador",
+      "Falta de verificación de energía cero",
+      "LOTO incompleto"
+    ],
+    "causas_sistemicas": [
+      "Procedimiento LOTO genérico",
+      "Diagramas hidráulicos incompletos",
+      "Capacitación insuficiente en energías almacenadas",
+      "Supervisión inadecuada"
+    ]
+  },
+  
+  "jerarquia_controles": {
+    "eliminacion": "No considerada",
+    "sustitucion": "No aplicable",
+    "ingenieria": "Ausencia de válvula de descarga visible",
+    "administrativos": "Procedimiento deficiente",
+    "epp": "Última barrera, no preventiva"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 25,
+      "pregunta": "¿Cuáles fueron las fallas CRÍTICAS del sistema que permitieron el evento? (Selecciona TODAS las aplicables)",
+      "opciones": [
+        { "texto": "Falla exclusiva del trabajador por no ser cuidadoso", "correcta": false, "feedback_sistemico": "❌ Enfoque individual: Los incidentes rara vez son causados por un solo error humano." },
+        { "texto": "LOTO incompleto: no se identificó el acumulador", "correcta": true, "feedback_sistemico": "✅ Correcto: El procedimiento LOTO debe identificar TODAS las fuentes de energía, incluyendo residuales." },
+        { "texto": "Falta de ingeniería de seguridad: ausencia de válvula de descarga visible", "correcta": true, "feedback_sistemico": "✅ Correcto: Los controles de ingeniería son más efectivos que los administrativos." },
+        { "texto": "Presión por tiempo que llevó a omitir pasos", "correcta": false, "feedback_sistemico": "⚠️ Parcial: La presión por tiempo es un factor, pero el sistema debe prevenir errores incluso bajo presión." },
+        { "texto": "Ausencia de verificación obligatoria de energía cero", "correcta": true, "feedback_sistemico": "✅ Correcto: La verificación de energía cero es el último paso crítico antes de iniciar trabajo." }
+      ],
+      "justificacion_experta": "El evento no fue producto de un solo error humano, sino de múltiples fallas del sistema de gestión de seguridad. Un enfoque sistémico identifica barreras fallidas, no culpables."
+    },
+    
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 30,
+      "pregunta": "Identifica la CAUSA RAÍZ REAL del evento. Explica POR QUÉ el sistema permitió que esto ocurriera.",
+      "palabras_clave_esperadas": [
+        "procedimiento", "identificación", "energía residual", "acumulador", 
+        "verificación", "sistema", "gestión", "LOTO", "energías peligrosas"
+      ],
+      "respuesta_modelo": "El evento ocurrió debido a un sistema de control de energías peligrosas deficiente, que no contempla la identificación, descarga y verificación de energías residuales hidráulicas, combinado con fallas de supervisión y documentación técnica incompleta.",
+      "criterios_evaluacion": {
+        "menciona_sistema": true,
+        "no_culpa_individuo": true,
+        "propone_mejora_procedimental": true
+      },
+      "feedback_guiado": "💡 Pista: Piensa en QUÉ del sistema falló, no en QUIÉN cometió el error. ¿El procedimiento era suficiente? ¿La documentación estaba completa? ¿Existían controles de ingeniería?"
+    },
+    
+    {
+      "id": "Q3",
+      "tipo": "analisis_responsabilidad",
+      "peso": 20,
+      "pregunta": "Asigna el nivel de responsabilidad SISTÉMICA (no individual) a cada rol:",
+      "roles": [
+        {
+          "rol": "Técnico de mantenimiento",
+          "opciones": [
+            { "nivel": "Alta", "correcta": false, "explicacion": "El técnico siguió el procedimiento disponible. La responsabilidad sistémica es baja." },
+            { "nivel": "Media", "correcta": false, "explicacion": "El técnico aplicó LOTO según lo conocido. La falla está en el sistema que no le dio la información completa." },
+            { "nivel": "Baja", "correcta": true, "explicacion": "✅ Correcto: En un enfoque sistémico, el individuo opera dentro de las barreras que el sistema le proporciona." }
+          ]
+        },
+        {
+          "rol": "Supervisor de mantenimiento",
+          "opciones": [
+            { "nivel": "Alta", "correcta": false, "explicacion": "El supervisor autorizó con la información disponible. La falla es del sistema de gestión." },
+            { "nivel": "Media", "correcta": true, "explicacion": "✅ Correcto: El supervisor tiene responsabilidad media por no verificar que el AST fuera específico para este equipo." },
+            { "nivel": "Baja", "correcta": false, "explicacion": "El supervisor tiene más responsabilidad que el técnico por la autorización del trabajo." }
+          ]
+        },
+        {
+          "rol": "Ingeniería / Documentación técnica",
+          "opciones": [
+            { "nivel": "Alta", "correcta": true, "explicacion": "✅ Correcto: La ausencia de diagramas completos que muestren el acumulador es una falla sistémica de alto impacto." },
+            { "nivel": "Media", "correcta": false, "explicacion": "La documentación incompleta es una causa raíz, no contribuyente." },
+            { "nivel": "Baja", "correcta": false, "explicacion": "La ingeniería tiene alta responsabilidad en proveer información técnica completa." }
+          ]
+        },
+        {
+          "rol": "Sistema de Gestión SHE de la empresa",
+          "opciones": [
+            { "nivel": "Alta", "correcta": true, "explicacion": "✅ Correcto: El sistema LOTO genérico que no considera energías residuales es la falla de mayor nivel." },
+            { "nivel": "Media", "correcta": false, "explicacion": "El sistema de gestión tiene la máxima responsabilidad en prevenir este tipo de eventos." },
+            { "nivel": "Baja", "correcta": false, "explicacion": "El sistema de gestión es el responsable último de las barreras de seguridad." }
+          ]
+        }
+      ]
+    },
+    
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Selecciona las acciones que PREVENIRÍAN la recurrencia de este evento (prioriza por efectividad):",
+      "opciones": [
+        { 
+          "texto": "Actualizar procedimiento LOTO para incluir verificación obligatoria de energías residuales", 
+          "correcta": true, 
+          "jerarquia": "administrativo",
+          "prioridad": 1,
+          "explicacion": "✅ Alta prioridad: Corrige la falla procedimental identificada."
+        },
+        {
+          "texto": "Capacitar únicamente al técnico involucrado",
+          "correcta": false,
+          "jerarquia": "administrativo",
+          "prioridad": 4,
+          "explicacion": "❌ Baja efectividad: Enfocarse en una persona no previene recurrencia sistémica."
+        },
+        {
+          "texto": "Identificar y señalizar físicamente todos los acumuladores en diagramas y campo",
+          "correcta": true,
+          "jerarquia": "ingenieria",
+          "prioridad": 1,
+          "explicacion": "✅ Alta prioridad: Control de ingeniería más efectivo que el administrativo."
+        },
+        {
+          "texto": "Implementar checklist obligatorio de 'Verificación de Energía Cero' antes de iniciar trabajo",
+          "correcta": true,
+          "jerarquia": "administrativo",
+          "prioridad": 2,
+          "explicacion": "✅ Media-alta prioridad: Barrera administrativa crítica para capturar errores."
+        },
+        {
+          "texto": "Auditoría trimestral del sistema LOTO por área SHE",
+          "correcta": true,
+          "jerarquia": "administrativo",
+          "prioridad": 3,
+          "explicacion": "✅ Media prioridad: Verificación periódica para detectar desviaciones."
+        },
+        {
+          "texto": "Instalar válvulas de descarga automática con enclavamiento en circuitos hidráulicos",
+          "correcta": true,
+          "jerarquia": "ingenieria",
+          "prioridad": 1,
+          "explicacion": "✅ Alta prioridad: Control de ingeniería que elimina la dependencia del comportamiento humano."
+        }
+      ],
+      "criterio_aprobacion": {
+        "min_correctas": 4,
+        "debe_incluir_ingenieria": true,
+        "no_debe_incluir_solo_capacitacion": true
+      }
+    }
+  ],
+  
+  "consecuencias_potenciales": {
+    "lesiones": ["Inyección hidráulica", "Amputación", "Lesión ocular grave"],
+    "fatales": "Posible",
+    "operativas": "Paro mayor de producción",
+    "legales": "Multas STPS, clausura temporal, responsabilidad penal",
+    "reputacionales": "Daño severo a imagen corporativa"
+  },
+  
+  "conclusion_oficial": "El evento fue un casi accidente de alto potencial causado por fallas sistémicas en el control de energías peligrosas. No se trató de un error individual, sino de un sistema LOTO incompleto que no considera energías residuales hidráulicas. La investigación recomienda actualizar procedimientos, mejorar documentación técnica e implementar controles de ingeniería para prevenir recurrencia.",
+  
+  "leccion_aprendida_master": "Si una energía no se identifica, no se controla. Si no se verifica energía cero, el trabajo no debe iniciar. La experiencia del trabajador no sustituye a un sistema de seguridad robusto. La prevención efectiva requiere barreras múltiples: ingeniería + procedimientos + verificación + supervisión.",
+  
+  "estado_final": {
+    "evento_cerrado": true,
+    "acciones_correctivas_implementadas": true,
+    "seguimiento": "Auditoría SHE trimestral del sistema LOTO",
+    "difusion_leccion": "Compartido con todas las áreas de mantenimiento"
+  },
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_master": 80,
+    "tiempo_estimado_minutos": 25,
+    "requisitos_previos": ["Examen LOTO Supervisor SHE aprobado", "Curso de Investigación de Incidentes"]
+  }
+}
