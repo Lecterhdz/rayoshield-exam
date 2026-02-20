@@ -111,17 +111,22 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
     let puntaje = 0;
     let feedback = [];
     
+    // Verificar cada opción
     pregunta.opciones.forEach(function(opt, idx) {
         const seleccionada = respuestasUsuario.includes(idx);
         if (seleccionada === opt.correcta) {
+            // Respuesta correcta (seleccionó correcta o no seleccionó incorrecta)
             puntaje += pregunta.peso / pregunta.opciones.length;
         } else {
-            feedback.push(opt.feedback_sistemico);
+            // Error: seleccionó incorrecta o no seleccionó correcta
+            if (opt.feedback_sistemico) {
+                feedback.push(opt.feedback_sistemico);
+            }
         }
     });
     
-    // Feedback experto si falló
-    if (puntaje < pregunta.peso * 0.8) {
+    // Feedback experto si falló significativamente
+    if (puntaje < pregunta.peso * 0.7 && pregunta.justificacion_experta) {
         feedback.push('💡 ' + pregunta.justificacion_experta);
     }
     
@@ -133,7 +138,7 @@ function evaluarRespuestaAbierta(respuestaUsuario, pregunta) {
     if (!respuestaUsuario || respuestaUsuario.trim().length < 20) {
         return { 
             puntaje: 0, 
-            feedback: ['⚠️ Tu respuesta es muy breve. Explica con más detalle el análisis sistémico.'] 
+            feedback: ['⚠️ Tu respuesta es muy breve. Explica con más detalle el análisis sistémico (mínimo 20 caracteres).'] 
         };
     }
     
@@ -141,30 +146,40 @@ function evaluarRespuestaAbierta(respuestaUsuario, pregunta) {
     let palabrasEncontradas = 0;
     
     // Contar palabras clave encontradas
-    pregunta.palabras_clave_esperadas.forEach(function(palabra) {
-        if (respuestaLower.includes(palabra.toLowerCase())) {
-            palabrasEncontradas++;
-        }
-    });
+    if (pregunta.palabras_clave_esperadas) {
+        pregunta.palabras_clave_esperadas.forEach(function(palabra) {
+            if (respuestaLower.includes(palabra.toLowerCase())) {
+                palabrasEncontradas++;
+            }
+        });
+    }
     
     // Calcular puntaje basado en cobertura de keywords
-    const cobertura = palabrasEncontradas / pregunta.palabras_clave_esperadas.length;
+    const totalKeywords = pregunta.palabras_clave_esperadas ? pregunta.palabras_clave_esperadas.length : 1;
+    const cobertura = palabrasEncontradas / totalKeywords;
     let puntaje = Math.round(pregunta.peso * cobertura);
     
     // Bonus por mencionar conceptos sistémicos
-    if (respuestaLower.includes('sistema') || respuestaLower.includes('procedimiento')) {
+    if (respuestaLower.includes('sistema') || respuestaLower.includes('procedimiento') || respuestaLower.includes('gestión')) {
         puntaje = Math.min(puntaje + 5, pregunta.peso);
     }
     
     // Feedback constructivo
     let feedback = [];
-    if (cobertura < 0.5) {
+    if (cobertura < 0.5 && pregunta.palabras_clave_esperadas) {
         feedback.push('💡 Considera mencionar: ' + pregunta.palabras_clave_esperadas.slice(0, 3).join(', ') + '...');
     }
-    if (!respuestaLower.includes('sistema') && pregunta.criterios_evaluacion?.menciona_sistema) {
-        feedback.push('💡 Enfócate en QUÉ del sistema falló, no en QUIÉN cometió el error.');
+    if (pregunta.criterios_evaluacion) {
+        if (pregunta.criterios_evaluacion.menciona_sistema && !respuestaLower.includes('sistema')) {
+            feedback.push('💡 Enfócate en QUÉ del sistema falló, no en QUIÉN cometió el error.');
+        }
+        if (pregunta.criterios_evaluacion.no_culpa_individuo && respuestaLower.match(/(culpa|error|falló)\s+(el\s+trabajador|técnico|operador)/i)) {
+            feedback.push('💡 En investigación sistémica, evitamos culpar al individuo. Analiza las barreras fallidas.');
+        }
     }
-    feedback.push('📝 Respuesta modelo: ' + pregunta.respuesta_modelo);
+    if (pregunta.respuesta_modelo) {
+        feedback.push('📝 Referencia: ' + pregunta.respuesta_modelo);
+    }
     
     return { puntaje: puntaje, feedback: feedback };
 }
@@ -176,18 +191,19 @@ function evaluarAnalisisResponsabilidad(respuestasUsuario, pregunta) {
     
     pregunta.roles.forEach(function(role, roleIdx) {
         const seleccionNivel = respuestasUsuario[roleIdx];
-        if (seleccionNivel !== undefined) {
+        if (seleccionNivel !== undefined && seleccionNivel !== null) {
             const opcion = role.opciones[seleccionNivel];
             if (opcion && opcion.correcta) {
                 puntaje += pregunta.peso / pregunta.roles.length;
-            } else if (opcion) {
+            } else if (opcion && opcion.explicacion) {
                 feedback.push(`👤 ${role.rol}: ${opcion.explicacion}`);
             }
         }
     });
     
-    if (feedback.length === 0 && puntaje < pregunta.peso) {
-        feedback.push('💡 En un enfoque sistémico, la responsabilidad se distribuye según la capacidad de influir en las barreras de seguridad.');
+    // Feedback general si hay errores
+    if (feedback.length === 0 && puntaje < pregunta.peso * 0.8) {
+        feedback.push('💡 En un enfoque sistémico, la responsabilidad se distribuye según la capacidad de influir en las barreras de seguridad. La organización tiene mayor responsabilidad que el individuo.');
     }
     
     return { puntaje: Math.round(puntaje), feedback: feedback };
@@ -197,14 +213,15 @@ function evaluarAnalisisResponsabilidad(respuestasUsuario, pregunta) {
 function evaluarPlanAccion(respuestasUsuario, pregunta) {
     let puntaje = 0;
     let feedback = [];
-    let seleccionadas = respuestasUsuario.filter(function(idx) { return idx !== undefined; });
+    let seleccionadas = respuestasUsuario.filter(function(idx) { return idx !== undefined && idx !== null; });
     
     // Verificar respuestas correctas
     seleccionadas.forEach(function(idx) {
         const opt = pregunta.opciones[idx];
         if (opt && opt.correcta) {
-            puntaje += pregunta.peso / pregunta.opciones.length * 1.2; // Bonus por priorizar correctas
-        } else if (opt) {
+            // Bonus por priorizar correctas
+            puntaje += pregunta.peso / pregunta.opciones.length * 1.2;
+        } else if (opt && opt.explicacion) {
             feedback.push(opt.explicacion);
         }
     });
@@ -216,15 +233,25 @@ function evaluarPlanAccion(respuestasUsuario, pregunta) {
         }).length;
         
         if (correctasCount < pregunta.criterio_aprobacion.min_correctas) {
-            feedback.push(`⚠️ Se requieren al menos ${pregunta.criterio_aprobacion.min_correctas} acciones efectivas.`);
+            feedback.push(`⚠️ Se requieren al menos ${pregunta.criterio_aprobacion.min_correctas} acciones efectivas para prevenir recurrencia.`);
         }
         
-        const incluyeIngenieria = seleccionadas.some(function(idx) {
-            return pregunta.opciones[idx]?.jerarquia === 'ingenieria' && pregunta.opciones[idx]?.correcta;
-        });
+        if (pregunta.criterio_aprobacion.debe_incluir_ingenieria) {
+            const incluyeIngenieria = seleccionadas.some(function(idx) {
+                return pregunta.opciones[idx]?.jerarquia === 'ingenieria' && pregunta.opciones[idx]?.correcta;
+            });
+            if (!incluyeIngenieria) {
+                feedback.push('💡 Los controles de ingeniería (diseño, hardware) son más efectivos que los administrativos. Priorízalos cuando sea posible.');
+            }
+        }
         
-        if (pregunta.criterio_aprobacion.debe_incluir_ingenieria && !incluyeIngenieria) {
-            feedback.push('💡 Los controles de ingeniería son más efectivos que los administrativos. Priorízalos.');
+        if (pregunta.criterio_aprobacion.no_debe_incluir_solo_capacitacion) {
+            const soloCapacitacion = seleccionadas.every(function(idx) {
+                return pregunta.opciones[idx]?.texto?.toLowerCase().includes('capacitar');
+            });
+            if (soloCapacitacion && seleccionadas.length > 0) {
+                feedback.push('💡 Capacitar es importante, pero no previene errores por sí solo. Combínalo con controles de ingeniería y procedimientos.');
+            }
         }
     }
     
@@ -234,7 +261,7 @@ function evaluarPlanAccion(respuestasUsuario, pregunta) {
     }).filter(function(j) { return j; });
     
     if (jerarquiasSeleccionadas.includes('ingenieria')) {
-        feedback.push('✅ Excelente: Priorizaste controles de ingeniería (más efectivos).');
+        feedback.push('✅ Excelente: Priorizaste controles de ingeniería (más efectivos y confiables).');
     }
     
     return { puntaje: Math.min(Math.round(puntaje), pregunta.peso), feedback: feedback };
@@ -264,12 +291,13 @@ function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
                 resultado = evaluarPlanAccion(respuestas, pregunta);
                 break;
             default:
-                resultado = { puntaje: 0, feedback: ['Tipo de pregunta no soportado'] };
+                resultado = { puntaje: 0, feedback: ['⚠️ Tipo de pregunta no soportado: ' + pregunta.tipo] };
         }
         
         puntajeTotal += resultado.puntaje;
         detallesPorPregunta.push({
             preguntaId: pregunta.id,
+            tipo: pregunta.tipo,
             puntaje: resultado.puntaje,
             maxPuntaje: pregunta.peso,
             feedback: resultado.feedback
@@ -280,7 +308,7 @@ function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
     // Determinar estado final
     const puntajeMaximo = caso.metadatos_evaluacion?.puntaje_maximo || 100;
     const puntajeAprobacion = caso.metadatos_evaluacion?.puntaje_aprobacion_master || 80;
-    const porcentaje = Math.round((puntajeTotal / puntajeMaximo) * 100);
+    const porcentaje = puntajeMaximo > 0 ? Math.round((puntajeTotal / puntajeMaximo) * 100) : 0;
     
     return {
         puntajeTotal: puntajeTotal,
@@ -289,17 +317,17 @@ function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
         aprobado: porcentaje >= puntajeAprobacion,
         feedback: feedbackGeneral,
         detalles: detallesPorPregunta,
-        leccion: caso.leccion_aprendida_master,
-        conclusion: caso.conclusion_oficial
+        leccion: caso.leccion_aprendida_master || caso.leccion_aprendida,
+        conclusion: caso.conclusion_oficial || caso.conclusion
     };
 }
 
-// Exportar para uso global
+// Exportar funciones para uso global (navegador)
 if (typeof window !== 'undefined') {
-    window.CATEGORIAS = CATEGORIAS;
-    window.CASOS_INVESTIGACION = CASOS_INVESTIGACION;
-    window.cargarExamen = cargarExamen;
-    window.cargarCasoInvestigacion = cargarCasoInvestigacion;
     window.evaluarCasoInvestigacion = evaluarCasoInvestigacion;
-    console.log('✅ exams.js cargado - Casos MASTER habilitados');
+    window.evaluarAnalisisMultiple = evaluarAnalisisMultiple;
+    window.evaluarRespuestaAbierta = evaluarRespuestaAbierta;
+    window.evaluarAnalisisResponsabilidad = evaluarAnalisisResponsabilidad;
+    window.evaluarPlanAccion = evaluarPlanAccion;
+    console.log('✅ Funciones de evaluación MASTER cargadas');
 }
