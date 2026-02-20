@@ -36,7 +36,7 @@ async function generarCertificado(userData, examen, resultado) {
     ctx.font = 'bold 48px Arial';
     ctx.fillStyle = '#1a1a1a';
     ctx.textAlign = 'center';
-    ctx.fillText('CERTIFICADO DE APROBACIÓN', canvas.width / 2, 150);
+    ctx.fillText('CERTIFICADO ORTOGADO A', canvas.width / 2, 150);
     
     // Subtítulo
     ctx.font = '24px Arial';
@@ -97,6 +97,21 @@ async function generarCertificado(userData, examen, resultado) {
     ctx.fillStyle = '#666';
     ctx.fillText('RayoShield - Seguridad Industrial', canvas.width / 2, 750);
     
+    // 🆕 MARCA DE AGUA DEMO (si aplica)
+    if (localStorage.getItem('rayoshield_licencia')) {
+        const licencia = JSON.parse(localStorage.getItem('rayoshield_licencia'));
+        if (licencia.tipo === 'DEMO') {
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(-Math.PI / 6);
+            ctx.font = 'bold 80px Arial';
+            ctx.fillStyle = 'rgba(255, 152, 0, 0.3)';
+            ctx.textAlign = 'center';
+            ctx.fillText('VERSIÓN DEMO', 0, 0);
+            ctx.restore();
+        }
+    }
+
     // Convertir a URL de imagen
     return canvas.toDataURL('image/png');
 }
