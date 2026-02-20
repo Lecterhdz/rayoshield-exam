@@ -756,7 +756,7 @@ const app = {
         document.getElementById('caso-resultado').style.display = 'none';
         this.casoActual = null;
         this.respuestasCaso = {};
-    }    
+    },    
 
     
     // ─────────────────────────────────────────────────────────────────────
@@ -789,6 +789,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
