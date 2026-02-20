@@ -428,6 +428,333 @@ const app = {
     },
     mostrarInfo: function() { this.mostrarPantalla('info-screen'); },
 
+
+
+    // ─────────────────────────────────────────────────────────────────────
+    // CASOS CRÍTICOS - INVESTIGACIÓN MASTER
+    // ─────────────────────────────────────────────────────────────────────
+
+    casoActual: null,
+    respuestasCaso: {},
+
+    irACasosMaster: function() {
+        document.getElementById('casos-list').style.display = 'block';
+        document.getElementById('caso-detalle').style.display = 'none';
+        document.getElementById('casos-main-buttons').style.display = 'block';
+    
+        var list = document.getElementById('casos-list');
+        if (!list) return;
+        list.innerHTML = '';
+    
+        if (typeof CASOS_INVESTIGACION === 'undefined' || CASOS_INVESTIGACION.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos de investigación disponibles aún.</p>';
+            return;
+        }
+    
+        var self = this;
+        CASOS_INVESTIGACION.forEach(function(caso) {
+            var item = document.createElement('div');
+            item.className = 'exam-item';
+            item.innerHTML = `
+                <h4>${caso.icono} ${caso.titulo}</h4>
+                <p><span class="badge-nivel ${caso.nivel}">${caso.nivel}</span> • ${caso.tiempo_estimado}</p>
+                <p style="color:#666;font-size:14px;margin-top:5px;">${caso.descripcion}</p>
+            ${caso.requisito ? `<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ${caso.requisito}</p>` : ''}
+            `;
+            item.onclick = function() { self.cargarCasoMaster(caso.id); };
+            list.appendChild(item);
+        });
+    
+        this.mostrarPantalla('casos-master-screen');
+    },
+
+    cargarCasoMaster: async function(casoId) {
+        var self = this;
+        this.casoActual = await cargarCasoInvestigacion(casoId);
+        if (!this.casoActual) {
+            alert('❌ Error cargando el caso');
+            return;
+        }
+    
+        // Ocultar lista, mostrar detalle
+        document.getElementById('casos-list').style.display = 'none';
+        document.getElementById('caso-detalle').style.display = 'block';
+        document.getElementById('casos-main-buttons').style.display = 'none';
+        document.getElementById('caso-resultado').style.display = 'none';
+    
+        // Llenar metadatos
+        document.getElementById('caso-id').textContent = this.casoActual.id;
+        document.getElementById('caso-fecha').textContent = this.casoActual.fecha_evento;
+        document.getElementById('caso-industria').textContent = this.casoActual.industria;
+        document.getElementById('caso-tiempo').textContent = this.casoActual.metadatos_evaluacion?.tiempo_estimado_minutos + ' min' || '25 min';
+    
+        // Descripción del evento
+        var desc = this.casoActual.descripcion_evento;
+        document.getElementById('caso-descripcion').innerHTML = `
+            <strong>Actividad:</strong> ${desc.actividad}<br>
+            <strong>Equipo:</strong> ${desc.equipo}<br>
+            <strong>Evento:</strong> ${desc.evento}<br>
+            <strong>Resultado:</strong> ${desc.resultado}<br>
+            <strong style="color:#f44336;">Clasificación:</strong> ${desc.clasificacion}
+        `;
+    
+        // Timeline
+        var timelineEl = document.getElementById('caso-timeline');
+        timelineEl.innerHTML = '';
+        this.casoActual.linea_tiempo.forEach(function(evento, idx) {
+            var item = document.createElement('div');
+            item.className = 'timeline-item' + (evento.includes('Liberación') ? ' evento-critico' : '');
+            item.textContent = evento;
+            timelineEl.appendChild(item);
+        });
+    
+        // Energías
+        var energiasEl = document.getElementById('caso-energias');
+        energiasEl.innerHTML = '';
+        var energias = this.casoActual.energias_identificadas;
+        Object.keys(energias).forEach(function(tipo) {
+            var estado = energias[tipo];
+            var clase = estado === 'Aisladas' ? 'aislada' : (estado === 'No aplican' ? 'na' : 'no-aislada');
+            var item = document.createElement('div');
+            item.className = 'energia-item ' + clase;
+            item.innerHTML = `<strong>${tipo}</strong><br><small>${estado}</small>`;
+            energiasEl.appendChild(item);
+        });
+    
+        // Preguntas
+        var preguntasEl = document.getElementById('caso-preguntas');
+        preguntasEl.innerHTML = '';
+        this.respuestasCaso = {};
+    
+        this.casoActual.preguntas.forEach(function(pregunta, idx) {
+            var preguntaDiv = document.createElement('div');
+            preguntaDiv.className = 'pregunta-master';
+            preguntaDiv.innerHTML = `<h4>🔍 Pregunta ${idx + 1} (${pregunta.tipo.replace('_', ' ')}) - ${pregunta.peso} pts</h4><p>${pregunta.pregunta}</p>`;
+        
+            switch(pregunta.tipo) {
+                case 'analisis_multiple':
+                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
+                    break;
+                case 'respuesta_abierta_guiada':
+                    preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
+                    break;
+                case 'analisis_responsabilidad':
+                    preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
+                    break;
+                case 'plan_accion':
+                    preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
+                    break;
+            }
+        
+            preguntasEl.appendChild(preguntaDiv);
+        });
+    
+        // Mostrar botón de enviar
+        document.getElementById('btn-enviar-caso').style.display = 'inline-block';
+    },
+
+    renderAnalisisMultiple: function(pregunta) {
+        var container = document.createElement('div');
+        var self = this;
+    
+        pregunta.opciones.forEach(function(opt, idx) {
+            var label = document.createElement('label');
+            label.className = 'opcion-sistemica';
+            label.innerHTML = `
+                <input type="checkbox" name="pregunta-${pregunta.id}" value="${idx}" style="margin-right:10px;">
+                ${opt.texto}
+            `;
+            label.onclick = function(e) {
+                if (e.target.tagName === 'INPUT') {
+                    label.classList.toggle('seleccionada');
+                }
+            };
+            container.appendChild(label);
+        });
+    
+        return container;
+    },
+
+    renderRespuestaAbierta: function(pregunta) {
+        var container = document.createElement('div');
+    
+        var textarea = document.createElement('textarea');
+        textarea.className = 'respuesta-abierta';
+        textarea.placeholder = 'Escribe tu análisis sistémico aquí... (mínimo 20 caracteres)';
+        textarea.id = `respuesta-${pregunta.id}`;
+        textarea.oninput = function() {
+            // Guardar respuesta
+        };
+        container.appendChild(textarea);
+    
+        if (pregunta.feedback_guiado) {
+            var pista = document.createElement('div');
+            pista.className = 'pista-experto';
+            pista.innerHTML = `💡 ${pregunta.feedback_guiado}`;
+            container.appendChild(pista);
+        }
+    
+        return container;
+    },
+
+    renderAnalisisResponsabilidad: function(pregunta) {
+        var container = document.createElement('div');
+        container.className = 'matriz-responsabilidad';
+        var self = this;
+    
+        pregunta.roles.forEach(function(role, roleIdx) {
+            var row = document.createElement('div');
+            row.className = 'role-row';
+            row.innerHTML = `<div class="role-name">${role.rol}</div>`;
+        
+            var optionsDiv = document.createElement('div');
+            optionsDiv.className = 'role-options';
+        
+            role.opciones.forEach(function(opt, optIdx) {
+                var label = document.createElement('label');
+                label.className = 'role-option';
+                label.innerHTML = `
+                    <input type="radio" name="responsabilidad-${pregunta.id}-${roleIdx}" value="${optIdx}">
+                    <span>${opt.nivel}</span>
+                `;
+                label.onclick = function(e) {
+                    if (e.target.tagName === 'INPUT') {
+                        // Desmarcar otros
+                        row.querySelectorAll('input').forEach(function(r) { r.closest('.role-option').classList.remove('seleccionada'); });
+                        label.classList.add('seleccionada');
+                    }
+                };
+                optionsDiv.appendChild(label);
+            });
+        
+            row.appendChild(optionsDiv);
+            container.appendChild(row);
+        });
+    
+        return container;
+    },
+
+    renderPlanAccion: function(pregunta) {
+        var container = document.createElement('div');
+        container.className = 'plan-accion-grid';
+        var self = this;
+    
+        pregunta.opciones.forEach(function(opt, idx) {
+            var item = document.createElement('label');
+            item.className = 'accion-item';
+            item.innerHTML = `
+                <input type="checkbox" name="plan-${pregunta.id}" value="${idx}" style="margin-top:5px;">
+                <div style="flex:1;">
+                    <strong>${opt.texto}</strong>
+                    <div style="margin-top:5px;">
+                        <span class="accion-jerarquia ${opt.jerarquia}">${opt.jerarquia}</span>
+                        ${opt.prioridad ? `<span style="margin-left:10px;font-size:12px;color:#666;">Prioridad: ${opt.prioridad}</span>` : ''}
+                    </div>
+                </div>
+            `;
+            item.onclick = function(e) {
+                if (e.target.tagName === 'INPUT') {
+                    item.classList.toggle('seleccionada');
+                }
+            };
+            container.appendChild(item);
+        });
+    
+        return container;
+    },
+
+    enviarRespuestasCaso: function() {
+        if (!this.casoActual) return;
+    
+        // Recopilar respuestas
+        var respuestasPorPregunta = {};
+    
+        this.casoActual.preguntas.forEach(function(pregunta) {
+            switch(pregunta.tipo) {
+                case 'analisis_multiple':
+                    var checks = document.querySelectorAll(`input[name="pregunta-${pregunta.id}"]:checked`);
+                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
+                    break;
+                case 'respuesta_abierta_guiada':
+                    var textarea = document.getElementById(`respuesta-${pregunta.id}`);
+                    respuestasPorPregunta[pregunta.id] = [textarea ? textarea.value : ''];
+                    break;
+                case 'analisis_responsabilidad':
+                    var respuestas = [];
+                    pregunta.roles.forEach(function(role, idx) {
+                        var selected = document.querySelector(`input[name="responsabilidad-${pregunta.id}-${idx}"]:checked`);
+                        respuestas.push(selected ? parseInt(selected.value) : undefined);
+                    });
+                    respuestasPorPregunta[pregunta.id] = respuestas;
+                    break;
+                case 'plan_accion':
+                    var checks = document.querySelectorAll(`input[name="plan-${pregunta.id}"]:checked`);
+                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
+                    break;
+            }
+        });
+    
+        // Evaluar
+        var resultado = evaluarCasoInvestigacion(respuestasPorPregunta, this.casoActual);
+    
+        // Mostrar resultado
+        this.mostrarResultadoCaso(resultado);
+    },
+
+    mostrarResultadoCaso: function(resultado) {
+        var resultadoEl = document.getElementById('caso-resultado');
+        resultadoEl.style.display = 'block';
+        resultadoEl.scrollIntoView({ behavior: 'smooth' });
+    
+        var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
+        var icono = resultado.aprobado ? '✅' : '📚';
+    
+        resultadoEl.innerHTML = `
+            <div class="resultado-investigacion ${claseEstado}">
+                <h2>${icono} Resultado de la Investigación</h2>
+                <div class="puntaje-master">${resultado.porcentaje}%</div>
+                <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
+                <p><strong>Estado:</strong> ${resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso'}</p>
+            </div>
+        
+            ${resultado.feedback.length > 0 ? `
+            <div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;">
+                <strong>💡 Retroalimentación:</strong>
+                <ul style="margin-top:10px;">
+                    ${resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('')}
+                </ul>
+            </div>` : ''}
+        
+            <div class="leccion-master">
+                <strong>🎓 Lección Aprendida:</strong>
+                <p style="margin-top:10px;">${resultado.leccion}</p>
+            </div>
+        
+            <div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;">
+                <strong>📋 Conclusión Oficial:</strong>
+                <p style="margin-top:10px;line-height:1.6;">${resultado.conclusion}</p>
+            </div>
+        
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>
+                <button class="btn btn-primary" onclick="app.volverHome()">🏠 Inicio</button>
+            </div>
+        `;
+    
+        // Ocultar botón de enviar
+        document.getElementById('btn-enviar-caso').style.display = 'none';
+    },
+
+    volverAListaCasos: function() {
+        document.getElementById('casos-list').style.display = 'block';
+        document.getElementById('caso-detalle').style.display = 'none';
+        document.getElementById('casos-main-buttons').style.display = 'block';
+        document.getElementById('caso-resultado').style.display = 'none';
+        this.casoActual = null;
+        this.respuestasCaso = {};
+    }    
+
+    
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
     // ─────────────────────────────────────────────────────────────────────
@@ -458,5 +785,6 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
