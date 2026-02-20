@@ -85,16 +85,34 @@
             </div>
         </section>
 
-        <!-- SELECCIÓN DE EXAMEN -->
+        <!-- SELECCIÓN DE EXAMEN (agrupado por categoría → nivel) -->
         <section id="select-exam-screen" class="screen">
             <div class="card">
                 <h2>📚 Selecciona un Examen</h2>
-                <div id="exam-list" class="exam-list"></div>
+        
+                <!-- Vista: Categorías -->
+                <div id="categorias-view">
+                    <p style="color:#666;margin-bottom:20px;">Elige una categoría de examen</p>
+                    <div id="categorias-list" class="exam-list"></div>
+                </div>
+        
+                <!-- Vista: Niveles (oculta por defecto) -->
+                <div id="niveles-view" style="display:none;">
+                    <button class="btn btn-secondary" onclick="app.volverACategorias()" style="margin-bottom:15px;">
+                        ← Volver a categorías
+                    </button>
+                    <h3 id="categoria-titulo" style="color:#2196F3;margin-bottom:10px;"></h3>
+                    <p id="categoria-norma" style="color:#666;margin-bottom:20px;"></p>
+                    <p style="color:#666;margin-bottom:20px;">Selecciona tu nivel:</p>
+                    <div id="niveles-list" class="exam-list"></div>
+                </div>
+        
                 <div class="button-group">
                     <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
                 </div>
             </div>
         </section>
+
 
         <!-- EXAMEN (actualizado con timer y sin botón salir) -->
         <section id="exam-screen" class="screen">
@@ -258,6 +276,7 @@
     </script>
 </body>
 </html>
+
 
 
 
