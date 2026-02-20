@@ -134,24 +134,40 @@ const app = {
     
     mostrarResultado() {
         this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
-        
+    
         const icono = getIconoResultado(this.resultadoActual.estado);
         const colorClase = getColorEstado(this.resultadoActual.estado);
-        
+    
         document.getElementById('result-icon').textContent = icono;
-        document.getElementById('result-title').textContent = this.resultadoActual.estado === 'Aprobado' ? '✅ APROBADO' : '❌ REPROBADO';
-        document.getElementById('score-number').textContent = `${this.resultadoActual.score}%`;
+    
+        // Agregar marca DEMO en el título si aplica
+        let tituloResultado = this.resultadoActual.estado === 'Aprobado' ? '✅ APROBADO' : '❌     REPROBADO';
+        if (this.licencia.tipo === 'DEMO') {
+            tituloResultado += ' (DEMO)';
+        }
+        document.getElementById('result-title').textContent = tituloResultado;
+    
+        document.getElementById('score-number').textContent =     `${this.resultadoActual.score}%`;
         document.getElementById('aciertos').textContent = this.resultadoActual.aciertos;
         document.getElementById('total').textContent = this.resultadoActual.total;
         document.getElementById('min-score').textContent = this.resultadoActual.minScore;
-        
+    
         const statusEl = document.getElementById('result-status');
         statusEl.textContent = this.resultadoActual.estado;
         statusEl.className = `score ${colorClase}`;
-        
+    
         const btnCertificado = document.getElementById('btn-certificado');
-        btnCertificado.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none';
-        
+        if (this.resultadoActual.estado === 'Aprobado') {
+            btnCertificado.style.display = 'inline-block';
+            if (this.licencia.tipo === 'DEMO') {
+                btnCertificado.textContent = '📄 Descargar Certificado (DEMO)';
+            } else {
+                btnCertificado.textContent = '📄 Descargar Certificado';
+            }
+        } else {
+            btnCertificado.style.display = 'none';
+        }
+    
         this.mostrarPantalla('result-screen');
         this.guardarEnHistorial();
         this.consumirExamen();
