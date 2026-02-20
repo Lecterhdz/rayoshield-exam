@@ -60,6 +60,9 @@
                     <button class="btn btn-info" onclick="app.mostrarInfo()">
                         ℹ️ Información
                     </button>
+                    <button class="btn btn-success" onclick="app.mostrarLicencia()">
+                        🔑 Licencia
+                    </button>
                 </div>
             </div>
         </section>
@@ -178,7 +181,40 @@
                 </button>
             </div>
         </section>
-
+<!-- LICENCIA -->
+<section id="license-screen" class="screen">
+    <div class="card">
+        <h2>🔑 Licencia</h2>
+        
+        <div id="licencia-info" class="licencia-info" style="padding: 20px; background: #f5f5f5; border-radius: 10px; margin: 20px 0; text-align: center;">
+            <!-- Se actualiza dinámicamente -->
+        </div>
+        
+        <div class="license-content">
+            <h3>¿Tienes un código de licencia?</h3>
+            <p style="color: #666; margin: 10px 0;">Ingresa tu código para activar la versión FULL</p>
+            
+            <input type="text" id="license-code" placeholder="Ej: FULL2026" 
+                   style="width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; margin: 15px 0;">
+            
+            <button class="btn btn-primary" onclick="app.activarLicencia()" style="width: 100%;">
+                🔓 Activar Licencia
+            </button>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #E3F2FD; border-radius: 10px;">
+                <h4 style="color: #1976D2; margin-bottom: 10px;">💰 Planes Disponibles</h4>
+                <p><strong>Individual:</strong> $499 MXN/año</p>
+                <p><strong>Equipo (10):</strong> $2,999 MXN/año</p>
+                <p><strong>Empresa (50+):</strong> $9,999 MXN/año</p>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">Contacto: tu@email.com</p>
+            </div>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="app.volverHome()" style="margin-top: 20px; width: 100%;">
+            ← Volver al Inicio
+        </button>
+    </div>
+</section>
     </main>
 
     <!-- Footer -->
