@@ -11,6 +11,7 @@ const app = {
     respuestasUsuario: [],
     preguntaActual: 0,
     resultadoActual: null,
+    respuestaTemporal: null,  // ← Agregar esta línea
     userData: {
         nombre: '',
         email: ''
@@ -124,14 +125,48 @@ const app = {
      * Maneja la selección de una respuesta
      * @param {number} indice - Índice de la opción seleccionada
      */
-    seleccionarRespuesta(indice) {
-        // Guardar respuesta
-        this.respuestasUsuario.push(indice);
+        seleccionarRespuesta(indice) {
+            // Guardar respuesta temporalmente
+            this.respuestaTemporal = indice;
+            
+            // Mostrar botón de confirmar
+            const optionsContainer = document.getElementById('options-container');
+            
+            // Remover botones de opciones existentes
+            optionsContainer.innerHTML = '';
+            
+            // Mostrar confirmación
+            const confirmDiv = document.createElement('div');
+            confirmDiv.className = 'confirm-container';
+            confirmDiv.style.cssText = 'text-align: center; padding: 20px;';
+            confirmDiv.innerHTML = `
+                <p style="font-size: 18px; margin-bottom: 20px;">
+                    ¿Confirmar esta respuesta?
+                </p>
+                <button class="btn btn-primary" onclick="app.confirmarRespuesta()" style="margin: 5px;">
+                    ✅ Confirmar
+                </button>
+                <button class="btn btn-secondary" onclick="app.cancelarRespuesta()" style="margin: 5px;">
+                    ↩️ Cambiar
+                </button>
+            `;
+            optionsContainer.appendChild(confirmDiv);
+        }
         
-        // Avanzar a siguiente pregunta o mostrar resultado
-        this.preguntaActual++;
+        confirmarRespuesta() {
+            this.respuestasUsuario.push(this.respuestaTemporal);
+            this.respuestaTemporal = null;
+            this.preguntaActual++;
+            
+            if (this.preguntaActual < this.examenActual.preguntas.length) {
+                this.mostrarPregunta();
+            } else {
+                this.mostrarResultado();
+            }
+        }
         
-        if (this.preguntaActual < this.examenActual.preguntas.length) {
+        cancelarRespuesta() {
+            this.respuestaTemporal = null;
             this.mostrarPregunta();
         } else {
             this.mostrarResultado();
@@ -286,4 +321,5 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
         .then(reg => console.log('Service Worker registrado', reg))
         .catch(err => console.log('Error registrando Service Worker', err));
+
 }
