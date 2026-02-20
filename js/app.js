@@ -731,17 +731,20 @@ const app = {
         var icono = resultado.aprobado ? '✅' : '📚';
         var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
     
-        // Botones condicionales
-        var botonesCertificado = resultado.aprobado ? 
-            '<div class="button-group" style="margin-top:20px;">' +
-            '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
-            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
-            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-            '</div>' :
-            '<div class="button-group" style="margin-top:20px;">' +
-            '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
-            '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-            '</div>';
+        // Botones condicionales (SEPARADOS del ternario)
+        var botonesHTML = '';
+        if (resultado.aprobado) {
+            botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
+                '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
+                '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
+                '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+                '</div>';
+        } else {
+            botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
+                '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
+                '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
+                '</div>';
+        }
     
         resultadoEl.innerHTML = `
             <div class="resultado-investigacion ${claseEstado}">
@@ -842,6 +845,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
