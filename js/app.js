@@ -732,7 +732,10 @@ const app = {
                 <h2>${icono} Resultado de la Investigación</h2>
                 <div class="puntaje-master">${resultado.porcentaje}%</div>
                 <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
-                <p><strong>Estado:</strong> ${resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso'}</p>
+                <p><strong>Estado:</strong> ${resultado.aprobado ? '✅ APROBADO - Nivel MASTER'<div class="button-group" style="margin-top:20px;">
+    <button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">
+        🏆 Descargar Certificado MASTER
+    </button> </div>: '📚 Requiere repaso'}</p>
             </div>
         
             ${resultado.feedback.length > 0 ? `
@@ -803,6 +806,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
