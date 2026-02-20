@@ -39,6 +39,7 @@ const app = {
         this.cargarDatosUsuario();
         this.cargarHistorial();
         this.cargarExamenGuardado();
+        this.initPWAInstall();  // ← Agregar esta línea
         this.actualizarUI();
         this.mostrarPantalla('home-screen');
         this.verificarExpiracionLicencia();
@@ -701,3 +702,52 @@ window.addEventListener('beforeunload', () => {
         clearInterval(app.timerExamen);
     }
 });
+// ───────────────────────────────────────────────────────────────────────
+// PWA INSTALL
+// ───────────────────────────────────────────────────────────────────────
+
+deferredPrompt: null,
+
+initPWAInstall() {
+    // Escuchar evento de instalación
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('✅ PWA instalable detectada');
+        e.preventDefault();
+        this.deferredPrompt = e;
+        
+        // Mostrar botón de instalar
+        const container = document.getElementById('pwa-install-container');
+        if (container) {
+            container.style.display = 'block';
+        }
+    });
+    
+    // Verificar si ya está instalada
+    window.addEventListener('appinstalled', () => {
+        console.log('✅ PWA instalada');
+        this.deferredPrompt = null;
+        const container = document.getElementById('pwa-install-container');
+        if (container) {
+            container.style.display = 'none';
+        }
+    });
+},
+
+async instalarPWA() {
+    if (!this.deferredPrompt) {
+        // Si no hay prompt, mostrar instrucciones manuales
+        alert('📲 Para instalar manualmente:\n\n1. Abre el menú de tu navegador (⋮)\n2. Toca "Agregar a pantalla principal"\n3. Confirma el nombre\n4. ¡Listo! La app aparecerá en tu inicio');
+        return;
+    }
+    
+    this.deferredPrompt.prompt();
+    const { outcome } = await this.deferredPrompt.userChoice;
+    console.log(`Instalación: ${outcome}`);
+    this.deferredPrompt = null;
+    
+    const container = document.getElementById('pwa-install-container');
+    if (container) {
+        container.style.display = 'none';
+    }
+}
+
