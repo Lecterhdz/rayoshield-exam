@@ -564,15 +564,29 @@ const app = {
         pregunta.opciones.forEach(function(opt, idx) {
             var label = document.createElement('label');
             label.className = 'opcion-sistemica';
-            label.innerHTML = `
-                <input type="checkbox" name="pregunta-${pregunta.id}" value="${idx}" style="margin-right:10px;">
-                ${opt.texto}
-            `;
+            label.style.display = 'flex';
+            label.style.alignItems = 'flex-start';
+            label.style.gap = '12px';
+        
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'pregunta-' + pregunta.id;
+            checkbox.value = idx;
+            checkbox.style.marginTop = '4px';
+        
+            var textoSpan = document.createElement('span');
+            textoSpan.className = 'texto-opcion';
+            textoSpan.textContent = opt.texto;
+        
+            label.appendChild(checkbox);
+            label.appendChild(textoSpan);
+        
             label.onclick = function(e) {
-                if (e.target.tagName === 'INPUT') {
+                if (e.target === checkbox) {
                     label.classList.toggle('seleccionada');
                 }
             };
+        
             container.appendChild(label);
         });
     
@@ -789,6 +803,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
