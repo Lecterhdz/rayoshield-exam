@@ -1,13 +1,15 @@
-const CACHE_NAME = 'rayoshield-v1';
+const CACHE_NAME = 'rayoshield-v2';
 const ASSETS = [
     '/',
     '/index.html',
+    '/app.html',
     '/css/styles.css',
     '/js/app.js',
     '/js/exams.js',
     '/js/scoring.js',
     '/js/certificate.js',
-    '/manifest.json'
+    '/manifest.json',
+    '/assets/logo.png'
 ];
 
 // Instalar Service Worker
@@ -20,11 +22,9 @@ self.addEventListener('install', (e) => {
 // Activar Service Worker
 self.addEventListener('activate', (e) => {
     e.waitUntil(
-        caches.keys().then((keys) => {
-            return Promise.all(
-                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-            );
-        })
+        caches.keys().then((keys) => Promise.all(
+            keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        ))
     );
 });
 
