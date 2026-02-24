@@ -317,4 +317,37 @@ const SmartEvaluationV2 = {
 if (typeof window !== 'undefined') {
     window.SmartEvaluationV2 = SmartEvaluationV2;
     console.log('✅ Smart Evaluation Engine 2.0 (5 Dimensiones) + Predictivo cargado');
+
+}
+// En smart-evaluation-v2.js, agrega esta función:
+evaluarCorrectivas: function(respuestas, pregunta) {
+    var puntaje = 0;
+    var seleccionoIngenieria = false;
+    var soloSeleccionoEPP = true;
+    
+    respuestas.forEach(function(idx) {
+        var opt = pregunta.opciones[idx];
+        if (opt.jerarquia === 'ingenieria') {
+            seleccionoIngenieria = true;
+            soloSeleccionoEPP = false;
+            puntaje += 10;
+        } else if (opt.jerarquia === 'administrativo') {
+            soloSeleccionoEPP = false;
+            puntaje += 5;
+        } else if (opt.jerarquia === 'epp') {
+            puntaje += 2;
+        }
+    });
+    
+    // Bonus si incluyó ingeniería
+    if (seleccionoIngenieria) {
+        puntaje += 5;
+    }
+    
+    // Penalización si solo seleccionó EPP
+    if (soloSeleccionoEPP) {
+        puntaje -= 10;
+    }
+    
+    return Math.min(pregunta.peso, Math.max(0, puntaje));
 }
