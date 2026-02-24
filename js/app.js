@@ -1,4 +1,4 @@
-// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL COMPLETA)
+// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL COMPLETA v4.0)
 // Guardar con codificación UTF-8
 
 const app = {
@@ -13,7 +13,7 @@ const app = {
     userData: { empresa: '', nombre: '', curp: '', puesto: '' },
     
     // Licencia
-    licencia: { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3 },
+    licencia: { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} },
     
     // Timer Examen
     timerExamen: null,
@@ -153,9 +153,9 @@ const app = {
             var expiracion = new Date(this.licencia.expiracion);
             if (ahora > expiracion) {
                 console.log('Licencia expirada');
-                this.licencia = { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3 };
+                this.licencia = { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} };
                 this.guardarLicencia();
-                alert('⚠️ Tu licencia ha expirado.\n\nHas vuelto a la versión DEMO.');
+                alert('⚠️ Tu licencia ha expirada.\n\nHas vuelto a la versión DEMO.');
             }
         }
     },
@@ -690,14 +690,15 @@ const app = {
         document.getElementById('caso-industria').textContent = this.casoActual.industria;
         document.getElementById('caso-tiempo').textContent = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos ? this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos : 25) + ' min';
         
+        // Descripción del evento (CON VALIDACIÓN)
         var desc = this.casoActual.descripcion_evento || {};
         document.getElementById('caso-descripcion').innerHTML = 
             '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
             '<strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '<br>' +
             '<strong>Evento:</strong> ' + (desc.evento || 'N/A') + '<br>' +
             '<strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '<br>' +
-            '<strong style="color:#f44336;">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');       
-       
+            '<strong style="color:#f44336;">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');
+        
         var timelineEl = document.getElementById('caso-timeline');
         timelineEl.innerHTML = '';
         this.casoActual.linea_tiempo.forEach(function(evento) {
@@ -728,6 +729,7 @@ const app = {
             preguntaDiv.className = 'pregunta-master';
             preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' (' + pregunta.tipo.replace('_', ' ') + ') - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
             
+            // ✅ SWITCH ACTUALIZADO CON TODOS LOS TIPOS DE PREGUNTAS
             switch(pregunta.tipo) {
                 case 'analisis_multiple': 
                 case 'deteccion_omisiones': 
@@ -755,6 +757,8 @@ const app = {
                 case 'calculo_tecnico':
                     preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
                     break;
+                default:
+                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
             }
             
             preguntasEl.appendChild(preguntaDiv);
@@ -762,7 +766,7 @@ const app = {
         
         document.getElementById('btn-enviar-caso').style.display = 'inline-block';
         
-        // INICIAR TIMER DEL CASO
+        // ✅ INICIAR TIMER DEL CASO
         this.iniciarTimerCaso();
     },
     
@@ -782,7 +786,7 @@ const app = {
             checkbox.style.marginTop = '4px';
             var textoSpan = document.createElement('span');
             textoSpan.className = 'texto-opcion';
-            textoSpan.textContent = opt.texto;
+            textoSpan.textContent = opt.texto || opt;
             label.appendChild(checkbox);
             label.appendChild(textoSpan);
             label.onclick = function(e) {
@@ -846,7 +850,10 @@ const app = {
         pregunta.opciones.forEach(function(opt, idx) {
             var item = document.createElement('label');
             item.className = 'accion-item';
-            item.innerHTML = '<input type="checkbox" name="plan-' + pregunta.id + '" value="' + idx + '" style="margin-top:5px;"><div style="flex:1;"><strong>' + opt.texto + '</strong><div style="margin-top:5px;"><span class="accion-jerarquia ' + opt.jerarquia + '">' + opt.jerarquia + '</span>' + (opt.prioridad ? '<span style="margin-left:10px;font-size:12px;color:#666;">Prioridad: ' + opt.prioridad + '</span>' : '') + '</div></div>';
+            var texto = opt.texto || opt.accion || opt;
+            var jerarquia = opt.jerarquia || opt.clasificacion || 'administrativo';
+            var prioridad = opt.prioridad || '';
+            item.innerHTML = '<input type="checkbox" name="plan-' + pregunta.id + '" value="' + idx + '" style="margin-top:5px;"><div style="flex:1;"><strong>' + texto + '</strong><div style="margin-top:5px;"><span class="accion-jerarquia ' + jerarquia + '">' + jerarquia + '</span>' + (prioridad ? '<span style="margin-left:10px;font-size:12px;color:#666;">Prioridad: ' + prioridad + '</span>' : '') + '</div></div>';
             item.onclick = function(e) {
                 if (e.target.tagName === 'INPUT') {
                     item.classList.toggle('seleccionada');
@@ -1228,4 +1235,3 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
-
