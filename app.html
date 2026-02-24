@@ -370,7 +370,39 @@
                 </div>
             </div>
         </section>
+        <!-- PANEL DE CONFIGURACIÓN WHITE LABEL -->
+        <section id="white-label-screen" class="screen" style="display:none;">
+            <div class="card">
+                <h2>🎨 Personaliza tu Marca</h2>
+                <p style="color:#666;">Configura cómo verán tus clientes la plataforma.</p>
+        
+                <div class="form-group">
+                    <label>Nombre de tu Empresa / Consultora</label>
+                    <input type="text" id="wl-nombre" placeholder="Ej: Seguridad Industrial MX" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
+                </div>
+        
+                <div class="form-group">
+                    <label>URL de tu Logo</label>
+                    <input type="text" id="wl-logo" placeholder="assets/mi-logo.png" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
+                    <small style="color:#666;">Puedes poner una URL externa o ruta local.</small>
+                </div>
+        
+                <div class="form-group">
+                    <label>Color Primario</label>
+                    <input type="color" id="wl-color" value="#2196F3" style="width:100%;height:50px;border:none;border-radius:10px;">
+                </div>
+        
+                <div class="form-group">
+                    <label>Email de Contacto</label>
+                    <input type="email" id="wl-email" placeholder="contacto@tuempresa.com" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
+                </div>
 
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="app.guardarWhiteLabel()">💾 Guardar Configuración</button>
+                    <button class="btn btn-secondary" onclick="app.volverHome()">↩️ Volver</button>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
@@ -393,8 +425,11 @@
                 .catch(err => console.log('⚠️ SW (no crítico):', err.message));
         }
     </script>
+    <!-- Executive Dashboard Engine -->
+    <script src="js/dashboard-ejecutivo-engine.js"></script>
 </body>
 </html>
+
 
 
 
