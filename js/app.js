@@ -731,32 +731,46 @@ const app = {
             
             // ✅ SWITCH ACTUALIZADO CON TODOS LOS TIPOS DE PREGUNTAS
             switch(pregunta.tipo) {
-                case 'analisis_multiple': 
-                case 'deteccion_omisiones': 
-                case 'identificacion_sesgos': 
-                case 'analisis_normativo': 
-                case 'deteccion_inconsistencias': 
+                case 'analisis_multiple':
+                case 'deteccion_omisiones':
+                case 'identificacion_sesgos':
+                case 'analisis_normativo':
+                case 'deteccion_inconsistencias':
                 case 'diagnostico_sistema':
-                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta)); 
+                    var checks = document.querySelectorAll('input[name="pregunta-' + pregunta.id + '"]:checked');
+                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
                     break;
-                case 'respuesta_abierta_guiada': 
+        
+                case 'respuesta_abierta_guiada':
                 case 'redaccion_tecnica':
-                    preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta)); 
+                    var textarea = document.getElementById('respuesta-' + pregunta.id);
+                    respuestasPorPregunta[pregunta.id] = [textarea ? textarea.value : ''];
                     break;
-                case 'analisis_responsabilidad': 
-                    preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta)); 
+        
+                case 'analisis_responsabilidad':
+                    var respuestas = [];
+                    pregunta.roles.forEach(function(role, idx) {
+                        var selected = document.querySelector('input[name="responsabilidad-' + pregunta.id + '-' + idx + '"]:checked');
+                        respuestas.push(selected ? parseInt(selected.value) : undefined);
+                    });
+                    respuestasPorPregunta[pregunta.id] = respuestas;
                     break;
-                case 'plan_accion': 
-                case 'evaluacion_correctivas':
-                    preguntaDiv.appendChild(self.renderPlanAccion(pregunta)); 
+        
+                case 'plan_accion':
+                case 'evaluacion_correctivas':  // ← AGREGAR ESTO
+                    var checks = document.querySelectorAll('input[name="plan-' + pregunta.id + '"]:checked');
+                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
                     break;
-                case 'ordenamiento_dinamico': 
+        
+                case 'ordenamiento_dinamico':
                 case 'matriz_priorizacion':
-                    preguntaDiv.appendChild(self.renderOrdenamientoDinamico(pregunta));
+                    var inputOrden = document.getElementById('respuesta-' + pregunta.id);
+                    respuestasPorPregunta[pregunta.id] = inputOrden && inputOrden.value ? JSON.parse(inputOrden.value) : [];
                     break;
+        
                 case 'calculo_tecnico':
-                    preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
-                    break;
+                    var inputCalculo = document.getElementById('respuesta-' + pregunta.id);
+                    respuestasPorPregunta[pregunta.id] = [inputCalculo ? parseFloat(inputCalculo.value) : 0];
                 default:
                     preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
             }
@@ -1235,3 +1249,4 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
