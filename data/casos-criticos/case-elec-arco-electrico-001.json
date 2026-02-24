@@ -1,228 +1,162 @@
 {
   "id": "case-elec-arco-electrico-001",
-  "tipo": "investigacion_accidente",
-  "clasificacion_evento": "Accidente grave con lesión",
+  "tipo": "investigacion_elite",
+  "nivel": "elite",
+  "titulo": "Arco Eléctrico en Tablero 480V - Análisis Pericial",
   "categoria": "electricos",
-  "nivel": "master",
-  "industria": "Industrial / Eléctrica",
-  "estatus": "Investigado",
-  "fecha_evento": "2026-01-25",
-  "investigador": "Comité SHE",
-  "confidencialidad": "Uso interno",
-  
-  "titulo": "Arco Eléctrico en Tablero de Distribución 480V",
-  
-  "descripcion_evento": {
-    "actividad": "Mantenimiento preventivo en tablero eléctrico 480V",
-    "equipo": "Tablero de distribución principal 480V/2000A",
-    "sistema": "Distribución eléctrica industrial",
-    "voltaje_nominal": "480V AC trifásico",
-    "condicion": "Trabajo con equipo energizado sin justificación",
-    "evento": "Arco eléctrico durante medición con multímetro",
-    "resultado": "Quemaduras de 2do y 3er grado en brazos y cara",
-    "clasificacion": "Accidente de alto potencial con lesión grave"
-  },
-  
-  "personas_involucradas": [
-    {
-      "rol": "Electricista industrial",
-      "experiencia": "15 años",
-      "capacitacion_arco": "Sí (hace 3 años)",
-      "lesiones": "Quemaduras 2do y 3er grado (40% cuerpo)"
-    },
-    {
-      "rol": "Supervisor de mantenimiento",
-      "experiencia": "20 años",
-      "presencia_en_sitio": "Sí",
-      "lesiones": "Ninguna"
-    }
-  ],
-  
-  "linea_tiempo": [
-    "06:00 – Inicio de turno",
-    "07:30 – Se programa mantenimiento en tablero",
-    "08:00 – Reunión de seguridad (AST genérico)",
-    "08:15 – Inicio de trabajo con equipo energizado",
-    "08:17 – Arco eléctrico durante medición",
-    "08:18 – Activación de alarma de emergencia",
-    "08:25 – Primeros auxilios en sitio",
-    "08:40 – Traslado a hospital especializado",
-    "09:00 – Notificación a STPS",
-    "10:00 – Aislamiento del área"
-  ],
-  
-  "energias_identificadas": {
-    "electricas": "480V AC trifásico - ENERGIZADO",
-    "hidraulicas": "No aplican",
-    "residuales": "Capacitores de corrección de factor de potencia",
-    "gravitacionales": "No aplican",
-    "termicas": "Arco eléctrico (35,000°F)",
-    "quimicas": "Gases de combustión del arco"
-  },
-  
-  "analisis_causa_raiz": {
-    "causa_inmediata": "Arco eléctrico por contacto accidental entre fases",
-    "causas_basicas": [
-      "Trabajo con equipo energizado sin justificación válida",
-      "EPP de arco eléctrico incompleto",
-      "Multímetro categoría incorrecta (CAT II en lugar de CAT IV)",
-      "AST genérico no específico para riesgo de arco eléctrico"
-    ],
-    "causas_sistemicas": [
-      "Cultura de producción sobre seguridad",
-      "Procedimiento de trabajo con equipos energizados deficiente",
-      "Capacitación en riesgo de arco vencida",
-      "Supervisión permisiva de trabajo con equipos energizados",
-      "Inventario de EPP de arco insuficiente"
-    ]
-  },
-  
-  "jerarquia_controles": {
-    "eliminacion": "No considerada (podía desenergizarse)",
-    "sustitucion": "No aplicable",
-    "ingenieria": "Interruptor con protección de arco ausente",
-    "administrativos": "Procedimiento de trabajo con equipos energizados deficiente",
-    "epp": "EPP de arco incompleto (sin capucha)"
-  },
+  "descripcion": "Caso de nivel ELITE con 9 tipos de preguntas inteligentes",
+  "tiempo_estimado": "40 min",
+  "requisito": "Examen Eléctricos Supervisor SHE aprobado",
   
   "preguntas": [
     {
       "id": "Q1",
-      "tipo": "analisis_multiple",
+      "tipo": "deteccion_omisiones",
       "peso": 25,
-      "pregunta": "¿Cuáles fueron las fallas CRÍTICAS del sistema que permitieron el evento? (Selecciona TODAS las aplicables)",
+      "pregunta": "Revise el procedimiento de trabajo mostrado. Identifique TODAS las omisiones críticas que contribuyeron al evento.",
+      "instrucciones": "Seleccione mínimo 3, máximo 6 omisiones. Cada selección incorrecta resta puntos.",
       "opciones": [
-        { "texto": "El electricista fue descuidado al manejar el multímetro", "correcta": false, "feedback_sistemico": "❌ Enfoque individual: El error humano fue consecuencia de fallas del sistema, no la causa raíz." },
-        { "texto": "Trabajo con equipo energizado sin justificación válida ni autorización escrita", "correcta": true, "feedback_sistemico": "✅ Correcto: La NOM-029-STPS exige desenergizar siempre que sea posible. El trabajo con equipos energizados requiere justificación escrita y autorización." },
-        { "texto": "EPP de arco eléctrico incompleto (faltó capucha con cara)", "correcta": true, "feedback_sistemico": "✅ Correcto: El EPP para riesgo de arco debe ser completo (ropa, guantes, capucha, gafas)." },
-        { "texto": "Multímetro de categoría incorrecta (CAT II en circuito 480V)", "correcta": true, "feedback_sistemico": "✅ Correcto: Para 480V se requiere multímetro CAT IV. CAT II es para instalaciones domésticas." },
-        { "texto": "El supervisor permitió trabajo con equipos energizados sin verificar controles", "correcta": true, "feedback_sistemico": "✅ Correcto: La supervisión tiene responsabilidad de verificar que todos los controles estén antes de autorizar." }
-      ],
-      "justificacion_experta": "El evento fue resultado de múltiples fallas del sistema de gestión de seguridad eléctrica. La jerarquía de controles no se aplicó correctamente: se pudo desenergizar (eliminación) pero se optó por trabajo con equipos energizados con controles administrativos y EPP insuficientes."
-    },
-    
-    {
-      "id": "Q2",
-      "tipo": "respuesta_abierta_guiada",
-      "peso": 30,
-      "pregunta": "Identifica la CAUSA RAÍZ REAL del evento. Explica POR QUÉ el sistema permitió trabajo con equipos energizados sin controles adecuados.",
-      "palabras_clave_esperadas": [
-        "procedimiento", "equipos energizados", "desenergizar", "autorización",
-        "NOM-029", "riesgo de arco", "sistema", "gestión", "justificación"
-      ],
-      "respuesta_modelo": "La causa raíz fue un sistema de gestión de trabajo con equipos energizados deficiente que permitió realizar mantenimiento con el equipo energizado sin justificación válida, sin autorización escrita, y sin verificar que todos los controles de la jerarquía fueran aplicados. El procedimiento no exigía desenergizar como primera opción.",
-      "criterios_evaluacion": {
-        "menciona_sistema": true,
-        "no_culpa_individuo": true,
-        "propone_mejora_procedimental": true
-      },
-      "feedback_guiado": "💡 Pista: Piensa en QUÉ del sistema falló. ¿El procedimiento exigía desenergizar? ¿Había autorización escrita? ¿La justificación de trabajo con equipos energizados era válida según NOM-029-STPS?"
-    },
-    
-    {
-      "id": "Q3",
-      "tipo": "analisis_responsabilidad",
-      "peso": 20,
-      "pregunta": "Asigna el nivel de responsabilidad SISTÉMICA (no individual) a cada rol:",
-      "roles": [
-        {
-          "rol": "Electricista industrial",
-          "opciones": [
-            { "nivel": "Alta", "correcta": false, "explicacion": "El electricista siguió la práctica establecida. La responsabilidad sistémica es media-baja." },
-            { "nivel": "Media", "correcta": true, "explicacion": "✅ Correcto: Tenía responsabilidad de rechazar trabajo inseguro, pero operaba dentro del sistema establecido." },
-            { "nivel": "Baja", "correcta": false, "explicacion": "El electricista tiene responsabilidad media por aceptar trabajo con equipos energizados sin cuestionar." }
-          ]
-        },
-        {
-          "rol": "Supervisor de mantenimiento",
-          "opciones": [
-            { "nivel": "Alta", "correcta": true, "explicacion": "✅ Correcto: Autorizó trabajo con equipos energizados sin verificar justificación, controles ni EPP adecuado." },
-            { "nivel": "Media", "correcta": false, "explicacion": "El supervisor tiene alta responsabilidad por autorizar sin verificar controles." },
-            { "nivel": "Baja", "correcta": false, "explicacion": "El supervisor tiene la mayor responsabilidad operativa en este evento." }
-          ]
-        },
-        {
-          "rol": "Gerencia / Dirección de planta",
-          "opciones": [
-            { "nivel": "Alta", "correcta": true, "explicacion": "✅ Correcto: La cultura de producción sobre seguridad y recursos insuficientes para EPP son responsabilidad de la gerencia." },
-            { "nivel": "Media", "correcta": false, "explicacion": "La gerencia tiene alta responsabilidad por establecer la cultura y proveer recursos." },
-            { "nivel": "Baja", "correcta": false, "explicacion": "La gerencia tiene responsabilidad última por el sistema de gestión de seguridad." }
-          ]
-        },
-        {
-          "rol": "Sistema de Gestión SHE de la empresa",
-          "opciones": [
-            { "nivel": "Alta", "correcta": true, "explicacion": "✅ Correcto: El procedimiento de trabajo con equipos energizados deficiente es la falla sistémica de mayor nivel." },
-            { "nivel": "Media", "correcta": false, "explicacion": "El sistema SHE tiene la máxima responsabilidad en prevenir este tipo de eventos." },
-            { "nivel": "Baja", "correcta": false, "explicacion": "El sistema SHE es el responsable último de los procedimientos de seguridad." }
-          ]
-        }
+        {"texto": "No se realizó verificación de ausencia de tensión", "correcta": true},
+        {"texto": "Falta de bloqueo de fuentes secundarias", "correcta": true},
+        {"texto": "No se identificaron energías residuales (capacitores)", "correcta": true},
+        {"texto": "Ausencia de supervisor en sitio durante trabajo energizado", "correcta": true},
+        {"texto": "EPP de arco eléctrico incompleto (sin capucha)", "correcta": true},
+        {"texto": "Multímetro categoría incorrecta (CAT II en lugar de CAT IV)", "correcta": true},
+        {"texto": "El trabajador llegó tarde ese día", "correcta": false},
+        {"texto": "El tablero era de color gris en lugar de azul", "correcta": false}
       ]
     },
-    
+    {
+      "id": "Q2",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 20,
+      "pregunta": "Ordene los pasos CORRECTOS para trabajo con equipos energizados según NOM-029-STPS:",
+      "instrucciones": "Arrastre los pasos en el orden correcto. Todos deben estar en la posición exacta.",
+      "respuesta_correcta": [3, 1, 4, 2, 5],
+      "opciones": [
+        "Justificación escrita de por qué no se puede desenergizar",
+        "Análisis de riesgo de arco eléctrico",
+        "Autorización por escrito de gerente de área",
+        "EPP de arco eléctrico completo según incidente energético",
+        "Supervisión presencial durante toda la actividad"
+      ]
+    },
+    {
+      "id": "Q3",
+      "tipo": "redaccion_tecnica",
+      "peso": 30,
+      "pregunta": "Redacte la causa raíz del evento en términos sistémicos, evitando culpar al trabajador. Incluya referencias a NOM aplicables.",
+      "criterios_evaluacion": {
+        "penaliza": ["error humano como causa raíz", "culpa del trabajador", "negligencia del electricista", "descuido"],
+        "premia": ["sistema", "procedimiento", "NOM-029", "gestión", "control jerárquico", "autorización", "cultura organizacional", "barrera"]
+      },
+      "longitud_minima": 80,
+      "longitud_optima": 150
+    },
     {
       "id": "Q4",
-      "tipo": "plan_accion",
+      "tipo": "matriz_priorizacion",
       "peso": 25,
-      "pregunta": "Selecciona las acciones que PREVENIRÍAN la recurrencia de este evento (prioriza por efectividad):",
+      "pregunta": "Priorice las siguientes acciones correctivas según: 1) Impacto en prevención, 2) Viabilidad de implementación, 3) Costo-beneficio",
+      "instrucciones": "Ordene del 1 (más prioritario) al 5 (menos prioritario). Considere jerarquía de controles.",
+      "respuesta_correcta": [1, 2, 4, 3, 5],
       "opciones": [
-        { 
-          "texto": "Actualizar procedimiento de trabajo con equipos energizados con requisitos de NOM-029-STPS", 
-          "correcta": true, 
-          "jerarquia": "administrativo",
-          "prioridad": 1,
-          "explicacion": "✅ Alta prioridad: Corrige la falla procedimental identificada."
-        },
-        {
-          "texto": "Capacitar únicamente al electricista involucrado",
-          "correcta": false,
-          "jerarquia": "administrativo",
-          "prioridad": 5,
-          "explicacion": "❌ Baja efectividad: Enfocarse en una persona no previene recurrencia sistémica."
-        },
-        {
-          "texto": "Implementar política de 'desenergizar siempre que sea posible'",
-          "correcta": true,
-          "jerarquia": "administrativo",
-          "prioridad": 1,
-          "explicacion": "✅ Alta prioridad: La eliminación es el control más efectivo según jerarquía de controles."
-        },
-        {
-          "texto": "Adquirir EPP de arco eléctrico completo (ropa, guantes, capucha CAT IV)",
-          "correcta": true,
-          "jerarquia": "epp",
-          "prioridad": 2,
-          "explicacion": "✅ Media-alta prioridad: EPP es última barrera pero necesaria cuando el trabajo con equipos energizados es justificado."
-        },
-        {
-          "texto": "Instalar interruptores con protección de falla de arco (AFCI)",
-          "correcta": true,
-          "jerarquia": "ingenieria",
-          "prioridad": 1,
-          "explicacion": "✅ Alta prioridad: Control de ingeniería que reduce energía de arco disponible."
-        },
-        {
-          "texto": "Auditoría trimestral de permisos de trabajo con equipos energizados",
-          "correcta": true,
-          "jerarquia": "administrativo",
-          "prioridad": 3,
-          "explicacion": "✅ Media prioridad: Verificación periódica para detectar desviaciones."
-        },
-        {
-          "texto": "Etiquetado de riesgo de arco en todos los tableros (NFPA 70E / NOM-029)",
-          "correcta": true,
-          "jerarquia": "administrativo",
-          "prioridad": 2,
-          "explicacion": "✅ Media-alta prioridad: Informa al trabajador del riesgo y EPP requerido."
-        }
-      ],
-      "criterio_aprobacion": {
-        "min_correctas": 5,
-        "debe_incluir_ingenieria": true,
-        "no_debe_incluir_solo_capacitacion": true
-      }
+        "Instalar interruptores con protección de falla de arco (AFCI)",
+        "Actualizar procedimiento de trabajo con equipos energizados con requisitos NOM-029",
+        "Capacitar únicamente al electricista involucrado",
+        "Implementar política de 'desenergizar siempre que sea posible'",
+        "Colocar señalización adicional en el tablero"
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "identificacion_sesgos",
+      "peso": 15,
+      "pregunta": "Identifique los sesgos cognitivos presentes en las declaraciones del incidente:",
+      "instrucciones": "Seleccione TODOS los sesgos identificados. Hay al menos 3 correctos.",
+      "opciones": [
+        {"texto": "Sesgo de resultado: Juzgar la decisión por el resultado, no por la información disponible al momento", "correcta": true},
+        {"texto": "Normalización de la desviación: 'Siempre lo hemos hecho así sin problemas'", "correcta": true},
+        {"texto": "Sesgo de confirmación: Buscar evidencia que apoye la conclusión inicial de 'error humano'", "correcta": true},
+        {"texto": "Falacia del costo hundido: 'Ya invertimos mucho en este procedimiento, no lo cambiemos'", "correcta": true},
+        {"texto": "Sesgo de disponibilidad: Sobrestimar riesgos recientes o memorables", "correcta": false},
+        {"texto": "El trabajador tenía poca experiencia", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q6",
+      "tipo": "analisis_normativo",
+      "peso": 20,
+      "pregunta": "Seleccione las NOM-STPS aplicables a este incidente y el artículo específico violado:",
+      "instrucciones": "Seleccione TODAS las aplicables. Debe identificar norma Y artículo.",
+      "opciones": [
+        {"texto": "NOM-029-STPS-2011, Art. 5.2 (Trabajo en instalaciones energizadas)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011, Art. 7.1 (Equipo de protección personal)", "correcta": true},
+        {"texto": "NOM-004-STPS-2008, Art. 6.3 (Sistemas de protección y dispositivos de seguridad)", "correcta": true},
+        {"texto": "NOM-017-STPS-2008, Art. 5.1 (Equipo de protección personal)", "correcta": true},
+        {"texto": "NOM-031-STPS-2011, Art. 4.2 (Comisiones de seguridad)", "correcta": false},
+        {"texto": "NOM-025-STPS-2008, Art. 6.1 (Iluminación)", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q7",
+      "tipo": "deteccion_inconsistencias",
+      "peso": 15,
+      "pregunta": "Identifique las inconsistencias entre las declaraciones de los testigos:",
+      "instrucciones": "Seleccione TODAS las inconsistencias encontradas. Hay 3 correctas.",
+      "declaraciones": {
+        "trabajador": "El procedimiento estaba actualizado y lo seguí al pie de la letra",
+        "supervisor": "El procedimiento tenía 3 años sin actualizar, pero nunca hubo problemas",
+        "gerente": "Nunca autorizamos trabajo en caliente sin justificación escrita",
+        "evidencia": "No existe justificación escrita en el archivo del día del incidente"
+      },
+      "opciones": [
+        {"texto": "El trabajador dice que siguió el procedimiento, pero el supervisor dice que estaba desactualizado", "correcta": true},
+        {"texto": "El gerente dice que nunca autorizan sin justificación, pero no existe justificación en el archivo", "correcta": true},
+        {"texto": "El supervisor admite que el procedimiento tenía 3 años sin actualizar (violación NOM-029)", "correcta": true},
+        {"texto": "El trabajador llegó 10 minutos tarde ese día", "correcta": false},
+        {"texto": "El tablero fue instalado en 2020", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q8",
+      "tipo": "evaluacion_correctivas",
+      "peso": 20,
+      "pregunta": "Evalúe la efectividad de las acciones correctivas propuestas según jerarquía de controles:",
+      "instrucciones": "Clasifique cada acción como: Muy Efectiva (eliminación/ingeniería), Moderada (administrativo), o Poco Efectiva (EPP/capacitación)",
+      "opciones": [
+        {"accion": "Instalar enclavamiento que impida abrir tablero energizado", "clasificacion": "muy_efectiva"},
+        {"accion": "Actualizar procedimiento de trabajo", "clasificacion": "moderada"},
+        {"accion": "Capacitar al trabajador en riesgo de arco", "clasificacion": "poco_efectiva"},
+        {"accion": "Implementar permisos de trabajo en caliente", "clasificacion": "moderada"},
+        {"accion": "Entregar guantes dieléctricos adicionales", "clasificacion": "poco_efectiva"}
+      ]
+    },
+    {
+      "id": "Q9",
+      "tipo": "diagnostico_sistema",
+      "peso": 25,
+      "pregunta": "Analice las fallas interconectadas del sistema que permitieron este evento. Seleccione las relaciones causa-efecto correctas:",
+      "instrucciones": "Seleccione TODAS las relaciones válidas. Debe identificar al menos 4.",
+      "opciones": [
+        {"texto": "Procedimiento desactualizado → Trabajador no conocía requisitos actuales → Incidente", "correcta": true},
+        {"texto": "Sin autorización escrita → Sin revisión de riesgos → EPP incompleto → Lesión grave", "correcta": true},
+        {"texto": "Cultura de producción sobre seguridad → Presión por tiempo → Atajos en procedimiento → Incidente", "correcta": true},
+        {"texto": "Sin auditorías de permisos → Desviaciones no detectadas → Normalización de riesgo → Incidente", "correcta": true},
+        {"texto": "El trabajador usó el multímetro incorrecto → Incidente", "correcta": false},
+        {"texto": "El tablero estaba en un área con poca iluminación → Incidente", "correcta": false}
+      ]
     }
   ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_elite": 85,
+    "puntaje_aprobacion_pericial": 95,
+    "tiempo_estimado_minutos": 40,
+    "complejidad": "alta",
+    "requiere_justificacion": true
+  },
   
   "consecuencias_potenciales": {
     "lesiones": ["Quemaduras de 2do y 3er grado", "Daño ocular permanente", "Amputación de dedos"],
@@ -232,21 +166,7 @@
     "reputacionales": "Daño severo a imagen corporativa"
   },
   
-  "conclusion_oficial": "El evento fue un accidente grave causado por fallas sistémicas en la gestión de trabajo con equipos energizados. No se aplicó la jerarquía de controles: se pudo desenergizar (eliminación) pero se optó por trabajo con equipos energizados con controles administrativos y EPP insuficientes. La investigación recomienda actualizar procedimientos, implementar política de desenergización, adquirir EPP de arco completo y realizar auditorías de permisos de trabajo con equipos energizados.",
+  "conclusion_oficial": "El evento fue un accidente grave causado por fallas sistémicas en la gestión de trabajo con equipos energizados. No se aplicó la jerarquía de controles: se pudo desenergizar (eliminación) pero se optó por trabajo con equipos energizados con controles administrativos y EPP insuficientes.",
   
-  "leccion_aprendida_master": "Si se puede desenergizar, DEBE desenergizarse. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales o es técnicamente imposible. La NOM-029-STPS es clara: la eliminación es siempre el primer control a considerar. Ninguna producción justifica poner en riesgo la vida de un trabajador.",
-  
-  "estado_final": {
-    "evento_cerrado": true,
-    "acciones_correctivas_implementadas": true,
-    "seguimiento": "Auditoría mensual de permisos de trabajo con equipos energizados",
-    "difusion_leccion": "Compartido con todas las áreas eléctricas y de mantenimiento"
-  },
-  
-  "metadatos_evaluacion": {
-    "puntaje_maximo": 100,
-    "puntaje_aprobacion_master": 80,
-    "tiempo_estimado_minutos": 30,
-    "requisitos_previos": ["Examen Eléctricos Supervisor SHE aprobado", "Curso de Riesgo de Arco Eléctrico"]
-  }
+  "leccion_aprendida_master": "Si se puede desenergizar, DEBE desenergizarse. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales o es técnicamente imposible. La NOM-029-STPS es clara: la eliminación es siempre el primer control a considerar."
 }
