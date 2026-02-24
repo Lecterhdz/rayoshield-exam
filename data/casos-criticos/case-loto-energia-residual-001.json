@@ -1,5 +1,5 @@
 {
-  "id": "case-loto-energia-residual-hidraulica",
+  "id": "case-loto-energia-residual-001",
   "tipo": "investigacion_accidente",
   "nivel": "master",
   "clasificacion_evento": "Incidente grave / Casi accidente",
@@ -227,3 +227,4 @@
   }
 
 }
+
