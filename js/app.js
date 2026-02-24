@@ -888,6 +888,94 @@ mostrarResultadoCaso: function(resultado) {
             alert('❌ Error generando certificado');
         });
     },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // WHITE LABEL MANAGER
+    // ─────────────────────────────────────────────────────────────────────
+
+    aplicarConfiguracionWhiteLabel: function() {
+        // Si la licencia NO tiene feature whiteLabel, no hacemos nada
+        if (!this.licencia.features || !this.licencia.features.whiteLabel) {
+            return; 
+        }
+
+        // Cargar config guardada
+        var configGuardada = localStorage.getItem('rayoshield_wl_config');
+        if (configGuardada) {
+            var config = JSON.parse(configGuardada);
+        
+            // Aplicar cambios visuales en tiempo real
+            document.documentElement.style.setProperty('--wl-primary', config.color);
+        
+            // Cambiar logos
+            var logos = document.querySelectorAll('img.logo');
+            logos.forEach(function(img) { 
+                if (config.logo) img.src = config.logo; 
+            });
+        
+            // Cambiar títulos
+            var titulos = document.querySelectorAll('.header-content h1');
+            titulos.forEach(function(h1) { 
+                if (config.nombre) h1.textContent = config.nombre; 
+            });
+        
+            console.log('✅ White Label aplicado:', config.nombre);
+        }
+    },
+
+    guardarWhiteLabel: function() {
+        // Verificar si tiene permiso
+        if (!this.licencia.features || !this.licencia.features.whiteLabel) {
+            alert('⚠️ Esta función solo está disponible en planes PRO + White Label o Enterprise.');
+            return;
+        }
+    
+        var nombre = document.getElementById('wl-nombre').value;
+        var logo = document.getElementById('wl-logo').value;
+        var color = document.getElementById('wl-color').value;
+        var email = document.getElementById('wl-email').value;
+
+        if(!nombre || !logo) { 
+            alert('Nombre y Logo son obligatorios'); 
+            return; 
+        }
+
+        var config = { 
+            nombre: nombre, 
+            logo: logo, 
+            color: color, 
+            email: email 
+        };
+    
+        localStorage.setItem('rayoshield_wl_config', JSON.stringify(config));
+    
+        this.aplicarConfiguracionWhiteLabel();
+        alert('✅ Marca actualizada correctamente. Recarga la página para ver cambios globales.');
+    },
+
+    mostrarPanelWhiteLabel: function() {
+        // Solo mostrar si tiene el feature
+        if (!this.licencia.features || !this.licencia.features.whiteLabel) {
+            alert('⚠️ Esta función solo está disponible en planes PRO + White Label o Enterprise.');
+            return;
+        }
+    
+        // Cargar valores actuales
+        var configGuardada = localStorage.getItem('rayoshield_wl_config');
+        if (configGuardada) {
+            var c = JSON.parse(configGuardada);
+            document.getElementById('wl-nombre').value = c.nombre || '';
+            document.getElementById('wl-logo').value = c.logo || '';
+            document.getElementById('wl-color').value = c.color || '#2196F3';
+            document.getElementById('wl-email').value = c.email || '';
+        }
+    
+        this.mostrarPantalla('white-label-screen');
+    },
+
+
+
+    
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
     // ─────────────────────────────────────────────────────────────────────
@@ -918,6 +1006,7 @@ mostrarResultadoCaso: function(resultado) {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
