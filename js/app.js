@@ -690,9 +690,14 @@ const app = {
         document.getElementById('caso-industria').textContent = this.casoActual.industria;
         document.getElementById('caso-tiempo').textContent = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos ? this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos : 25) + ' min';
         
-        var desc = this.casoActual.descripcion_evento;
-        document.getElementById('caso-descripcion').innerHTML = '<strong>Actividad:</strong> ' + desc.actividad + '<br><strong>Equipo:</strong> ' + desc.equipo + '<br><strong>Evento:</strong> ' + desc.evento + '<br><strong>Resultado:</strong> ' + desc.resultado + '<br><strong style="color:#f44336;">Clasificación:</strong> ' + desc.clasificacion;
-        
+        var desc = this.casoActual.descripcion_evento || {};
+        document.getElementById('caso-descripcion').innerHTML = 
+            '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
+            '<strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '<br>' +
+            '<strong>Evento:</strong> ' + (desc.evento || 'N/A') + '<br>' +
+            '<strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '<br>' +
+            '<strong style="color:#f44336;">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');       
+       
         var timelineEl = document.getElementById('caso-timeline');
         timelineEl.innerHTML = '';
         this.casoActual.linea_tiempo.forEach(function(evento) {
@@ -1223,3 +1228,4 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
