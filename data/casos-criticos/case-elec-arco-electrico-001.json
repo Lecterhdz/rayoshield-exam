@@ -8,11 +8,55 @@
   "fecha_evento": "2026-01-25",
   "industria": "Industrial / Eléctrica",
   "descripcion_evento": {
-    "actividad": "Mantenimiento preventivo",
-    "equipo": "Tablero 480V",
-    "evento": "Arco eléctrico",
-    "resultado": "Quemaduras",
-    "clasificacion": "Accidente grave"
+    "actividad": "Mantenimiento preventivo programado en tablero de distribución principal 480V/2000A, incluyendo medición de parámetros eléctricos con multímetro, verificación de conexiones, limpieza de barras y termografía infrarroja",
+    "equipo": "Tablero de distribución principal TD-480-01, 480V AC trifásico, 2000A, con capacitores de corrección de factor de potencia",
+    "sistema": "Sistema de distribución eléctrica industrial de 480V, alimentando líneas de producción crítica",
+    "voltaje_nominal": "480V AC trifásico + neutro",
+    "condicion": "Trabajo con equipo energizado sin justificación escrita ni autorización formal. No se realizó procedimiento de bloqueo/etiquetado (LOTO)",
+    "evento": "Arco eléctrico durante medición de voltaje fase-fase con multímetro categoría incorrecta (CAT II en lugar de CAT IV). Contacto accidental entre fases por herramienta inadecuada",
+    "resultado": "Quemaduras de 2do y 3er grado en brazos, manos y cara (40% superficie corporal). Daño ocular por radiación UV del arco. Hospitalización 21 días",
+    "clasificacion": "Accidente grave de alto potencial con lesión incapacitante permanente",
+    "area": "Nave de Producción 3, Línea de Ensamble B, Zona Eléctrica Norte",
+    "personal_involucrado": [
+      {
+        "nombre": "Juan Pérez García",
+        "puesto": "Electricista Industrial",
+        "experiencia": "15 años",
+        "capacitacion_arco": "Sí (hace 3 años, vencida)",
+        "lesiones": "Quemaduras 2do y 3er grado (40% cuerpo)"
+      },
+      {
+        "nombre": "Roberto Martínez López",
+        "puesto": "Supervisor de Mantenimiento",
+        "experiencia": "20 años",
+        "presencia_en_sitio": "Sí",
+        "lesiones": "Ninguna"
+      },
+      {
+        "nombre": "Ing. Ana Rodríguez",
+        "puesto": "Gerente de Mantenimiento",
+        "experiencia": "12 años",
+        "autorizo_trabajo": "Sí (verbal, sin documentación)",
+        "lesiones": "Ninguna"
+      }
+    ],
+    "actividades_detalladas": [
+      "06:00 - Inicio de turno, reunión de seguridad general (AST genérico, no específico)",
+      "07:30 - Gerente solicita mantenimiento en tablero TD-480-01 por lecturas anómalas",
+      "08:00 - Supervisor asigna electricista sin emitir orden de trabajo formal",
+      "08:10 - Electricista llega al tablero con multímetro CAT II (incorrecto para 480V)",
+      "08:12 - Supervisor verifica visualmente sin revisar procedimiento escrito",
+      "08:15 - Inicio de trabajo con equipo energizado (sin LOTO, sin justificación)",
+      "08:16 - Electricista prepara mediciones fase-fase 480V",
+      "08:17 - Arco eléctrico durante medición (temperatura estimada 35,000°F)",
+      "08:18 - Activación de alarma de emergencia, llamado a brigada",
+      "08:20 - Primeros auxilios en sitio por brigadistas",
+      "08:25 - Llegada de paramédicos externos",
+      "08:40 - Traslado a hospital especializado en quemaduras",
+      "09:00 - Notificación a STPS y aseguradora",
+      "10:00 - Aislamiento del área, preservación de evidencia",
+      "11:00 - Inicio de investigación preliminar"
+    ]
   },
   "linea_tiempo": ["08:00 - Inicio", "08:15 - Incidente"],
   "energias_identificadas": {
@@ -180,4 +224,5 @@
   
   "leccion_aprendida_master": "Si se puede desenergizar, DEBE desenergizarse. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales o es técnicamente imposible. La NOM-029-STPS es clara: la eliminación es siempre el primer control a considerar."
 }
+
 
