@@ -65,7 +65,7 @@ const DashboardEngine = {
             <div style="text-align: center; margin-top: 40px; color: #999; font-size: 12px; border-top: 1px solid #eee; padding-top: 20px;">
                 Generado por ${this.config.empresa} Intelligence Engine • ${new Date().toLocaleDateString('es-MX')}
                 <br>
-                <button onclick="window.print()" style="margin-top: 10px; padding: 8px 16px; background: ${this.config.colorPrimario}; color: white; border: none; border-radius: 4px; cursor: pointer;">🖨️ Imprimir Reporte</button>
+                <button onclick="app.imprimirDashboard()" style="margin-top: 10px; padding: 8px 16px; background: ${this.config.colorPrimario}; color: white; border: none; border-radius: 4px; cursor: pointer;">🖨️ Imprimir Reporte</button>
             </div>
         </div>
         `;
@@ -104,4 +104,5 @@ if (typeof window !== 'undefined') {
     window.DashboardEngine = DashboardEngine;
     DashboardEngine.cargarConfig();
     console.log('✅ Executive Dashboard Engine cargado');
+
 }
