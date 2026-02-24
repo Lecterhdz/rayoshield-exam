@@ -53,7 +53,7 @@ const DashboardEngine = {
             <!-- GRÁFICA RADAR DE COMPETENCIAS -->
             <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); margin-bottom: 30px;">
                 <h2 style="color: #1a237e; margin: 0 0 10px 0; font-size: 24px; font-weight: 600;">🎯 Perfil Competencial por Dimensión</h2>
-                <p style="color: #666; margin: 0 0 30px 0; font-size: 14px;">Evaluación de las 5 dimensiones críticas para Directores SHE</p>
+                <p style="color: #666; margin: 0 0 30px 0; font-size: 14px;">Evaluación de las 5 dimensiones críticas.</p>
                 
                 <div style="position: relative; height: 400px; display: flex; justify-content: center; align-items: center;">
                     ${this.generarGraficaRadarHTML(dimensiones)}
@@ -401,3 +401,4 @@ if (typeof window !== 'undefined') {
     DashboardEngine.cargarConfig();
     console.log('✅ Executive Dashboard Engine v3.0 cargado');
 }
+
