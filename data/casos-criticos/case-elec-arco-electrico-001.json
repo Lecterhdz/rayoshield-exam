@@ -176,15 +176,108 @@
       "id": "Q8",
       "tipo": "evaluacion_correctivas",
       "peso": 20,
-      "pregunta": "Evalúe la efectividad de las acciones correctivas propuestas según jerarquía de controles:",
-      "instrucciones": "Clasifique cada acción como: Muy Efectiva (eliminación/ingeniería), Moderada (administrativo), o Poco Efectiva (EPP/capacitación)",
+      "pregunta": "Evalúe la efectividad de las acciones correctivas propuestas según la jerarquía de controles de la NOM-004-STPS:",
+      "instrucciones": "Seleccione las acciones que realmente prevenirían la recurrencia del evento. Considere que los controles de ingeniería son más efectivos que los administrativos, y estos más que el EPP.",
+      "descripcion_adicional": "La jerarquía de controles establece que: 1) Eliminación > 2) Sustitución > 3) Controles de Ingeniería > 4) Controles Administrativos > 5) Equipo de Protección Personal",
       "opciones": [
-        {"accion": "Instalar enclavamiento que impida abrir tablero energizado", "clasificacion": "muy_efectiva"},
-        {"accion": "Actualizar procedimiento de trabajo", "clasificacion": "moderada"},
-        {"accion": "Capacitar al trabajador en riesgo de arco", "clasificacion": "poco_efectiva"},
-        {"accion": "Implementar permisos de trabajo en caliente", "clasificacion": "moderada"},
-        {"accion": "Entregar guantes dieléctricos adicionales", "clasificacion": "poco_efectiva"}
-      ]
+        {
+          "texto": "Instalar enclavamiento eléctrico que impida abrir el tablero con energía presente",
+          "jerarquia": "ingenieria",
+          "clasificacion": "muy_efectiva",
+          "prioridad": "1",
+          "costo_estimado": "$15,000 - $50,000 MXN",
+          "tiempo_implementacion": "2-4 semanas",
+          "efectividad": "95%",
+          "feedback": "✅ Correcto: Los enclavamientos son controles de ingeniería que eliminan físicamente la posibilidad de exposición al riesgo."
+        },
+        {
+          "texto": "Actualizar procedimiento de trabajo seguro para operaciones eléctricas",
+          "jerarquia": "administrativo",
+          "clasificacion": "moderada",
+          "prioridad": "2",
+          "costo_estimado": "$5,000 - $10,000 MXN",
+          "tiempo_implementacion": "1-2 semanas",
+          "efectividad": "60%",
+          "feedback": "⚠️ Parcial: Los procedimientos son necesarios pero dependen del cumplimiento humano. No previenen errores por sí solos."
+        },
+        {
+          "texto": "Capacitar al trabajador en riesgo de arco eléctrico y uso de EPP",
+          "jerarquia": "administrativo",
+          "clasificacion": "poco_efectiva",
+          "prioridad": "4",
+          "costo_estimado": "$3,000 - $8,000 MXN",
+          "tiempo_implementacion": "1 semana",
+          "efectividad": "40%",
+          "feedback": "⚠️ Limitada: La capacitación es importante pero no elimina el riesgo. El trabajador ya estaba capacitado y ocurrió el incidente."
+        },
+        {
+          "texto": "Implementar sistema de permisos de trabajo en caliente con autorización por escrito",
+          "jerarquia": "administrativo",
+          "clasificacion": "moderada",
+          "prioridad": "2",
+          "costo_estimado": "$2,000 - $5,000 MXN",
+          "tiempo_implementacion": "1 semana",
+          "efectividad": "65%",
+          "feedback": "⚠️ Parcial: Los permisos ayudan a controlar pero dependen de la supervisión y cumplimiento."
+        },
+        {
+          "texto": "Entregar guantes dieléctricos adicionales y EPP de arco eléctrico categoría 4",
+          "jerarquia": "epp",
+          "clasificacion": "poco_efectiva",
+          "prioridad": "5",
+          "costo_estimado": "$10,000 - $20,000 MXN",
+          "tiempo_implementacion": "1 semana",
+          "efectividad": "30%",
+          "feedback": "❌ Limitada: El EPP es la última barrera. No previene el incidente, solo mitiga consecuencias. Además, el EPP ya estaba disponible."
+        },
+        {
+          "texto": "Instalar sistema de bloqueo automático con interlock que desenergice al abrir puertas",
+          "jerarquia": "ingenieria",
+          "clasificacion": "muy_efectiva",
+          "prioridad": "1",
+          "costo_estimado": "$25,000 - $60,000 MXN",
+          "tiempo_implementacion": "3-5 semanas",
+          "efectividad": "98%",
+          "feedback": "✅ Excelente: Los interlocks son controles de ingeniería que previenen físicamente la exposición al riesgo."
+        },
+        {
+          "texto": "Colocar señalización de advertencia de riesgo de arco en el tablero",
+          "jerarquia": "administrativo",
+          "clasificacion": "poco_efectiva",
+          "prioridad": "3",
+          "costo_estimado": "$500 - $2,000 MXN",
+          "tiempo_implementacion": "1 día",
+          "efectividad": "25%",
+          "feedback": "❌ Limitada: La señalización es un recordatorio pero no previene activamente el incidente."
+        },
+        {
+          "texto": "Realizar auditorías trimestrales de cumplimiento de procedimientos eléctricos",
+          "jerarquia": "administrativo",
+          "clasificacion": "moderada",
+          "prioridad": "3",
+          "costo_estimado": "$15,000 - $30,000 MXN/año",
+          "tiempo_implementacion": "Continuo",
+          "efectividad": "70%",
+          "feedback": "✅ Buena: Las auditorías detectan desviaciones antes de que causen incidentes, pero requieren acción correctiva."
+        }
+      ],
+      "criterios_evaluacion": {
+        "debe_seleccionar_minimo": 3,
+        "debe_incluir_ingenieria": true,
+        "no_debe_seleccionar_solo_epp": true,
+        "puntaje_maximo": 20,
+        "ponderacion": {
+          "ingenieria": 10,
+          "administrativo": 5,
+          "epp": 2
+        }
+      },
+      "retroalimentacion_general": {
+        "excelente": "Seleccionó controles de ingeniería como prioridad. Comprende la jerarquía de controles.",
+        "aceptable": "Seleccionó mezcla de controles pero priorizó administrativos sobre ingeniería.",
+        "insuficiente": "Seleccionó principalmente EPP y capacitación. Requiere reforzar concepto de jerarquía de controles."
+      },
+      "referencia_normativa": "NOM-004-STPS-2008, Art. 6.3 - Sistemas de protección y dispositivos de seguridad"
     },
     {
       "id": "Q9",
@@ -224,5 +317,6 @@
   
   "leccion_aprendida_master": "Si se puede desenergizar, DEBE desenergizarse. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales o es técnicamente imposible. La NOM-029-STPS es clara: la eliminación es siempre el primer control a considerar."
 }
+
 
 
