@@ -914,4 +914,120 @@ body {
     }
 }
 
+/* ───────────────────────────────────────────────────────────────────────
+   WHITE LABEL PANEL - Estilos específicos
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Asegurar que la pantalla sea visible cuando está activa */
+#white-label-screen {
+    display: none;
+}
+
+#white-label-screen.active {
+    display: block !important;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Forzar visibilidad de la card */
+#white-label-screen .card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: white !important;
+    padding: 30px !important;
+}
+
+/* Form groups visibles */
+#white-label-screen .form-group {
+    display: block !important;
+    margin: 20px 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Labels visibles */
+#white-label-screen .form-group label {
+    display: block !important;
+    font-weight: bold !important;
+    margin-bottom: 8px !important;
+    color: #1a1a1a !important;
+    visibility: visible !important;
+}
+
+/* Inputs visibles y con estilo */
+#white-label-screen .form-group input[type="text"],
+#white-label-screen .form-group input[type="email"] {
+    display: block !important;
+    width: 100% !important;
+    padding: 15px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+    margin: 10px 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: white !important;
+    color: #1a1a1a !important;
+}
+
+#white-label-screen .form-group input[type="color"] {
+    display: block !important;
+    width: 100% !important;
+    height: 50px !important;
+    border: 2px solid #ddd !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: white !important;
+}
+
+#white-label-screen .form-group input:focus {
+    outline: none !important;
+    border-color: #2196F3 !important;
+}
+
+/* Small text visible */
+#white-label-screen .form-group small {
+    display: block !important;
+    color: #666 !important;
+    font-size: 12px !important;
+    margin-top: 5px !important;
+    visibility: visible !important;
+}
+
+/* Button group visible */
+#white-label-screen .button-group {
+    display: flex !important;
+    gap: 15px !important;
+    margin-top: 30px !important;
+    flex-wrap: wrap !important;
+    visibility: visible !important;
+}
+
+#white-label-screen .button-group .btn {
+    display: inline-block !important;
+    flex: 1 !important;
+    min-width: 150px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* H2 visible */
+#white-label-screen h2 {
+    display: block !important;
+    color: #2196F3 !important;
+    margin-bottom: 15px !important;
+    font-size: 24px !important;
+    visibility: visible !important;
+}
+
+#white-label-screen p {
+    display: block !important;
+    color: #666 !important;
+    margin-bottom: 25px !important;
+    visibility: visible !important;
+}
+
+
 
