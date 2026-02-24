@@ -97,6 +97,26 @@ const app = {
         }
     },
 
+        // Control de visibilidad de botones según plan
+        var btnCasosMaster = document.getElementById('btn-casos-master');
+        if (btnCasosMaster) {
+            if (this.licencia.features && this.licencia.features.casosElite) {
+                btnCasosMaster.style.display = 'inline-block';
+            } else {
+                btnCasosMaster.style.display = 'none';
+            }
+        }
+
+        var btnWhiteLabel = document.getElementById('btn-white-label');
+        if (btnWhiteLabel) {
+            if (this.licencia.features && this.licencia.features.whiteLabel) {
+                btnWhiteLabel.style.display = 'inline-block';
+            } else {
+               btnWhiteLabel.style.display = 'none';
+            }
+        }
+
+    
     // ─────────────────────────────────────────────────────────────────────
     // LICENCIAS CON ID + CLAVE
     // ─────────────────────────────────────────────────────────────────────
@@ -1006,6 +1026,7 @@ mostrarResultadoCaso: function(resultado) {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
