@@ -501,6 +501,30 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
+    // DESCARGAR INSIGNIA (NUEVA FUNCIÓN)
+    // ─────────────────────────────────────────────────────────────────────
+    descargarInsignia: function() {
+        if (!this.casoActual || !this.resultadoCaso) {
+            alert('❌ No hay insignia disponible');
+            return;
+        }
+        if (!this.resultadoCaso.aprobado) {
+            alert('⚠️ Debes aprobar el caso para obtener la insignia');
+            return;
+        }
+        var self = this;
+        generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
+            var a = document.createElement('a');
+            a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.href = url;
+            a.click();
+        }).catch(function() {
+            alert('❌ Error generando insignia');
+        });
+    },
+
+    
+    // ─────────────────────────────────────────────────────────────────────
     // NAVEGACIÓN
     // ─────────────────────────────────────────────────────────────────────
     volverHome: function() { this.detenerTimer(); this.examenActual = null; this.respuestasUsuario = []; this.preguntaActual = 0; this.resultadoActual = null; this.respuestaTemporal = null; this.mostrarPantalla('home-screen'); },
@@ -1008,6 +1032,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
