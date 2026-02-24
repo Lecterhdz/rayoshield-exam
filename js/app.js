@@ -542,6 +542,7 @@ const app = {
     casoActual: null,
     respuestasCaso: {},
     irACasosMaster: function() {
+        this.detenerTimerCaso();  // ← AGREGAR ESTO
         document.getElementById('casos-list').style.display = 'block';
         document.getElementById('caso-detalle').style.display = 'none';
         document.getElementById('casos-main-buttons').style.display = 'block';
@@ -620,6 +621,7 @@ const app = {
         });
         
         document.getElementById('btn-enviar-caso').style.display = 'inline-block';
+        this.iniciarTimerCaso();  // ← AGREGAR ESTO
     },
     renderAnalisisMultiple: function(pregunta) {
         var container = document.createElement('div');
@@ -743,7 +745,7 @@ const app = {
         var resultadoEl = document.getElementById('caso-resultado');
         resultadoEl.style.display = 'block';
         resultadoEl.scrollIntoView({ behavior: 'smooth' });
-        
+    
         // ✅ Si tiene feature predictivo, usar Dashboard Engine
         if (this.licencia.features && this.licencia.features.predictivo && typeof DashboardEngine !== 'undefined') {
             resultadoEl.innerHTML = DashboardEngine.generar(resultado);
@@ -753,11 +755,14 @@ const app = {
             var icono = resultado.aprobado ? '✅' : '📚';
             var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
         
-            // ✅ Botones condicionales (VARIABLE: botonesHTML)
+            // ✅ Determinar insignia según puntaje
+            var insignia = this.obtenerInsigniaPorPuntaje(resultado.porcentaje);
+        
+            // ✅ Botones condicionales
             var botonesHTML = '';
             if (resultado.aprobado) {
                 botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
-                    '<button class="btn btn-primary" onclick="app.descargarCertificadoMaster()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏆 Descargar Certificado MASTER</button>' +
+                    '<button class="btn btn-primary" onclick="app.descargarInsignia()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏅 Descargar Insignia</button>' +
                     '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
                     '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
                     '</div>';
@@ -768,38 +773,140 @@ const app = {
                     '</div>';
             }
         
-            resultadoEl.innerHTML = '<div class="resultado-investigacion ' + claseEstado + '"><h2>' + icono + ' Resultado de la Investigación</h2><div class="puntaje-master">' + resultado.porcentaje + '%</div><p><strong>Puntaje:</strong> ' + resultado.puntajeTotal + ' / ' + resultado.puntajeMaximo + '</p><p><strong>Estado:</strong> ' + estadoTexto + '</p></div>' + (resultado.feedback.length > 0 ? '<div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;"><strong>💡 Retroalimentación:</strong><ul style="margin-top:10px;">' + resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul></div>' : '') + '<div class="leccion-master"><strong>🎓 Lección Aprendida:</strong><p style="margin-top:10px;">' + resultado.leccion + '</p></div><div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;"><strong>📋 Conclusión Oficial:</strong><p style="margin-top:10px;line-height:1.6;">' + resultado.conclusion + '</p></div>' + botonesHTML;
+            resultadoEl.innerHTML = `
+            <div class="resultado-investigacion ${claseEstado}">
+                <h2>${icono} Resultado de la Investigación</h2>
+                <div class="puntaje-master">${resultado.porcentaje}%</div>
+                <p><strong>Puntaje:</strong> ${resultado.puntajeTotal} / ${resultado.puntajeMaximo}</p>
+                <p><strong>Estado:</strong> ${estadoTexto}</p>
+                ${resultado.aprobado ? `
+                <div style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#D4AF37,#FFD700);border-radius:10px;text-align:center;">
+                    <div style="font-size:64px;margin-bottom:10px;">${insignia.icono}</div>
+                    <div style="font-size:20px;font-weight:bold;color:#1a1a1a;">Insignia ${insignia.nombre}</div>
+                    <div style="font-size:14px;color:#333;margin-top:5px;">${insignia.descripcion}</div>
+                </div>
+                ` : ''}
+            </div>
+            ${resultado.feedback.length > 0 ? `
+            <div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;">
+                <strong>💡 Retroalimentación:</strong>
+                <ul style="margin-top:10px;">
+                    ${resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('')}
+                </ul>
+            </div>` : ''}
+            <div class="leccion-master">
+                <strong>🎓 Lección Aprendida:</strong>
+                <p style="margin-top:10px;">${resultado.leccion}</p>
+            </div>
+            <div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;">
+                <strong>📋 Conclusión Oficial:</strong>
+                <p style="margin-top:10px;line-height:1.6;">${resultado.conclusion}</p>
+            </div>
+            ${botonesHTML}
+            `;
         }
+    
         document.getElementById('btn-enviar-caso').style.display = 'none';
     },
-    volverAListaCasos: function() {
-        document.getElementById('casos-list').style.display = 'block';
-        document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('casos-main-buttons').style.display = 'block';
-        document.getElementById('caso-resultado').style.display = 'none';
-        this.casoActual = null;
-        this.respuestasCaso = {};
+
+    obtenerInsigniaPorPuntaje: function(puntaje) {
+        if (puntaje >= 95) {
+            return { nombre: 'PERICIAL', icono: '⚖️', descripcion: 'Excelencia en investigación de incidentes', color: '#D4AF37' };
+        } else if (puntaje >= 90) {
+            return { nombre: 'ELITE', icono: '🥇', descripcion: 'Competencia avanzada en análisis SHE', color: '#9C27B0' };
+        } else if (puntaje >= 80) {
+            return { nombre: 'MASTER', icono: '🥈', descripcion: 'Competencia sólida en investigación', color: '#2196F3' };
+        } else if (puntaje >= 75) {
+            return { nombre: 'AVANZADO', icono: '🥉', descripcion: 'Competencia en desarrollo', color: '#4CAF50' };
+        } else {
+            return { nombre: 'PARTICIPACIÓN', icono: '📚', descripcion: 'Continúa practicando', color: '#FF9800' };
+        }
     },
-    descargarCertificadoMaster: function() {
+
+    descargarInsignia: function() {
         if (!this.casoActual || !this.resultadoCaso) {
-            alert('❌ No hay certificado disponible');
+            alert('❌ No hay insignia disponible');
             return;
         }
         if (!this.resultadoCaso.aprobado) {
-            alert('⚠️ Debes aprobar el caso para obtener el certificado');
+            alert('⚠️ Debes aprobar el caso para obtener la insignia');
             return;
         }
         var self = this;
         generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
             var a = document.createElement('a');
-            a.download = 'RayoShield_MASTER_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.href = url;
             a.click();
         }).catch(function() {
-            alert('❌ Error generando certificado');
+            alert('❌ Error generando insignia');
         });
     },
 
+
+    // ─────────────────────────────────────────────────────────────────────
+    // TIMER PARA CASOS MASTER
+    // ─────────────────────────────────────────────────────────────────────
+    timerCaso: null,
+    tiempoCasoLimite: 40 * 60 * 1000, // 40 minutos por defecto
+    tiempoCasoInicio: null,
+    tiempoCasoRestante: null,
+
+    iniciarTimerCaso: function() {
+        var self = this;
+        this.tiempoCasoInicio = Date.now();
+        this.tiempoCasoRestante = this.casoActual.metadatos_evaluacion?.tiempo_estimado_minutos * 60 * 1000 || this.tiempoCasoLimite;
+    
+        var timerEl = document.getElementById('caso-timer');
+        if (!timerEl) {
+            // Crear elemento timer si no existe
+            var casoDetalle = document.getElementById('caso-detalle');
+            if (casoDetalle) {
+                timerEl = document.createElement('div');
+                timerEl.id = 'caso-timer';
+                timerEl.style.cssText = 'text-align:center;font-size:24px;font-weight:bold;color:#666;margin:15px 0;padding:10px;background:#f5f5f5;border-radius:10px;';
+                casoDetalle.insertBefore(timerEl, casoDetalle.firstChild);
+            }
+        }
+    
+        this.timerCaso = setInterval(function() {
+            self.tiempoCasoRestante = self.tiempoCasoLimite - (Date.now() - self.tiempoCasoInicio);
+        
+            if (self.tiempoCasoRestante <= 0) {
+                clearInterval(self.timerCaso);
+                self.timerCaso = null;
+                alert('⏰ Tiempo agotado. Tu caso se enviará automáticamente.');
+                self.enviarRespuestasCaso();
+                return;
+            }
+        
+            self.actualizarTimerCasoUI();
+        
+            // Alerta de 5 minutos
+            if (self.tiempoCasoRestante <= 300000 && self.tiempoCasoRestante > 240000) {
+                alert('⚠️ Quedan 5 minutos');
+            }
+        }, 1000);
+    },
+
+    actualizarTimerCasoUI: function() {
+        var el = document.getElementById('caso-timer');
+        if (!el) return;
+    
+        var min = Math.floor(this.tiempoCasoRestante / 60000);
+        var seg = Math.floor((this.tiempoCasoRestante % 60000) / 1000);
+        el.textContent = '⏱️ ' + min + ':' + (seg < 10 ? '0' : '') + seg;
+        el.style.color = this.tiempoCasoRestante <= 300000 ? '#f44336' : '#666';
+    },
+
+    detenerTimerCaso: function() {
+        if (this.timerCaso) {
+            clearInterval(this.timerCaso);
+            this.timerCaso = null;
+        }
+    },
+
+    
     // ─────────────────────────────────────────────────────────────────────
     // WHITE LABEL MANAGER
     // ─────────────────────────────────────────────────────────────────────
@@ -901,6 +1008,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
