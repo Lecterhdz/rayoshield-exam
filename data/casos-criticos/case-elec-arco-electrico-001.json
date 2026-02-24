@@ -1,13 +1,23 @@
 {
   "id": "case-elec-arco-electrico-001",
-  "tipo": "investigacion_elite",
-  "nivel": "elite",
-  "titulo": "Arco Eléctrico en Tablero 480V - Análisis Pericial",
+  "titulo": "Arco Eléctrico en Tablero 480V",
   "categoria": "electricos",
-  "descripcion": "Caso de nivel ELITE con 9 tipos de preguntas inteligentes",
+  "nivel": "elite",
+  "descripcion": "Caso de nivel ELITE",
   "tiempo_estimado": "40 min",
-  "requisito": "Examen Eléctricos Supervisor SHE aprobado",
-  
+  "fecha_evento": "2026-01-25",
+  "industria": "Industrial / Eléctrica",
+  "descripcion_evento": {
+    "actividad": "Mantenimiento preventivo",
+    "equipo": "Tablero 480V",
+    "evento": "Arco eléctrico",
+    "resultado": "Quemaduras",
+    "clasificacion": "Accidente grave"
+  },
+  "linea_tiempo": ["08:00 - Inicio", "08:15 - Incidente"],
+  "energias_identificadas": {
+    "electricas": "480V - ENERGIZADO"
+  },
   "preguntas": [
     {
       "id": "Q1",
@@ -170,3 +180,4 @@
   
   "leccion_aprendida_master": "Si se puede desenergizar, DEBE desenergizarse. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales o es técnicamente imposible. La NOM-029-STPS es clara: la eliminación es siempre el primer control a considerar."
 }
+
