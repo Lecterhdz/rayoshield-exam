@@ -141,23 +141,74 @@ const app = {
         }
         
         // LICENCIAS VÁLIDAS
+        // ─────────────────────────────────────────────────────────────────────
+        // BASE DE DATOS DE LICENCIAS CON FEATURES POR PLAN
+        // ─────────────────────────────────────────────────────────────────────
         var licenciasValidas = {
-            'RS-A3F8-C2E9-B1D4': { clienteId: 'CONSTRUCTORA_AZTECA_001', tipo: 'FULL', duracion: 365 },
-            'RS-2D5F-8A1C-4E7B': { clienteId: 'SEGURIDAD_INDUSTRIAL_MX', tipo: 'EMPRESARIAL', duracion: 365 },
-            'RS-9C2E-5B8D-1F4A': { clienteId: 'CAPACITACION_PRO_2026', tipo: 'FULL', duracion: 180 }
+            // PLAN PRO (Evaluación básica + Casos MASTER)
+            'RS-A3F8-C2E9-B1D4': { 
+                clienteId: 'CONSTRUCTORA_AZTECA_001', 
+                tipo: 'FULL', 
+                duracion: 365,
+                features: { 
+                    whiteLabel: false,      // ❌ Sin panel de marca
+                    predictivo: false,      // ❌ Sin dashboard ejecutivo
+                    auditoria: false,       // ❌ Sin modo STPS
+                    casosElite: true,       // ✅ Casos MASTER incluidos
+                    casosPericial: false    // ❌ Sin nivel pericial
+                } 
+            },
+            // PLAN PRO + WHITE LABEL (Consultores DC5)
+            'RS-2D5F-8A1C-4E7B': { 
+                clienteId: 'SEGURIDAD_INDUSTRIAL_MX', 
+                tipo: 'EMPRESARIAL', 
+                duracion: 365,
+                features: { 
+                    whiteLabel: true,       // ✅ Panel de marca personalizado
+                    predictivo: false,      // ❌ Sin dashboard ejecutivo
+                    auditoria: false,       // ❌ Sin modo STPS
+                    casosElite: true,       // ✅ Casos MASTER incluidos
+                    casosPericial: false    // ❌ Sin nivel pericial
+                } 
+            },
+            // PLAN ENTERPRISE (Todo incluido)
+            'RS-9C2E-5B8D-1F4A': { 
+                clienteId: 'CAPACITACION_PRO_2026', 
+                tipo: 'ENTERPRISE', 
+                duracion: 365,
+                features: { 
+                    whiteLabel: true,       // ✅ Panel de marca
+                    predictivo: true,       // ✅ Dashboard ejecutivo + Riesgos
+                    auditoria: true,        // ✅ Modo auditoría STPS
+                    casosElite: true,       // ✅ Casos MASTER
+                    casosPericial: true     // ✅ Casos PERICIAL
+                } 
+            }
         };
-        
-        var licencia = licenciasValidas[clave.toUpperCase()];
-        if (!licencia) {
+        // ─────────────────────────────────────────────────────────────────────
+    
+        var licenciaData = licenciasValidas[clave.toUpperCase()];
+    
+        if (!licenciaData) {
             return Promise.resolve({ valido: false, error: 'Clave inválida' });
         }
-        if (licencia.clienteId.toUpperCase() !== clienteId.toUpperCase()) {
+    
+        if (licenciaData.clienteId.toUpperCase() !== clienteId.toUpperCase()) {
             return Promise.resolve({ valido: false, error: 'ID no coincide con esta clave' });
         }
-        
+    
+        // Calcular fecha de expiración
         var expiracion = new Date();
-        expiracion.setDate(expiracion.getDate() + licencia.duracion);
-        return Promise.resolve({ valido: true, tipo: licencia.tipo, clienteId: licencia.clienteId, expiracion: expiracion.toISOString() });
+        expiracion.setDate(expiracion.getDate() + licenciaData.duracion);
+    
+        // Devolver objeto COMPLETO con features
+        return Promise.resolve({ 
+            valido: true, 
+            tipo: licenciaData.tipo, 
+            clienteId: licenciaData.clienteId, 
+            expiracion: expiracion.toISOString(),
+            features: licenciaData.features  // ✅ IMPORTANTE: Pasamos las capacidades
+        });
     },
 
     activarLicencia: function() {
@@ -169,18 +220,54 @@ const app = {
         
         if (!clienteId || !clave) { alert('⚠️ Ingresa ID y clave'); return; }
         
+        // ✅ VERIFICACIÓN DE SEGURIDAD: Si ya hay licencia activa
+        if (this.licencia.tipo !== 'DEMO' && this.licencia.expiracion) {
+            var hoy = new Date();
+            var vence = new Date(this.licencia.expiracion);
+        
+            if (hoy < vence) {
+                if (this.licencia.clave === clave) {
+                    alert('✅ Esta licencia ya está activa.\nVence: ' + vence.toLocaleDateString('es-MX'));
+                    return;
+                } else {
+                    var confirmar = confirm('⚠️ Ya tienes una licencia activa hasta ' + vence.toLocaleDateString('es-MX') + '.\n\nActivar esta nueva licencia reemplazará la actual.\n\n¿Continuar?');
+                    if (!confirmar) return;
+                }
+            }
+        }
+    
         var btn = document.querySelector('#license-screen .btn-primary');
-        if (btn) { btn.disabled = true; btn.textContent = '⏳ Validando...'; }
+        if (btn) { 
+            btn.disabled = true; 
+            btn.textContent = '⏳ Validando...'; 
+        }
         
         this.validarLicencia(clienteId, clave).then(function(res) {
             if (btn) { btn.disabled = false; btn.textContent = '🔓 Activar Licencia'; }
             if (res.valido) {
-                self.licencia = { tipo: res.tipo, clave: clave, clienteId: res.clienteId, expiracion: res.expiracion, examenesRestantes: 9999 };
+                // ✅ GUARDAR LICENCIA CON FEATURES
+                self.licencia = { 
+                    tipo: res.tipo, 
+                    clave: clave, 
+                    clienteId: res.clienteId, 
+                    expiracion: res.expiracion, 
+                    examenesRestantes: 9999,
+                    features: res.features  // ✅ Guardamos las capacidades del plan
+                };
                 self.guardarLicencia();
+
+                // ✅ Si tiene White Label, aplicar configuración guardada
+                if (res.features.whiteLabel) {
+                    self.aplicarConfiguracionWhiteLabel();
+                }
+                
                 var fecha = new Date(res.expiracion).toLocaleDateString('es-MX');
-                alert('✅ Licencia ' + res.tipo + ' activada\nCliente: ' + res.clienteId + '\nVálida hasta: ' + fecha);
+                alert('✅ Licencia ' + res.tipo + ' activada\n\nCliente: ' + res.clienteId + '\nVálida hasta: ' + fecha + '\n\nFeatures activas:\n• Casos MASTER: ' + (res.features.casosElite ? '✅' : '❌') + '\n• White Label: ' + (res.features.whiteLabel ? '✅' : '❌') + '\n• Dashboard Predictivo: ' + (res.features.predictivo ? '✅' : '❌'));
+            
                 if (idEl) idEl.value = '';
                 if (keyEl) keyEl.value = '';
+            
+                self.actualizarUI();
             } else {
                 alert('❌ ' + res.error);
             }
@@ -831,6 +918,7 @@ mostrarResultadoCaso: function(resultado) {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
 
