@@ -855,7 +855,22 @@ const app = {
     mostrarInfo: function() {
         this.mostrarPantalla('info-screen');
     },
+    // ─────────────────────────────────────────────────────────────────────
+    // IMPRIMIR DASHBOARD
+    // ─────────────────────────────────────────────────────────────────────
+    imprimirDashboard: function() {
+        var dashboardEl = document.querySelector('.dashboard-container');
+        if (dashboardEl) {
+            var contenidoOriginal = document.body.innerHTML;
+            document.body.innerHTML = dashboardEl.outerHTML;
+            window.print();
+            location.reload(); // Recargar para restaurar la app
+        } else {
+            window.print();
+        }
+    },
 
+    
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
     // ─────────────────────────────────────────────────────────────────────
@@ -886,4 +901,5 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
