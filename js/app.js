@@ -737,40 +737,26 @@ const app = {
                 case 'analisis_normativo':
                 case 'deteccion_inconsistencias':
                 case 'diagnostico_sistema':
-                    var checks = document.querySelectorAll('input[name="pregunta-' + pregunta.id + '"]:checked');
-                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
+                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
                     break;
-        
                 case 'respuesta_abierta_guiada':
                 case 'redaccion_tecnica':
-                    var textarea = document.getElementById('respuesta-' + pregunta.id);
-                    respuestasPorPregunta[pregunta.id] = [textarea ? textarea.value : ''];
+                    preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
                     break;
-        
                 case 'analisis_responsabilidad':
-                    var respuestas = [];
-                    pregunta.roles.forEach(function(role, idx) {
-                        var selected = document.querySelector('input[name="responsabilidad-' + pregunta.id + '-' + idx + '"]:checked');
-                        respuestas.push(selected ? parseInt(selected.value) : undefined);
-                    });
-                    respuestasPorPregunta[pregunta.id] = respuestas;
+                    preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
                     break;
-        
                 case 'plan_accion':
-                case 'evaluacion_correctivas':  // ← AGREGAR ESTO
-                    var checks = document.querySelectorAll('input[name="plan-' + pregunta.id + '"]:checked');
-                    respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
+                case 'evaluacion_correctivas':  // ← ¿ESTÁ ESTO?
+                    preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
                     break;
-        
                 case 'ordenamiento_dinamico':
                 case 'matriz_priorizacion':
-                    var inputOrden = document.getElementById('respuesta-' + pregunta.id);
-                    respuestasPorPregunta[pregunta.id] = inputOrden && inputOrden.value ? JSON.parse(inputOrden.value) : [];
+                    preguntaDiv.appendChild(self.renderOrdenamientoDinamico(pregunta));
                     break;
-        
                 case 'calculo_tecnico':
-                    var inputCalculo = document.getElementById('respuesta-' + pregunta.id);
-                    respuestasPorPregunta[pregunta.id] = [inputCalculo ? parseFloat(inputCalculo.value) : 0];
+                    preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
+                    break;
                 default:
                     preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
             }
@@ -1249,4 +1235,5 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
