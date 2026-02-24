@@ -878,4 +878,40 @@ body {
     transition: width 0.3s;
 }
 
+/* ───────────────────────────────────────────────────────────────────────
+   ESTILOS DE IMPRESIÓN - Solo dashboard
+   ─────────────────────────────────────────────────────────────────────── */
+@media print {
+    /* Ocultar todo excepto el dashboard */
+    body * {
+        visibility: hidden;
+    }
+    
+    .dashboard-container, .dashboard-container * {
+        visibility: visible;
+    }
+    
+    .dashboard-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        background: white !important;
+        color: black !important;
+    }
+    
+    /* Ocultar botones en impresión */
+    button, .btn, .no-print {
+        display: none !important;
+    }
+    
+    /* Ajustar colores para impresión */
+    .dashboard-container {
+        background: white !important;
+        color: black !important;
+    }
+}
+
 
