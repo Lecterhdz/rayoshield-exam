@@ -1,0 +1,15 @@
+{
+  "enabled": false,
+  "empresaNombre": "RayoShield",
+  "empresaLogo": "assets/logo.png",
+  "colores": {
+    "primario": "#2196F3",
+    "secundario": "#1976D2",
+    "fondo": "linear-gradient(135deg, #1a237e, #3949ab)"
+  },
+  "contacto": {
+    "email": "contacto@rayoshield.com",
+    "telefono": "55-XXXX-XXXX",
+    "website": "www.rayoshield.com"
+  }
+}
