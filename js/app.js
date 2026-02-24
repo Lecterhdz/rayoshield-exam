@@ -163,7 +163,7 @@ const app = {
         // BASE DE DATOS DE LICENCIAS CON FEATURES POR PLAN
         // ─────────────────────────────────────────────────────────────────────
         var licenciasValidas = {
-            // PLAN PRO
+            // PLAN PRO (Evaluación básica + Casos MASTER)
             'RS-A3F8-C2E9-B1D4': { 
                 clienteId: 'CONSTRUCTORA_AZTECA_001', 
                 tipo: 'FULL', 
@@ -176,7 +176,7 @@ const app = {
                     casosPericial: false
                 } 
             },
-            // PLAN ENTERPRISE (con White Label)
+            // PLAN ENTERPRISE (con White Label + Predictivo)
             'RS-2D5F-8A1C-4E7B': { 
                 clienteId: 'SEGURIDAD_INDUSTRIAL_MX', 
                 tipo: 'EMPRESARIAL', 
@@ -195,7 +195,7 @@ const app = {
                 tipo: 'FULL', 
                 duracion: 180,
                 features: { 
-                    whiteLabel: false, 
+                    whiteLabel: true, 
                     predictivo: false, 
                     auditoria: false,
                     casosElite: true,
@@ -901,5 +901,6 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); });
+
 
 
