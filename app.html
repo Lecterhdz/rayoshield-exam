@@ -43,12 +43,14 @@
                 </div>
                 
                 <div class="button-group">
-                    <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar">📚 Comenzar Examen</button>
-                    <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">📋 Mis Datos</button>
+                    <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar">📚 Examen</button>
+                    <button class="btn btn-warning" onclick="app.irACasosMaster()" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);color:white;">⚠️ Casos MASTER</button>
+                    <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">📋 Datos de usuario</button>
                     <button class="btn btn-info" onclick="app.mostrarHistorial()">📋 Historial</button>
                     <button class="btn btn-success" onclick="app.mostrarLicencia()">🔑 Licencia</button>
                     <button class="btn btn-secondary" onclick="app.mostrarInfo()">ℹ️ Información</button>
-                    <button class="btn btn-warning" onclick="app.irACasosMaster()" style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);color:white;">⚠️ Casos MASTER</button>
+                    <button class="btn btn-warning" onclick="app.mostrarPanelWhiteLabel()" id="btn-white-label" style="background:linear-gradient(135deg,#9C27B0,#673AB7);color:white;display:none;">🎨 Personalizar Marca</button>
+                    
                 </div>
             </div>
         </section>
@@ -393,6 +395,7 @@
     </script>
 </body>
 </html>
+
 
 
 
