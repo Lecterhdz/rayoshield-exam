@@ -313,3 +313,63 @@ if (typeof window !== 'undefined') {
     window.evaluarCasoInvestigacion = evaluarCasoInvestigacion;
     console.log('✅ exams.js cargado - Casos MASTER habilitados');
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NUEVOS TIPOS DE PREGUNTAS INTELIGENTES
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TIPOS_PREGUNTAS_AVANZADAS = {
+    // 1. Matriz de Priorización (Pensamiento crítico)
+    matriz_priorizacion: {
+        descripcion: 'Ordena acciones por prioridad e impacto',
+        evaluacion: 'Critera: Urgencia vs Impacto vs Viabilidad'
+    },
+    
+    // 2. Ordenamiento Dinámico (Secuencia lógica)
+    ordenamiento_dinamico: {
+        descripcion: 'Arrastra y ordena los pasos en secuencia correcta',
+        evaluacion: 'Cada posición correcta suma puntos'
+    },
+    
+    // 3. Detección de Omisiones (Capacidad analítica)
+    deteccion_omisiones: {
+        descripcion: 'Identifica qué elementos faltan en el procedimiento',
+        evaluacion: 'Cada omisión detectada suma puntos'
+    },
+    
+    // 4. Redacción Técnica Guiada (Competencia profesional)
+    redaccion_tecnica: {
+        descripcion: 'Redacta causa raíz en términos sistémicos',
+        evaluacion: 'Keywords: sistema, procedimiento, control, barrera'
+    },
+    
+    // 5. Diagnóstico de Sistema (Pensamiento sistémico)
+    diagnostico_sistema: {
+        descripcion: 'Analiza múltiples fallas interconectadas',
+        evaluacion: 'Identifica relaciones causa-efecto'
+    },
+    
+    // 6. Evaluación de Acciones Correctivas (Madurez preventiva)
+    evaluacion_correctivas: {
+        descripcion: 'Evalúa efectividad de acciones propuestas',
+        evaluacion: 'Jerarquía de controles + ROI + Sostenibilidad'
+    },
+    
+    // 7. Identificación de Sesgos (Nivel cognitivo)
+    identificacion_sesgos: {
+        descripcion: 'Identifica sesgos cognitivos en el incidente',
+        evaluacion: 'Sesgo de confirmación, normalización, etc.'
+    },
+    
+    // 8. Análisis Normativo Aplicado (Capacidad regulatoria)
+    analisis_normativo: {
+        descripcion: 'Identifica NOMs aplicables y artículos específicos',
+        evaluacion: 'NOM correcta + artículo específico'
+    },
+    
+    // 9. Detección de Inconsistencias (Análisis crítico)
+    deteccion_inconsistencias: {
+        descripcion: 'Encuentra contradicciones en testimonios/evidencia',
+        evaluacion: 'Cada inconsistencia detectada suma puntos'
+    }
+};
