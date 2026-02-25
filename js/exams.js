@@ -191,6 +191,26 @@ const CASOS_INVESTIGACION = [
       tiempo_estimado: '40 min',
       descripcion: 'Análisis de costo-beneficio de controles preventivos',
       requisito: '5 casos MASTER aprobados con 80%+'
+    },
+
+    // Casos PERICIAL
+    {
+      id: 'case-legal-pericial-001',
+      icono: '⚖️',
+      titulo: 'Accidente Fatal con Responsabilidad Penal',
+      nivel: 'pericial',
+      tiempo_estimado: '60 min',
+      descripcion: 'Análisis forense con implicaciones legales penales',
+      requisito: '10 casos ELITE aprobados con 85%+'
+    },
+    {
+      id: 'case-corte-pericial-001',
+      icono: '⚖️',
+      titulo: 'Dictamen Pericial para Audiencia Laboral',
+      nivel: 'pericial',
+      tiempo_estimado: '60 min',
+      descripcion: 'Determinación de despido justificado según LFT',
+      requisito: '10 casos ELITE aprobados con 85%+'
     }
     
     // Agrega más casos aquí conforme los crees
@@ -501,6 +521,7 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
 
 
