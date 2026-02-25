@@ -701,8 +701,9 @@ const app = {
         }
         
         var self = this;
+        var casosMostrados = 0;
+        var maxCasosDemo = 1; // ✅ DEMO solo ve 1 caso
 
-        
         // ✅ FILTRAR CASOS SEGÚN PLAN
         CASOS_INVESTIGACION.forEach(function(caso) {
             // ✅ Verificar si el usuario tiene acceso a este nivel
@@ -712,7 +713,12 @@ const app = {
             else if (caso.nivel === 'master' && self.licencia.features.casosMaster) tieneAcceso = true;
             else if (caso.nivel === 'elite' && self.licencia.features.casosElite) tieneAcceso = true;
             else if (caso.nivel === 'pericial' && self.licencia.features.casosPericial) tieneAcceso = true;
-        
+
+            // ✅ Limitar DEMO a solo 1 caso
+            if (self.licencia.tipo === 'DEMO' && casosMostrados >= maxCasosDemo) {
+                return; // ✅ Salir del forEach si ya mostró 1 caso
+            }
+            
             if (tieneAcceso) {
                 var item = document.createElement('div');
                 item.className = 'exam-item';
@@ -1273,6 +1279,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
