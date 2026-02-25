@@ -269,18 +269,32 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
     let puntaje = 0;
     let feedback = [];
     
+    // ✅ VERIFICAR QUE EXISTEN LAS OPCIONES
+    if (!pregunta || !pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+        return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
+    }
+    
+    // ✅ VERIFICAR QUE LAS RESPUESTAS SON UN ARRAY
+    if (!respuestasUsuario || !Array.isArray(respuestasUsuario)) {
+        respuestasUsuario = [];
+    }
+    
     pregunta.opciones.forEach(function(opt, idx) {
         const seleccionada = respuestasUsuario.includes(idx);
         if (seleccionada === opt.correcta) {
             puntaje += pregunta.peso / pregunta.opciones.length;
         } else {
-            feedback.push(opt.feedback_sistemico);
+            if (opt.feedback_sistemico) {
+                feedback.push(opt.feedback_sistemico);
+            }
         }
     });
     
     // Feedback experto si falló
     if (puntaje < pregunta.peso * 0.8) {
-        feedback.push('💡 ' + pregunta.justificacion_experta);
+        if (pregunta.justificacion_experta) {
+            feedback.push('💡 ' + pregunta.justificacion_experta);
+        }
     }
     
     return { puntaje: Math.round(puntaje), feedback: feedback };
@@ -546,6 +560,7 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
 
 
