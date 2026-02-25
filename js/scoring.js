@@ -72,63 +72,55 @@ function evaluarCasoInvestigacion(respuestas, caso) {
     caso.preguntas.forEach(function(pregunta, idx) {
         var puntajePregunta = 0;
         var respuestaUsuario = respuestas[pregunta.id];
+        var resultadoEvaluacion = null;
         
-        // Calcular puntaje por pregunta
-        if (pregunta.tipo === 'analisis_multiple') {
-            var correctas = pregunta.opciones.filter(function(o) { return o.correcta; }).length;
-            var seleccionadas = respuestaUsuario ? respuestaUsuario.length : 0;
-            var acertadas = 0;
+        // ✅ Evaluar según tipo de pregunta
+        if (pregunta.tipo === 'analisis_multiple' || 
+            pregunta.tipo === 'deteccion_omisiones' || 
+            pregunta.tipo === 'identificacion_sesgos' ||
+            pregunta.tipo === 'analisis_normativo' ||
+            pregunta.tipo === 'deteccion_inconsistencias' ||
+            pregunta.tipo === 'diagnostico_sistema') {
             
-            if (respuestaUsuario) {
-                respuestaUsuario.forEach(function(idx) {
-                    if (pregunta.opciones[idx] && pregunta.opciones[idx].correcta) acertadas++;
-                });
-            }
-            
-            puntajePregunta = correctas > 0 ? (acertadas / correctas) * pregunta.peso : 0;
-            
-            if (acertadas < correctas) {
-                feedback.push('❌ Pregunta ' + (idx + 1) + ': Faltaron opciones correctas');
-            }
+            resultadoEvaluacion = evaluarAnalisisMultiple(pregunta, respuestaUsuario);
         }
-        else if (pregunta.tipo === 'respuesta_abierta_guiada' || pregunta.tipo === 'redaccion_tecnica') {
-            var texto = respuestaUsuario ? respuestaUsuario[0] : '';
-            var longitudMinima = pregunta.longitud_minima || 50;
+        else if (pregunta.tipo === 'respuesta_abierta_guiada' || 
+                 pregunta.tipo === 'redaccion_tecnica') {
             
-            if (texto && texto.length >= longitudMinima) {
-                puntajePregunta = pregunta.peso;
-            } else if (texto && texto.length > 0) {
-                puntajePregunta = pregunta.peso * 0.5;
-                feedback.push('⚠️ Pregunta ' + (idx + 1) + ': Respuesta muy corta (mínimo ' + longitudMinima + ' caracteres)');
-            } else {
-                feedback.push('❌ Pregunta ' + (idx + 1) + ': Sin respuesta');
-            }
+            resultadoEvaluacion = evaluarRespuestaAbierta(pregunta, respuestaUsuario);
         }
-        else if (pregunta.tipo === 'plan_accion' || pregunta.tipo === 'evaluacion_correctivas') {
-            var seleccionadas = respuestaUsuario ? respuestaUsuario.length : 0;
-            var correctas = pregunta.opciones.filter(function(o) { 
-                return o.correcta || o.jerarquia === 'ingenieria' || o.jerarquia === 'administrativo'; 
-            }).length;
-            
-            puntajePregunta = seleccionadas > 0 ? (Math.min(seleccionadas, correctas) / correctas) * pregunta.peso : 0;
-            
-            if (seleccionadas < correctas) {
-                feedback.push('⚠️ Pregunta ' + (idx + 1) + ': Selecciona más acciones preventivas');
-            }
+        else if (pregunta.tipo === 'analisis_responsabilidad') {
+            resultadoEvaluacion = evaluarAnalisisResponsabilidad(pregunta, respuestaUsuario);
         }
-        else {
-            // Otros tipos de preguntas
-            puntajePregunta = pregunta.peso * 0.8; // Puntaje base
+        else if (pregunta.tipo === 'plan_accion' || 
+                 pregunta.tipo === 'evaluacion_correctivas') {
+            
+            resultadoEvaluacion = evaluarPlanAccion(pregunta, respuestaUsuario);
+        }
+        else if (pregunta.tipo === 'ordenamiento_dinamico' || 
+                 pregunta.tipo === 'matriz_priorizacion') {
+            
+            resultadoEvaluacion = evaluarOrdenamientoDinamico(pregunta, respuestaUsuario);
+        }
+        else if (pregunta.tipo === 'calculo_tecnico') {
+            resultadoEvaluacion = evaluarCalculoTecnico(pregunta, respuestaUsuario);
         }
         
-        puntajeTotal += puntajePregunta;
-        puntajeMaximo += pregunta.peso;
+        // ✅ Acumular puntaje y feedback
+        if (resultadoEvaluacion) {
+            puntajeTotal += resultadoEvaluacion.puntaje;
+            puntajeMaximo += pregunta.peso;
+            
+            if (resultadoEvaluacion.feedback) {
+                feedback.push(resultadoEvaluacion.feedback);
+            }
+        }
     });
     
     var porcentaje = puntajeMaximo > 0 ? Math.round((puntajeTotal / puntajeMaximo) * 100) : 0;
     var aprobado = porcentaje >= 70;
     
-    // ✅ MAPEAR CAMPOS DEL CASO AL RESULTADO
+    // ✅ MAPEAR CORRECTAMENTE LOS CAMPOS DEL CASO
     return {
         puntajeTotal: Math.round(puntajeTotal),
         puntajeMaximo: puntajeMaximo,
@@ -137,14 +129,24 @@ function evaluarCasoInvestigacion(respuestas, caso) {
         estado: aprobado ? 'Aprobado' : 'Reprobado',
         fecha: new Date().toISOString(),
         
-        // ✅ CAMPOS DE RETROALIMENTACIÓN
+        // ✅ RETROALIMENTACIÓN
         feedback: feedback.length > 0 ? feedback : ['✅ ¡Buen trabajo! No se detectaron errores críticos.'],
+        
+        // ✅ LECCIÓN APRENDIDA (del caso JSON)
         leccion: caso.leccion_aprendida || 'Continúa practicando para mejorar tus competencias en investigación de incidentes.',
+        
+        // ✅ CONCLUSIÓN OFICIAL (del caso JSON)
         conclusion: caso.conclusion_oficial || 'La investigación fue completada. Revisa la retroalimentación para mejorar.',
         
         // Para compatibilidad con SmartEvaluationV2
         dimensiones: {},
         puntajeCompetencias: porcentaje,
-        nivelGeneral: { nivel: porcentaje >= 80 ? 'MASTER' : 'BÁSICO', color: '#2196F3', icono: '🥈', validez: '1 año' }
+        nivelGeneral: { 
+            nivel: porcentaje >= 80 ? 'MASTER' : 'BÁSICO', 
+            color: '#2196F3', 
+            icono: '🥈', 
+            validez: '1 año' 
+        }
     };
 }
+
