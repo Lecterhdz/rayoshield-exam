@@ -44,19 +44,56 @@ const app = {
     init: function() {
         console.log('RayoShield iniciado');
         this.cargarLicencia();
-
-        // ✅ Inicializar features para DEMO si no existen
-        if (this.licencia.tipo === 'DEMO' && !this.licencia.features) {
-            this.licencia.features = {
-                casosBasicos: true,
-                casosMaster: false,
-                casosElite: false,
-                casosPericial: false,
-                whiteLabel: false,
-                predictivo: false
-            };
+    
+        // ✅ Inicializar features si están vacías o no existen
+        if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
+            if (this.licencia.tipo === 'DEMO') {
+                this.licencia.features = {
+                    casosBasicos: true,
+                    casosMaster: false,
+                    casosElite: false,
+                    casosPericial: false,
+                    whiteLabel: false,
+                    predictivo: false
+                };
+            } else if (this.licencia.tipo === 'PROFESIONAL') {
+                this.licencia.features = {
+                    casosBasicos: true,
+                    casosMaster: true,
+                    casosElite: false,
+                    casosPericial: false,
+                    whiteLabel: false,
+                    predictivo: false,
+                    insignias: false,
+                    dashboard: false
+                };
+            } else if (this.licencia.tipo === 'CONSULTOR') {
+                this.licencia.features = {
+                    casosBasicos: true,
+                    casosMaster: true,
+                    casosElite: true,
+                    casosPericial: false,
+                    whiteLabel: false,
+                    predictivo: false,
+                    insignias: true,
+                    dashboard: 'basico'
+                };
+            } else if (this.licencia.tipo === 'EMPRESARIAL') {
+                this.licencia.features = {
+                    casosBasicos: true,
+                    casosMaster: true,
+                    casosElite: true,
+                    casosPericial: true,
+                    whiteLabel: true,
+                    predictivo: true,
+                    insignias: true,
+                    dashboard: 'predictivo',
+                    multiUsuario: 50
+                };
+            }
+            this.guardarLicencia();
         }
-
+    
         this.cargarDatosUsuario();
         this.cargarHistorial();
         this.cargarExamenGuardado();
@@ -1293,6 +1330,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
