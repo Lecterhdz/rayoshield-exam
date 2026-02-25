@@ -164,58 +164,85 @@ body {
 .btn {
     padding: 14px 28px;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: 12px;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.18);
 }
 
+.btn:active {
+    transform: translateY(0);
+}
+
+/* Primario - Azul Ejecutivo (Acción Principal) */
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
     color: white;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-dark), #1565C0);
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 100%);
 }
 
+/* Secundario - Gris Azulado (Acciones Secundarias) */
 .btn-secondary {
-    background: linear-gradient(135deg, #78909C, #546E7A);
+    background: linear-gradient(135deg, #607D8B 0%, #546E7A 100%);
     color: white;
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #546E7A, #455A64);
+    background: linear-gradient(135deg, #546E7A 0%, #455A64 100%);
 }
 
+/* Éxito - Verde Esmeralda (Licencia/Acceso) */
 .btn-success {
-    background: linear-gradient(135deg, var(--success-color), var(--secondary-dark));
+    background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
     color: white;
 }
 
-.btn-warning {
-    background: linear-gradient(135deg, #FFA726, #FB8C00);
-    color: white;
+.btn-success:hover {
+    background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
 }
 
+/* Información - Turquesa (Datos/Historial) */
 .btn-info {
-    background: linear-gradient(135deg, var(--info-color), #1E88E5);
+    background: linear-gradient(135deg, #0097A7 0%, #00838F 100%);
     color: white;
 }
 
-.btn-danger {
-    background: linear-gradient(135deg, var(--danger-color), #E53935);
+.btn-info:hover {
+    background: linear-gradient(135deg, #00838F 0%, #006064 100%);
+}
+
+/* Advertencia - Púrpura Premium (Features Especiales) */
+.btn-warning {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
     color: white;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+}
+
+/* Danger - Rojo (Eliminar/Salir) */
+.btn-danger {
+    background: linear-gradient(135deg, #E53935 0%, #C62828 100%);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #C62828 0%, #B71C1C 100%);
 }
 
 /* Exam List */
@@ -1102,6 +1129,7 @@ body {
     margin-bottom: 25px !important;
     visibility: visible !important;
 }
+
 
 
 
