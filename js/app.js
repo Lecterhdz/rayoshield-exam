@@ -181,6 +181,58 @@ const app = {
                 tipo: 'FULL', 
                 duracion: 180,
                 features: { whiteLabel: false, predictivo: false, auditoria: false, casosElite: true, casosPericial: false }
+            },
+
+        // PLAN PROFESIONAL
+            'RS-PROF-2026-A1B2': {
+                clienteId: 'PROFESIONAL_001',
+                tipo: 'PROFESIONAL',
+                duracion: 365,
+                features: {
+                    whiteLabel: false,
+                    predictivo: false,
+                    auditoria: false,
+                    casosElite: false,
+                    casosPericial: false,
+                    casosMaster: true,
+                    insignias: false,
+                    dashboard: false
+                }
+            },
+    
+         // PLAN CONSULTOR
+            'RS-CONS-2026-C3D4': {
+                clienteId: 'CONSULTOR_001',
+                tipo: 'CONSULTOR',
+                duracion: 365,
+                features: {
+                    whiteLabel: false,
+                    predictivo: false,
+                    auditoria: false,
+                    casosElite: true,
+                    casosPericial: false,
+                    casosMaster: true,
+                    insignias: true,
+                    dashboard: 'basico'
+                }
+            },
+    
+        // PLAN EMPRESARIAL
+            'RS-EMPR-2026-E5F6': {
+                clienteId: 'EMPRESARIAL_001',
+                tipo: 'EMPRESARIAL',
+                duracion: 365,
+                features: {
+                    whiteLabel: true,
+                    predictivo: true,
+                    auditoria: false,
+                    casosElite: true,
+                    casosPericial: true,
+                    casosMaster: true,
+                    insignias: true,
+                    dashboard: 'predictivo',
+                    multiUsuario: 50
+                }
             }
         };
         
@@ -1186,4 +1238,5 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
