@@ -45,6 +45,54 @@ const CATEGORIAS = [
 // CASOS CRÍTICOS DE OBRA - INVESTIGACIÓN (NIVEL MASTER)
 // ─────────────────────────────────────────────────────────────────────────
 const CASOS_INVESTIGACION = [
+    // CASOS BÁSICOS
+    {
+      id: 'case-loto-basico-001',
+      icono: '🔒',
+      titulo: 'Mantenimiento de Bomba sin LOTO',
+      nivel: 'basico',
+      tiempo_estimado: '15 min',
+      descripcion: 'Trabajador realiza mantenimiento en bomba sin aplicar procedimiento de bloqueo/etiquetado',
+      requisito: 'Examen NOM-004-STPS aprobado'
+    },
+    {
+      id: 'case-epp-basico-001',
+      icono: '🦺',
+      titulo: 'Trabajo en Altura sin Arnés',
+      nivel: 'basico',
+      tiempo_estimado: '15 min',
+      descripcion: 'Trabajador realiza trabajo en plataforma elevada sin usar arnés de seguridad',
+      requisito: 'Examen NOM-009-STPS aprobado'
+    },
+    {
+      id: 'case-espacio-confinado-basico-001',
+      icono: '🛢️',
+      titulo: 'Entrada a Tanque sin Medición',
+      nivel: 'basico',
+      tiempo_estimado: '15 min',
+      descripcion: 'Trabajador entra a tanque de almacenamiento sin medición previa de atmósfera',
+      requisito: 'Examen NOM-033-STPS aprobado'
+    },
+    {
+      id: 'case-electrico-basico-001',
+      icono: '⚡',
+      titulo: 'Conexión Eléctrica sin Desenergizar',
+      nivel: 'basico',
+      tiempo_estimado: '15 min',
+      descripcion: 'Electricista realiza conexión en tablero energizado sin EPP adecuado',
+      requisito: 'Examen NOM-029-STPS aprobado'
+    },
+    {
+      id: 'case-quimico-basico-001',
+      icono: '🧪',
+      titulo: 'Manejo de Químico sin Hoja de Seguridad',
+      nivel: 'basico',
+      tiempo_estimado: '15 min',
+      descripcion: 'Trabajador maneja producto químico sin conocer sus peligros ni usar EPP adecuado',
+      requisito: 'Examen NOM-018-STPS aprobado'
+    },
+    
+    // CASOS MASTER (ya existentes)
     {
         id: 'case-loto-energia-residual-001',
         titulo: 'Liberación de Energía Residual - Sistema Hidráulico',
@@ -373,3 +421,4 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
