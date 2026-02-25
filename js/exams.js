@@ -1,8 +1,11 @@
-// RAYOSHIELD EXAM - exams.js (CON SOPORTE PARA CASOS MASTER)
+// ─────────────────────────────────────────────────────────────────────────────
+// RAYOSHIELD EXAM - exams.js
+// Versión: 2.0 - Corregido y Mejorado
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // CATEGORÍAS DE EXÁMENES TRADICIONALES
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 const CATEGORIAS = [
     { id: 'loto', nombre: '🔒 LOTO', norma: 'NOM-004-STPS-2008', descripcion: 'Sistemas de protección', icono: '🔒', niveles: [
         { id: 'operativo', nombre: 'Operativo', examId: 'loto_operativo' },
@@ -41,11 +44,11 @@ const CATEGORIAS = [
     ]}
 ];
 
-// ─────────────────────────────────────────────────────────────────────────
-// CASOS CRÍTICOS DE OBRA - INVESTIGACIÓN (NIVEL MASTER)
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// CASOS CRÍTICOS DE OBRA - INVESTIGACIÓN
+// ─────────────────────────────────────────────────────────────────────────────
 const CASOS_INVESTIGACION = [
-    // CASOS BÁSICOS
+    // CASOS BÁSICOS (5)
     {
       id: 'case-loto-basico-001',
       icono: '🔒',
@@ -92,7 +95,7 @@ const CASOS_INVESTIGACION = [
       requisito: 'Examen NOM-018-STPS aprobado'
     },
     
-    // CASOS MASTER
+    // CASOS MASTER (7)
     {
         id: 'case-loto-energia-residual-001',
         titulo: 'Liberación de Energía Residual - Sistema Hidráulico',
@@ -133,7 +136,7 @@ const CASOS_INVESTIGACION = [
         tiempo_estimado: '30 min',
         requisito: 'Examen NOM-002-STPS aprobado'
     },
-        {
+    {
         id: 'case-quimico-master-001',
         titulo: 'Exposición a Solvente Tóxico sin Protección',
         categoria: 'Quimicos',
@@ -156,7 +159,7 @@ const CASOS_INVESTIGACION = [
     {
         id: 'case-alturas-master-001',
         titulo: 'Caída desde Andamio Inestable',
-        categoria: 'electricos',
+        categoria: 'Alturas',
         nivel: 'master',
         icono: '🏗️',
         descripcion: 'Trabajador cae desde andamio mal instalado en trabajo de fachada',
@@ -164,7 +167,7 @@ const CASOS_INVESTIGACION = [
         requisito: 'Examen NOM-009-STPS aprobado'
     },
     
-    // Casos ELITE
+    // CASOS ELITE (3)
     {
       id: 'case-loto-elite-001',
       icono: '🔒',
@@ -193,7 +196,7 @@ const CASOS_INVESTIGACION = [
       requisito: '5 casos MASTER aprobados con 80%+'
     },
 
-    // Casos PERICIAL
+    // CASOS PERICIAL (2)
     {
       id: 'case-legal-pericial-001',
       icono: '⚖️',
@@ -212,15 +215,15 @@ const CASOS_INVESTIGACION = [
       descripcion: 'Determinación de despido justificado según LFT',
       requisito: '10 casos ELITE aprobados con 85%+'
     }
-    
-    // Agrega más casos aquí conforme los crees
 ];
 
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 // FUNCIONES DE CARGA
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Cargar examen tradicional
+/**
+ * Cargar examen tradicional desde JSON
+ */
 async function cargarExamen(examId) {
     try {
         const response = await fetch('data/exams/' + examId + '.json');
@@ -232,7 +235,9 @@ async function cargarExamen(examId) {
     }
 }
 
-// Cargar caso de investigación MASTER
+/**
+ * Cargar caso de investigación desde JSON
+ */
 async function cargarCasoInvestigacion(casoId) {
     try {
         const response = await fetch('data/casos-criticos/' + casoId + '.json');
@@ -244,7 +249,9 @@ async function cargarCasoInvestigacion(casoId) {
     }
 }
 
-// Examen demo para pruebas
+/**
+ * Examen demo para pruebas
+ */
 function obtenerExamenDemo(examId) {
     return {
         id: examId || 'demo',
@@ -260,29 +267,38 @@ function obtenerExamenDemo(examId) {
     };
 }
 
-// ─────────────────────────────────────────────────────────────────────────
-// EVALUACIÓN INTELIGENTE PARA CASOS MASTER
-// ─────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// FUNCIONES DE EVALUACIÓN POR TIPO DE PREGUNTA
+// ─────────────────────────────────────────────────────────────────────────────
 
-// Evaluar pregunta de tipo "analisis_multiple" (múltiple selección)
+/**
+ * Evalúa pregunta de tipo análisis múltiple (checkbox)
+ */
 function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
-    let puntaje = 0;
-    let feedback = [];
-    
-    // ✅ VERIFICAR QUE EXISTEN LAS OPCIONES
-    if (!pregunta || !pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+    // ✅ VALIDACIONES DE SEGURIDAD
+    if (!pregunta) {
+        console.error('❌ Error: pregunta es undefined');
         return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
     }
     
-    // ✅ VERIFICAR QUE LAS RESPUESTAS SON UN ARRAY
+    if (!pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+        console.error('❌ Error: pregunta.opciones no es un array', pregunta);
+        return { puntaje: 0, feedback: ['❌ Error en las opciones de la pregunta'] };
+    }
+    
     if (!respuestasUsuario || !Array.isArray(respuestasUsuario)) {
         respuestasUsuario = [];
     }
     
+    let puntaje = 0;
+    let feedback = [];
+    let pesoPorOpcion = pregunta.peso / pregunta.opciones.length;
+    
+    // ✅ EVALUAR CADA OPCIÓN
     pregunta.opciones.forEach(function(opt, idx) {
         const seleccionada = respuestasUsuario.includes(idx);
         if (seleccionada === opt.correcta) {
-            puntaje += pregunta.peso / pregunta.opciones.length;
+            puntaje += pesoPorOpcion;
         } else {
             if (opt.feedback_sistemico) {
                 feedback.push(opt.feedback_sistemico);
@@ -291,66 +307,90 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
     });
     
     // Feedback experto si falló
-    if (puntaje < pregunta.peso * 0.8) {
-        if (pregunta.justificacion_experta) {
-            feedback.push('💡 ' + pregunta.justificacion_experta);
-        }
+    if (puntaje < pregunta.peso * 0.8 && pregunta.justificacion_experta) {
+        feedback.push('💡 ' + pregunta.justificacion_experta);
     }
     
     return { puntaje: Math.round(puntaje), feedback: feedback };
 }
 
-    // Evaluar pregunta de tipo "respuesta_abierta_guiada" (keyword matching)
-    function evaluarRespuestaAbierta(pregunta, respuestaUsuario) {
-        var puntaje = 0;
-        var feedback = '';
-
-        // ✅ La respuesta viene como array: ['texto del usuario']
-        var texto = respuestaUsuario && respuestaUsuario[0] ? respuestaUsuario[0] : '';
-
-        var longitudMinima = pregunta.longitud_minima || 50;
-
-        if (!texto || texto.trim().length === 0) {
-            puntaje = 0;
-            feedback = '❌ No proporcionaste respuesta';
-        }
-        else if (texto.length < longitudMinima) {
-            puntaje = pregunta.peso * 0.3;
-            feedback = '⚠️ Tu respuesta es muy breve. Explica con más detalle el análisis sistémico (mínimo ' + longitudMinima + ' caracteres)';
-        }
-        else if (texto.length >= longitudMinima && texto.length < longitudMinima * 2) {
-            puntaje = pregunta.peso * 0.7;
-            feedback = '✅ Respuesta aceptable, pero podrías profundizar más en el análisis';
-        }
-        else {
-            puntaje = pregunta.peso;
-            feedback = '✅ Excelente: Tu respuesta demuestra análisis sistémico profundo';
-        }
-
-        return {
-            puntaje: puntaje,
-            feedback: feedback,
-            longitud: texto.length
-        };
+/**
+ * Evalúa pregunta de respuesta abierta guiada
+ */
+function evaluarRespuestaAbierta(pregunta, respuestasUsuario) {
+    // ✅ VALIDACIONES
+    if (!pregunta) {
+        return { puntaje: 0, feedback: '❌ Error en la pregunta' };
     }
     
-// Evaluar pregunta de tipo "analisis_responsabilidad" (matriz de roles)
+    // ✅ OBTENER TEXTO DE RESPUESTA
+    var texto = '';
+    if (respuestasUsuario && Array.isArray(respuestasUsuario) && respuestasUsuario[0]) {
+        texto = respuestasUsuario[0];
+    }
+    
+    var longitudMinima = pregunta.longitud_minima || 50;
+    var puntaje = 0;
+    var feedback = '';
+    
+    // ✅ EVALUAR LONGITUD
+    if (!texto || texto.trim().length === 0) {
+        puntaje = 0;
+        feedback = '❌ No proporcionaste respuesta';
+    }
+    else if (texto.length < longitudMinima) {
+        puntaje = Math.round(pregunta.peso * 0.3);
+        feedback = '⚠️ Tu respuesta es muy breve (mínimo ' + longitudMinima + ' caracteres)';
+    }
+    else if (texto.length >= longitudMinima && texto.length < longitudMinima * 2) {
+        puntaje = Math.round(pregunta.peso * 0.7);
+        feedback = '✅ Respuesta aceptable, pero podrías profundizar más';
+    }
+    else {
+        puntaje = pregunta.peso;
+        feedback = '✅ Excelente: Tu respuesta demuestra análisis sistémico';
+    }
+    
+    return {
+        puntaje: puntaje,
+        feedback: feedback,
+        longitud: texto.length
+    };
+}
+
+/**
+ * Evalúa pregunta de análisis de responsabilidad (matriz de roles)
+ */
 function evaluarAnalisisResponsabilidad(respuestasUsuario, pregunta) {
+    // ✅ VALIDACIONES
+    if (!pregunta || !pregunta.roles || !Array.isArray(pregunta.roles)) {
+        return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
+    }
+    
+    if (!respuestasUsuario || !Array.isArray(respuestasUsuario)) {
+        respuestasUsuario = [];
+    }
+    
     let puntaje = 0;
     let feedback = [];
+    let pesoPorRol = pregunta.peso / pregunta.roles.length;
     
+    // ✅ EVALUAR CADA ROL
     pregunta.roles.forEach(function(role, roleIdx) {
-        const seleccionNivel = respuestasUsuario[roleIdx];
-        if (seleccionNivel !== undefined) {
-            const opcion = role.opciones[seleccionNivel];
-            if (opcion && opcion.correcta) {
-                puntaje += pregunta.peso / pregunta.roles.length;
-            } else if (opcion) {
-                feedback.push(`👤 ${role.rol}: ${opcion.explicacion}`);
+        var seleccionNivel = respuestasUsuario[roleIdx];
+        
+        if (seleccionNivel !== undefined && role.opciones && role.opciones[seleccionNivel]) {
+            var opcion = role.opciones[seleccionNivel];
+            
+            if (opcion.correcta) {
+                puntaje += pesoPorRol;
+            } else if (opcion.explicacion) {
+                feedback.push('👤 ' + role.rol + ': ' + opcion.explicacion);
             }
         }
     });
     
+    // ✅ FEEDBACK SISTÉMICO
     if (feedback.length === 0 && puntaje < pregunta.peso) {
         feedback.push('💡 En un enfoque sistémico, la responsabilidad se distribuye según la capacidad de influir en las barreras de seguridad.');
     }
@@ -358,63 +398,185 @@ function evaluarAnalisisResponsabilidad(respuestasUsuario, pregunta) {
     return { puntaje: Math.round(puntaje), feedback: feedback };
 }
 
-// Evaluar pregunta de tipo "plan_accion" (selección con jerarquía)
+/**
+ * Evalúa pregunta de plan de acción (selección con jerarquía)
+ */
 function evaluarPlanAccion(respuestasUsuario, pregunta) {
+    // ✅ VALIDACIONES
+    if (!pregunta || !pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+        return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
+    }
+    
+    if (!respuestasUsuario || !Array.isArray(respuestasUsuario)) {
+        respuestasUsuario = [];
+    }
+    
     let puntaje = 0;
     let feedback = [];
-    let seleccionadas = respuestasUsuario.filter(function(idx) { return idx !== undefined; });
+    let pesoPorOpcion = pregunta.peso / pregunta.opciones.length;
     
-    // Verificar respuestas correctas
-    seleccionadas.forEach(function(idx) {
-        const opt = pregunta.opciones[idx];
-        if (opt && opt.correcta) {
-            puntaje += pregunta.peso / pregunta.opciones.length * 1.2; // Bonus por priorizar correctas
-        } else if (opt) {
-            feedback.push(opt.explicacion);
+    // ✅ EVALUAR RESPUESTAS SELECCIONADAS
+    respuestasUsuario.forEach(function(idx) {
+        var opt = pregunta.opciones[idx];
+        
+        if (opt) {
+            if (opt.correcta) {
+                // ✅ Bonus por priorizar controles de ingeniería
+                if (opt.jerarquia === 'ingenieria') {
+                    puntaje += pesoPorOpcion * 1.2;
+                    feedback.push('✅ Excelente: Priorizaste controles de ingeniería (más efectivos).');
+                } else {
+                    puntaje += pesoPorOpcion;
+                }
+            } else if (opt.explicacion) {
+                feedback.push(opt.explicacion);
+            }
         }
     });
     
-    // Verificar criterios de aprobación
+    // ✅ VERIFICAR CRITERIOS DE APROBACIÓN
     if (pregunta.criterio_aprobacion) {
-        const correctasCount = seleccionadas.filter(function(idx) {
-            return pregunta.opciones[idx]?.correcta;
+        var correctasCount = respuestasUsuario.filter(function(idx) {
+            return pregunta.opciones[idx] && pregunta.opciones[idx].correcta;
         }).length;
         
         if (correctasCount < pregunta.criterio_aprobacion.min_correctas) {
-            feedback.push(`⚠️ Se requieren al menos ${pregunta.criterio_aprobacion.min_correctas} acciones efectivas.`);
-        }
-        
-        const incluyeIngenieria = seleccionadas.some(function(idx) {
-            return pregunta.opciones[idx]?.jerarquia === 'ingenieria' && pregunta.opciones[idx]?.correcta;
-        });
-        
-        if (pregunta.criterio_aprobacion.debe_incluir_ingenieria && !incluyeIngenieria) {
-            feedback.push('💡 Los controles de ingeniería son más efectivos que los administrativos. Priorízalos.');
+            feedback.push('⚠️ Se requieren al menos ' + pregunta.criterio_aprobacion.min_correctas + ' acciones efectivas.');
         }
     }
     
-    // Feedback sobre jerarquía de controles
-    const jerarquiasSeleccionadas = seleccionadas.map(function(idx) {
-        return pregunta.opciones[idx]?.jerarquia;
-    }).filter(function(j) { return j; });
+    // ✅ LIMITAR PUNTAJE AL MÁXIMO
+    puntaje = Math.min(puntaje, pregunta.peso);
     
-    if (jerarquiasSeleccionadas.includes('ingenieria')) {
-        feedback.push('✅ Excelente: Priorizaste controles de ingeniería (más efectivos).');
-    }
-    
-    return { puntaje: Math.min(Math.round(puntaje), pregunta.peso), feedback: feedback };
+    return { puntaje: Math.round(puntaje), feedback: feedback };
 }
 
-// Función principal de evaluación para casos MASTER
+/**
+ * Evalúa pregunta de ordenamiento dinámico
+ */
+function evaluarOrdenamientoDinamico(respuestasUsuario, pregunta) {
+    // ✅ VALIDACIONES
+    if (!pregunta || !pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+        return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
+    }
+    
+    if (!respuestasUsuario || !Array.isArray(respuestasUsuario) || respuestasUsuario.length === 0) {
+        return { puntaje: 0, feedback: ['⚠️ No ordenaste los elementos'] };
+    }
+    
+    // ✅ ORDEN CORRECTO (0, 1, 2, 3...)
+    var ordenCorrecto = pregunta.opciones.map(function(_, idx) { return idx; });
+    
+    // ✅ CONTAR POSICIONES CORRECTAS
+    var posicionesCorrectas = 0;
+    respuestasUsuario.forEach(function(posicion, idx) {
+        if (posicion === ordenCorrecto[idx]) {
+            posicionesCorrectas++;
+        }
+    });
+    
+    // ✅ CALCULAR PUNTAJE PROPORCIONAL
+    var porcentajeCorrecto = posicionesCorrectas / pregunta.opciones.length;
+    var puntaje = Math.round(pregunta.peso * porcentajeCorrecto);
+    
+    var feedback = [];
+    if (porcentajeCorrecto === 1) {
+        feedback.push('✅ Excelente: Secuencia lógica correcta');
+    } else if (porcentajeCorrecto >= 0.5) {
+        feedback.push('⚠️ Algunas posiciones son correctas, revisa la secuencia lógica');
+    } else {
+        feedback.push('❌ La secuencia no es la óptima. Revisa el procedimiento estándar.');
+    }
+    
+    return { puntaje: puntaje, feedback: feedback };
+}
+
+/**
+ * Evalúa pregunta de cálculo técnico
+ */
+function evaluarCalculoTecnico(respuestasUsuario, pregunta) {
+    // ✅ VALIDACIONES
+    if (!pregunta) {
+        return { puntaje: 0, feedback: ['❌ Error en la pregunta'] };
+    }
+    
+    var respuestaUsuario = respuestasUsuario && respuestasUsuario[0] ? respuestasUsuario[0] : null;
+    
+    if (respuestaUsuario === null || respuestaUsuario === undefined || isNaN(respuestaUsuario)) {
+        return { puntaje: 0, feedback: ['❌ No ingresaste un valor numérico'] };
+    }
+    
+    // ✅ VERIFICAR SI HAY RESPUESTA CORRECTA DEFINIDA
+    if (pregunta.respuesta_correcta !== undefined) {
+        var tolerancia = pregunta.tolerancia || 0.05; // 5% de tolerancia por defecto
+        var diferencia = Math.abs(respuestaUsuario - pregunta.respuesta_correcta);
+        var margen = pregunta.respuesta_correcta * tolerancia;
+        
+        if (diferencia <= margen) {
+            return { puntaje: pregunta.peso, feedback: ['✅ Excelente: Cálculo correcto'] };
+        } else {
+            return { puntaje: Math.round(pregunta.peso * 0.3), feedback: ['⚠️ El cálculo no es exacto. Revisa la fórmula y las unidades.'] };
+        }
+    }
+    
+    // ✅ SI NO HAY RESPUESTA CORRECTA DEFINIDA, DAR PUNTAJE POR INTENTO
+    return { puntaje: Math.round(pregunta.peso * 0.5), feedback: ['✅ Cálculo registrado. Revisa la retroalimentación del caso.'] };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FUNCIÓN PRINCIPAL DE EVALUACIÓN DE CASOS
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Evalúa un caso de investigación completo
+ */
 function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
+    // ✅ VALIDACIONES DE SEGURIDAD
+    if (!caso || !caso.preguntas || !Array.isArray(caso.preguntas)) {
+        console.error('❌ Error: Caso o preguntas no válidos');
+        return {
+            puntajeTotal: 0,
+            puntajeMaximo: 0,
+            porcentaje: 0,
+            aprobado: false,
+            estado: 'Error',
+            feedback: ['❌ Error en la evaluación del caso'],
+            leccion: 'Error en la carga del caso. Recarga la página e intenta nuevamente.',
+            conclusion: 'No se pudo completar la evaluación.',
+            fecha: new Date().toISOString()
+        };
+    }
+    
+    if (!respuestasPorPregunta || typeof respuestasPorPregunta !== 'object') {
+        console.error('❌ Error: Respuestas no válidas');
+        return {
+            puntajeTotal: 0,
+            puntajeMaximo: 0,
+            porcentaje: 0,
+            aprobado: false,
+            estado: 'Error',
+            feedback: ['❌ Error en las respuestas'],
+            leccion: 'Error en el envío de respuestas. Intenta nuevamente.',
+            conclusion: 'No se pudo completar la evaluación.',
+            fecha: new Date().toISOString()
+        };
+    }
+    
     let puntajeTotal = 0;
     let feedbackGeneral = [];
     let detallesPorPregunta = [];
     
-    caso.preguntas.forEach(function(pregunta) {
+    // ✅ EVALUAR CADA PREGUNTA
+    caso.preguntas.forEach(function(pregunta, idx) {
+        if (!pregunta || !pregunta.id) {
+            console.warn('⚠️ Pregunta ' + idx + ' sin ID válido');
+            return;
+        }
+        
         const respuestas = respuestasPorPregunta[pregunta.id] || [];
         let resultado;
         
+        // ✅ EVALUAR SEGÚN TIPO DE PREGUNTA
         switch(pregunta.tipo) {
             case 'analisis_multiple':
             case 'deteccion_omisiones':
@@ -424,50 +586,73 @@ function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
             case 'diagnostico_sistema':
                 resultado = evaluarAnalisisMultiple(respuestas, pregunta);
                 break;
+                
             case 'respuesta_abierta_guiada':
             case 'redaccion_tecnica':
                 resultado = evaluarRespuestaAbierta(pregunta, respuestas);
                 break;
+                
             case 'analisis_responsabilidad':
                 resultado = evaluarAnalisisResponsabilidad(respuestas, pregunta);
                 break;
+                
             case 'plan_accion':
             case 'evaluacion_correctivas':
                 resultado = evaluarPlanAccion(respuestas, pregunta);
                 break;
+                
             case 'ordenamiento_dinamico':
             case 'matriz_priorizacion':
-                resultado = { puntaje: pregunta.peso * 0.8, feedback: ['Ordenamiento completado'] };
+                resultado = evaluarOrdenamientoDinamico(respuestas, pregunta);
                 break;
+                
             case 'calculo_tecnico':
-                resultado = { puntaje: pregunta.peso * 0.5, feedback: ['Cálculo registrado'] };
+                resultado = evaluarCalculoTecnico(respuestas, pregunta);
                 break;
+                
             default:
-                resultado = { puntaje: pregunta.peso * 0.5, feedback: ['Pregunta completada'] };
+                // Pregunta de tipo desconocido - dar puntaje parcial
+                resultado = {
+                    puntaje: pregunta.peso ? pregunta.peso * 0.5 : 0,
+                    feedback: ['⚠️ Tipo de pregunta no reconocido']
+                };
         }
         
-        puntajeTotal += resultado.puntaje;
-        detallesPorPregunta.push({
-            preguntaId: pregunta.id,
-            puntaje: resultado.puntaje,
-            maxPuntaje: pregunta.peso,
-            feedback: resultado.feedback
-        });
-        feedbackGeneral = feedbackGeneral.concat(resultado.feedback);
+        // ✅ ACUMULAR PUNTAJE Y FEEDBACK
+        if (resultado) {
+            puntajeTotal += resultado.puntaje || 0;
+            detallesPorPregunta.push({
+                preguntaId: pregunta.id,
+                puntaje: resultado.puntaje,
+                maxPuntaje: pregunta.peso,
+                feedback: resultado.feedback
+            });
+            
+            // ✅ ASEGURAR QUE FEEDBACK SEA ARRAY
+            if (resultado.feedback) {
+                if (Array.isArray(resultado.feedback)) {
+                    feedbackGeneral = feedbackGeneral.concat(resultado.feedback);
+                } else if (typeof resultado.feedback === 'string') {
+                    feedbackGeneral.push(resultado.feedback);
+                }
+            }
+        }
     });
     
-    // Determinar estado final
+    // ✅ CALCULAR PORCENTAJE
     const puntajeMaximo = caso.metadatos_evaluacion?.puntaje_maximo || 100;
-    const puntajeAprobacion = caso.metadatos_evaluacion?.puntaje_aprobacion_master || 80;
-    const porcentaje = Math.round((puntajeTotal / puntajeMaximo) * 100);
+    const puntajeAprobacion = caso.metadatos_evaluacion?.puntaje_aprobacion || 
+                              caso.metadatos_evaluacion?.puntaje_aprobacion_master || 70;
+    const porcentaje = puntajeMaximo > 0 ? Math.round((puntajeTotal / puntajeMaximo) * 100) : 0;
+    const aprobado = porcentaje >= puntajeAprobacion;
     
     // ✅ MAPEAR CORRECTAMENTE LOS CAMPOS DEL CASO JSON
     return {
         puntajeTotal: Math.round(puntajeTotal),
         puntajeMaximo: puntajeMaximo,
         porcentaje: porcentaje,
-        aprobado: porcentaje >= puntajeAprobacion,
-        estado: porcentaje >= puntajeAprobacion ? 'Aprobado' : 'Reprobado',
+        aprobado: aprobado,
+        estado: aprobado ? 'Aprobado' : 'Reprobado',
         fecha: new Date().toISOString(),
         
         // ✅ RETROALIMENTACIÓN
@@ -479,92 +664,51 @@ function evaluarCasoInvestigacion(respuestasPorPregunta, caso) {
         // ✅ CONCLUSIÓN OFICIAL (del caso JSON)
         conclusion: caso.conclusion_oficial || 'La investigación fue completada. Revisa la retroalimentación para mejorar.',
         
-        // Para compatibilidad con SmartEvaluationV2
+        // ✅ PARA COMPATIBILIDAD CON SmartEvaluationV2
         dimensiones: {},
         puntajeCompetencias: porcentaje,
         nivelGeneral: { 
             nivel: porcentaje >= 80 ? 'MASTER' : 'BÁSICO', 
-            color: '#2196F3', 
-            icono: '🥈', 
+            color: porcentaje >= 80 ? '#2196F3' : '#FF9800', 
+            icono: porcentaje >= 80 ? '🥈' : '📚', 
             validez: '1 año' 
         }
     };
 }
 
-// Exportar para uso global
+// ─────────────────────────────────────────────────────────────────────────────
+// TIPOS DE PREGUNTAS AVANZADAS (Referencia)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TIPOS_PREGUNTAS_AVANZADAS = {
+    matriz_priorizacion: { descripcion: 'Ordena acciones por prioridad e impacto', evaluacion: 'Criterio: Urgencia vs Impacto vs Viabilidad' },
+    ordenamiento_dinamico: { descripcion: 'Arrastra y ordena los pasos en secuencia correcta', evaluacion: 'Cada posición correcta suma puntos' },
+    deteccion_omisiones: { descripcion: 'Identifica qué elementos faltan en el procedimiento', evaluacion: 'Cada omisión detectada suma puntos' },
+    redaccion_tecnica: { descripcion: 'Redacta causa raíz en términos sistémicos', evaluacion: 'Keywords: sistema, procedimiento, control, barrera' },
+    diagnostico_sistema: { descripcion: 'Analiza múltiples fallas interconectadas', evaluacion: 'Identifica relaciones causa-efecto' },
+    evaluacion_correctivas: { descripcion: 'Evalúa efectividad de acciones propuestas', evaluacion: 'Jerarquía de controles + ROI + Sostenibilidad' },
+    identificacion_sesgos: { descripcion: 'Identifica sesgos cognitivos en el incidente', evaluacion: 'Sesgo de confirmación, normalización, etc.' },
+    analisis_normativo: { descripcion: 'Identifica NOMs aplicables y artículos específicos', evaluacion: 'NOM correcta + artículo específico' },
+    deteccion_inconsistencias: { descripcion: 'Encuentra contradicciones en testimonios/evidencia', evaluacion: 'Cada inconsistencia detectada suma puntos' }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORTAR FUNCIONES PARA USO GLOBAL
+// ─────────────────────────────────────────────────────────────────────────────
+
 if (typeof window !== 'undefined') {
     window.CATEGORIAS = CATEGORIAS;
     window.CASOS_INVESTIGACION = CASOS_INVESTIGACION;
     window.cargarExamen = cargarExamen;
     window.cargarCasoInvestigacion = cargarCasoInvestigacion;
     window.evaluarCasoInvestigacion = evaluarCasoInvestigacion;
-    console.log('✅ exams.js cargado - Casos MASTER habilitados');
+    window.evaluarAnalisisMultiple = evaluarAnalisisMultiple;
+    window.evaluarRespuestaAbierta = evaluarRespuestaAbierta;
+    window.evaluarAnalisisResponsabilidad = evaluarAnalisisResponsabilidad;
+    window.evaluarPlanAccion = evaluarPlanAccion;
+    window.evaluarOrdenamientoDinamico = evaluarOrdenamientoDinamico;
+    window.evaluarCalculoTecnico = evaluarCalculoTecnico;
+    window.TIPOS_PREGUNTAS_AVANZADAS = TIPOS_PREGUNTAS_AVANZADAS;
+    
+    console.log('✅ exams.js cargado - ' + CASOS_INVESTIGACION.length + ' casos habilitados');
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NUEVOS TIPOS DE PREGUNTAS INTELIGENTES
-// ─────────────────────────────────────────────────────────────────────────────
-
-const TIPOS_PREGUNTAS_AVANZADAS = {
-    // 1. Matriz de Priorización (Pensamiento crítico)
-    matriz_priorizacion: {
-        descripcion: 'Ordena acciones por prioridad e impacto',
-        evaluacion: 'Critera: Urgencia vs Impacto vs Viabilidad'
-    },
-    
-    // 2. Ordenamiento Dinámico (Secuencia lógica)
-    ordenamiento_dinamico: {
-        descripcion: 'Arrastra y ordena los pasos en secuencia correcta',
-        evaluacion: 'Cada posición correcta suma puntos'
-    },
-    
-    // 3. Detección de Omisiones (Capacidad analítica)
-    deteccion_omisiones: {
-        descripcion: 'Identifica qué elementos faltan en el procedimiento',
-        evaluacion: 'Cada omisión detectada suma puntos'
-    },
-    
-    // 4. Redacción Técnica Guiada (Competencia profesional)
-    redaccion_tecnica: {
-        descripcion: 'Redacta causa raíz en términos sistémicos',
-        evaluacion: 'Keywords: sistema, procedimiento, control, barrera'
-    },
-    
-    // 5. Diagnóstico de Sistema (Pensamiento sistémico)
-    diagnostico_sistema: {
-        descripcion: 'Analiza múltiples fallas interconectadas',
-        evaluacion: 'Identifica relaciones causa-efecto'
-    },
-    
-    // 6. Evaluación de Acciones Correctivas (Madurez preventiva)
-    evaluacion_correctivas: {
-        descripcion: 'Evalúa efectividad de acciones propuestas',
-        evaluacion: 'Jerarquía de controles + ROI + Sostenibilidad'
-    },
-    
-    // 7. Identificación de Sesgos (Nivel cognitivo)
-    identificacion_sesgos: {
-        descripcion: 'Identifica sesgos cognitivos en el incidente',
-        evaluacion: 'Sesgo de confirmación, normalización, etc.'
-    },
-    
-    // 8. Análisis Normativo Aplicado (Capacidad regulatoria)
-    analisis_normativo: {
-        descripcion: 'Identifica NOMs aplicables y artículos específicos',
-        evaluacion: 'NOM correcta + artículo específico'
-    },
-    
-    // 9. Detección de Inconsistencias (Análisis crítico)
-    deteccion_inconsistencias: {
-        descripcion: 'Encuentra contradicciones en testimonios/evidencia',
-        evaluacion: 'Cada inconsistencia detectada suma puntos'
-    }
-};
-
-
-
-
-
-
-
-
