@@ -6,17 +6,17 @@
     <title>RayoShield PRO - Planes y Precios</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; }
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; background: #F5F7FA; }
         
         /* HERO */
         .hero {
             background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
             color: white;
-            padding: 60px 20px;
+            padding: 50px 20px;
             text-align: center;
         }
         .hero h1 { font-size: 36px; margin-bottom: 15px; }
-        .hero p { font-size: 16px; opacity: 0.9; margin-bottom: 40px; }
+        .hero p { font-size: 16px; opacity: 0.9; margin-bottom: 30px; }
         .hero .btn {
             display: inline-block;
             background: linear-gradient(135deg, #FFD700, #FFA726);
@@ -25,33 +25,14 @@
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.3s;
         }
         .hero .btn:hover { transform: translateY(-3px); }
         
-        /* FEATURES */
-        .features { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
-        .features h2 { text-align: center; font-size: 36px; margin-bottom: 60px; color: #1a237e; }
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-        .feature-card {
-            text-align: center;
-            padding: 30px;
-            background: #f5f7fa;
-            border-radius: 15px;
-            transition: transform 0.3s;
-        }
-        .feature-card:hover { transform: translateY(-5px); }
-        .feature-card .icon { font-size: 48px; margin-bottom: 20px; }
-        .feature-card h3 { color: #1a237e; margin-bottom: 15px; }
-        
         /* PRICING */
-        .pricing { padding: 80px 20px; background: #f5f7fa; }
-        .pricing h2 { text-align: center; font-size: 36px; margin-bottom: 60px; color: #1a237e; }
+        .pricing { padding: 60px 20px; }
+        .pricing h2 { text-align: center; font-size: 32px; margin-bottom: 50px; color: #1a237e; }
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -61,16 +42,17 @@
         }
         .pricing-card {
             background: white;
-            padding: 40px 30px;
+            padding: 35px 30px;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 5px 25px rgba(0,0,0,0.1);
             position: relative;
             transition: transform 0.3s;
+            border-top: 5px solid #E0E0E0;
         }
         .pricing-card:hover { transform: translateY(-5px); }
         .pricing-card.destacado {
-            border: 3px solid #2196F3;
+            border-top: 5px solid #2196F3;
             transform: scale(1.05);
         }
         .pricing-card.destacado:hover { transform: scale(1.05) translateY(-5px); }
@@ -85,29 +67,31 @@
             font-size: 12px;
             font-weight: bold;
         }
-        .pricing-card h3 { color: #1a237e; font-size: 24px; margin-bottom: 10px; }
+        .pricing-card h3 { color: #1a237e; font-size: 22px; margin-bottom: 10px; }
         .pricing-card .price {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: bold;
             color: #2196F3;
             margin: 20px 0;
         }
-        .pricing-card .price span { font-size: 16px; color: #666; }
+        .pricing-card .price span { font-size: 14px; color: #666; }
         .pricing-card ul {
             list-style: none;
-            margin: 30px 0;
+            margin: 25px 0;
             text-align: left;
         }
         .pricing-card ul li {
             padding: 10px 0;
             border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #546E7A;
         }
-        .pricing-card ul li::before { content: '✅ '; }
+        .pricing-card ul li::before { content: '✅ '; color: #4CAF50; }
         .pricing-card .btn {
             display: block;
             background: linear-gradient(135deg, #2196F3, #1976D2);
             color: white;
-            padding: 15px;
+            padding: 14px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
@@ -115,9 +99,43 @@
         }
         .pricing-card .btn:hover { opacity: 0.9; }
         
+        /* SERVICIOS ADICIONALES */
+        .servicios { padding: 60px 20px; background: white; }
+        .servicios h2 { text-align: center; font-size: 32px; margin-bottom: 50px; color: #1a237e; }
+        .servicios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .servicio-card {
+            background: #F5F7FA;
+            padding: 30px;
+            border-radius: 15px;
+            border-left: 5px solid #2196F3;
+        }
+        .servicio-card h3 { color: #1a237e; margin-bottom: 15px; }
+        .servicio-card .precio {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 15px 0;
+        }
+        .servicio-card ul {
+            list-style: none;
+            margin: 15px 0;
+        }
+        .servicio-card ul li {
+            padding: 8px 0;
+            color: #546E7A;
+            font-size: 14px;
+        }
+        .servicio-card ul li::before { content: '✓ '; color: #4CAF50; font-weight: bold; }
+        
         /* OFERTAS */
-        .ofertas { padding: 60px 20px; background: #FFF3E0; text-align: center; }
-        .ofertas h2 { color: #E65100; margin-bottom: 40px; }
+        .ofertas { padding: 50px 20px; background: #FFF3E0; text-align: center; }
+        .ofertas h2 { color: #E65100; margin-bottom: 35px; }
         .ofertas-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -131,29 +149,29 @@
             border-radius: 10px;
         }
         .oferta-card h4 { color: #1976D2; margin-bottom: 10px; }
-        .oferta-card p { color: #666; }
+        .oferta-card p { color: #666; font-size: 14px; }
         
         /* TESTIMONIALS */
-        .testimonials { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
-        .testimonials h2 { text-align: center; font-size: 36px; margin-bottom: 60px; color: #1a237e; }
+        .testimonials { padding: 60px 20px; max-width: 1200px; margin: 0 auto; }
+        .testimonials h2 { text-align: center; font-size: 32px; margin-bottom: 50px; color: #1a237e; }
         .testimonial-card {
-            background: #f5f7fa;
-            padding: 30px;
+            background: #F5F7FA;
+            padding: 25px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-        .testimonial-card p { font-style: italic; color: #555; margin-bottom: 20px; }
-        .testimonial-card .author { font-weight: bold; color: #1a237e; }
+        .testimonial-card p { font-style: italic; color: #555; margin-bottom: 15px; font-size: 14px; }
+        .testimonial-card .author { font-weight: bold; color: #1a237e; font-size: 14px; }
         
         /* CTA */
         .cta {
             background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
             color: white;
-            padding: 80px 20px;
+            padding: 60px 20px;
             text-align: center;
         }
-        .cta h2 { font-size: 36px; margin-bottom: 20px; }
-        .cta p { font-size: 18px; opacity: 0.9; margin-bottom: 40px; }
+        .cta h2 { font-size: 32px; margin-bottom: 15px; }
+        .cta p { font-size: 16px; opacity: 0.9; margin-bottom: 30px; }
         .cta .btn {
             display: inline-block;
             background: linear-gradient(135deg, #FFD700, #FFA726);
@@ -162,22 +180,22 @@
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
         }
         
         /* FOOTER */
         footer {
             background: #1a237e;
             color: white;
-            padding: 40px 20px;
+            padding: 30px 20px;
             text-align: center;
         }
-        footer a { color: white; text-decoration: none; margin: 0 10px; }
+        footer a { color: white; text-decoration: none; margin: 0 10px; font-size: 14px; }
         footer a:hover { text-decoration: underline; }
         
         /* RESPONSIVE */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 32px; }
+            .hero h1 { font-size: 28px; }
             .pricing-card.destacado { transform: scale(1); }
         }
     </style>
@@ -187,45 +205,7 @@
     <section class="hero">
         <h1>🛡️ RayoShield PRO</h1>
         <p>Plataforma de Evaluación de Competencia en Seguridad Industrial STPS</p>
-        <p style="font-size: 16px; margin-top: 20px;">15 casos de investigación • 5 dimensiones de competencia • Dashboard ejecutivo</p>
         <a href="app.html" class="btn">Comenzar Demo Gratis</a>
-    </section>
-    
-    <!-- FEATURES -->
-    <section class="features">
-        <h2>¿Por qué RayoShield PRO?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="icon">🧠</div>
-                <h3>Smart Evaluation 2.0</h3>
-                <p>Evaluación de 5 dimensiones: Técnica, Sistémica, Decisional, Preventiva y Normativa</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">📊</div>
-                <h3>Dashboard Ejecutivo</h3>
-                <p>Gráficas radar, benchmark vs industria, predictivo de riesgos y ROI estimado</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">📚</div>
-                <h3>15 Casos Reales</h3>
-                <p>Desde nivel básico hasta pericial, con escenarios de la industria mexicana</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">🏅</div>
-                <h3>Certificados e Insignias</h3>
-                <p>Reconocimientos descargables con QR verificable para cada nivel</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">📱</div>
-                <h3>100% Online</h3>
-                <p>Accede desde cualquier dispositivo, sin instalaciones, con modo offline</p>
-            </div>
-            <div class="feature-card">
-                <div class="icon">🔒</div>
-                <h3>Seguro y Confiable</h3>
-                <p>Tus datos se guardan localmente en tu dispositivo con encriptación</p>
-            </div>
-        </div>
     </section>
     
     <!-- PRICING -->
@@ -237,9 +217,11 @@
                 <h3>📋 DEMO</h3>
                 <div class="price">Gratis</div>
                 <ul>
-                    <li>1 caso básico</li>
+                    <li>1 caso básico de prueba</li>
                     <li>3 exámenes por día</li>
                     <li>Certificado con marca de agua</li>
+                    <li>Acceso ilimitado a exámenes básicos</li>
+                    <li>Soporte por email</li>
                 </ul>
                 <a href="app.html" class="btn">Comenzar Gratis</a>
             </div>
@@ -253,8 +235,8 @@
                     <li>5 casos MASTER</li>
                     <li>21 exámenes NOM-STPS</li>
                     <li>Certificados sin marca de agua</li>
-                    <li>Historial</li>
-                    <li>Acceso a dashboard</li>
+                    <li>Historial completo de resultados</li>
+                    <li>Acceso a dashboard de progreso</li>
                     <li>Soporte técnico por email</li>
                 </ul>
                 <a href="app.html" class="btn">Comprar Ahora</a>
@@ -270,7 +252,8 @@
                     <li>+3 casos ELITE</li>
                     <li>Insignias digitales descargables</li>
                     <li>Dashboard básico de competencias</li>
-                    <li>Certificados</li>
+                    <li>Certificados con QR verificable</li>
+                    <li>Reportes de progreso por usuario</li>
                     <li>Soporte técnico prioritario</li>
                 </ul>
                 <a href="app.html" class="btn">Comprar Ahora</a>
@@ -284,11 +267,83 @@
                     <li>Todos los casos (15 total)</li>
                     <li>+2 casos PERICIAL</li>
                     <li>Dashboard predictivo de riesgos</li>
+                    <li>Multi-usuario (hasta 50 usuarios)</li>
+                    <li>Reportes ejecutivos por equipo</li>
                     <li>Análisis de brechas de competencia</li>
                     <li>Soporte técnico dedicado</li>
                     <li>Actualizaciones normativas incluidas</li>
                 </ul>
                 <a href="mailto:hdzlecter@gmail.com" class="btn">Contactar Ventas</a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- SERVICIOS ADICIONALES -->
+    <section class="servicios">
+        <h2>🎓 Servicios Profesionales Adicionales</h2>
+        <div class="servicios-grid">
+            <!-- Capacitación Presencial -->
+            <div class="servicio-card">
+                <h3>👨‍🏫 Capacitación Presencial</h3>
+                <div class="precio">$8,000 <span>MXN/día + IVA</span></div>
+                <ul>
+                    <li>Instructor certificado DC5</li>
+                    <li>Máximo 25 participantes</li>
+                    <li>Material didáctico incluido</li>
+                    <li>Certificados de participación</li>
+                    <li>Viáticos no incluidos</li>
+                </ul>
+            </div>
+    
+            <!-- Exámenes Personalizados -->
+            <div class="servicio-card">
+                <h3>📝 Exámenes Personalizados</h3>
+                <div class="precio">$5,000 <span>MXN/examen + IVA</span></div>
+                <ul>
+                    <li>Desarrollo de preguntas del tema seleccionado</li>
+                    <li>Validación técnica por experto</li>
+                    <li>Integración en plataforma</li>
+                    <li>Actualizaciones anuales incluidas</li>
+                    <li>Incluye realizar 5 exámenes y 1 caso MASTER</li>
+                </ul>
+            </div>
+    
+            <!-- Desarrollo de Herramienta Digital -->
+            <div class="servicio-card" style="border-left-color: #FFD700;">
+                <h3>💻 Desarrollo de Herramienta Digital</h3>
+                <div class="precio">Desde $30,000 <span>MXN + IVA</span></div>
+                <ul>
+                    <li>Aplicación web para móvil y PC</li>
+                    <li>Funcionamiento 100% local (sin internet)</li>
+                    <li>Personalización con tu marca (White Label)</li>
+                    <li>Contenido del tema seleccionado</li>
+                    <li>Exámenes y casos personalizados</li>
+                    <li>Dashboard de resultados integrado</li>
+                    <li>Generación de certificados automática</li>
+                    <li>Capacitación para administradores</li>
+                    <li>Soporte técnico por 1 año</li>
+                    <li>Código fuente opcional (+50%)</li>
+                </ul>
+                <p style="font-size: 13px; color: #666; margin-top: 15px;">
+                    <strong>⏱️ Tiempo de desarrollo:</strong> 4-6 semanas<br>
+                    <strong>📱 Compatible:</strong> Windows, Mac, iOS, Android<br>
+                    <strong>🔒 Seguridad:</strong> Datos locales encriptados
+                </p>
+            </div>
+    
+            <!-- Consultoría SHE -->
+            <div class="servicio-card">
+                <h3>📊 Consultoría SHE</h3>
+                <div class="precio">Cotización</div>
+                <ul>
+                    <li>Plan de capacitación anual</li>
+                    <li>Auditorías de seguimiento</li>
+                    <li>Actualización normativa STPS</li>
+                    <li>Desarrollo de pláticas de seguridad</li>
+                    <li>Pláticas de 5 minutos (diarias)</li>
+                    <li>Infografías de seguridad personalizadas</li>
+                    <li>Reportes ejecutivos mensuales</li>
+                </ul>
             </div>
         </div>
     </section>
@@ -308,6 +363,10 @@
             <div class="oferta-card">
                 <h4>💳 Anual</h4>
                 <p>2 meses gratis pago anual</p>
+            </div>
+            <div class="oferta-card">
+                <h4>🎓 Desarrollo Digital</h4>
+                <p>10% descuento pago anticipado</p>
             </div>
         </div>
     </section>
@@ -334,19 +393,17 @@
         <h2>¿Listo para elevar tu competencia SHE?</h2>
         <p>Comienza con la demo gratis y descubre por qué +200 profesionales ya usan RayoShield PRO</p>
         <a href="app.html" class="btn">Comenzar Demo Gratis</a>
-        <p style="margin-top: 30px; font-size: 14px; opacity: 0.8;">📧 hdzlecter@gmail.com</p>
+        <p style="margin-top: 25px; font-size: 14px; opacity: 0.8;">📧 hdzlecter@gmail.com</p>
     </section>
     
     <!-- FOOTER -->
     <footer>
         <p>© 2026 RayoShield. Todos los derechos reservados.</p>
-        <p style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
+        <p style="margin-top: 15px;">
             <a href="app.html">Acceder a la App</a> | 
             <a href="#">Términos y Condiciones</a> | 
-            <a href="privacidad.html">Política de Privacidad</a>
+            <a href="#">Política de Privacidad</a>
         </p>
     </footer>
 </body>
 </html>
-
-
