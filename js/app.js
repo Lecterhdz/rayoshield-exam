@@ -726,18 +726,19 @@ const app = {
             else if (caso.nivel === 'master' && self.licencia.features.casosMaster) tieneAcceso = true;
             else if (caso.nivel === 'elite' && self.licencia.features.casosElite) tieneAcceso = true;
             else if (caso.nivel === 'pericial' && self.licencia.features.casosPericial) tieneAcceso = true;
-
-            // ✅ Limitar DEMO a solo 1 caso
-            if (self.licencia.tipo === 'DEMO' && casosMostrados >= maxCasosDemo) {
-                return; // ✅ Salir del forEach si ya mostró 1 caso
-            }
             
             if (tieneAcceso) {
+                // ✅ Limitar DEMO a solo 1 caso
+                if (self.licencia.tipo === 'DEMO' && casosMostrados >= maxCasosDemo) {
+                    return; // ✅ Salir del forEach si ya mostró 1 caso
+                }
+
                 var item = document.createElement('div');
                 item.className = 'exam-item';
                 item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:#666;font-size:14px;margin-top:5px;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
                 item.onclick = function() { self.cargarCasoMaster(caso.id); };
                 list.appendChild(item);
+                casosMostrados++; // ✅ Incrementar contador
             }
         });
     
@@ -1292,6 +1293,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
