@@ -290,12 +290,12 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
     function evaluarRespuestaAbierta(pregunta, respuestaUsuario) {
         var puntaje = 0;
         var feedback = '';
-    
+
         // ✅ La respuesta viene como array: ['texto del usuario']
         var texto = respuestaUsuario && respuestaUsuario[0] ? respuestaUsuario[0] : '';
-    
+
         var longitudMinima = pregunta.longitud_minima || 50;
-    
+
         if (!texto || texto.trim().length === 0) {
             puntaje = 0;
             feedback = '❌ No proporcionaste respuesta';
@@ -312,7 +312,7 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
             puntaje = pregunta.peso;
             feedback = '✅ Excelente: Tu respuesta demuestra análisis sistémico profundo';
         }
-    
+
         return {
             puntaje: puntaje,
             feedback: feedback,
@@ -320,35 +320,6 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
         };
     }
     
-    // Contar palabras clave encontradas
-    pregunta.palabras_clave_esperadas.forEach(function(palabra) {
-        if (respuestaLower.includes(palabra.toLowerCase())) {
-            palabrasEncontradas++;
-        }
-    });
-    
-    // Calcular puntaje basado en cobertura de keywords
-    const cobertura = palabrasEncontradas / pregunta.palabras_clave_esperadas.length;
-    let puntaje = Math.round(pregunta.peso * cobertura);
-    
-    // Bonus por mencionar conceptos sistémicos
-    if (respuestaLower.includes('sistema') || respuestaLower.includes('procedimiento')) {
-        puntaje = Math.min(puntaje + 5, pregunta.peso);
-    }
-    
-    // Feedback constructivo
-    let feedback = [];
-    if (cobertura < 0.5) {
-        feedback.push('💡 Considera mencionar: ' + pregunta.palabras_clave_esperadas.slice(0, 3).join(', ') + '...');
-    }
-    if (!respuestaLower.includes('sistema') && pregunta.criterios_evaluacion?.menciona_sistema) {
-        feedback.push('💡 Enfócate en QUÉ del sistema falló, no en QUIÉN cometió el error.');
-    }
-    feedback.push('📝 Respuesta modelo: ' + pregunta.respuesta_modelo);
-    
-    return { puntaje: puntaje, feedback: feedback };
-}
-
 // Evaluar pregunta de tipo "analisis_responsabilidad" (matriz de roles)
 function evaluarAnalisisResponsabilidad(respuestasUsuario, pregunta) {
     let puntaje = 0;
@@ -575,6 +546,7 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
 
 
