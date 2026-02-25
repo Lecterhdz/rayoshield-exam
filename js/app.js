@@ -1,4 +1,4 @@
-// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL COMPLETA v4.0)
+// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL v4.1 - CORREGIDA)
 // Guardar con codificación UTF-8
 
 const app = {
@@ -69,7 +69,6 @@ const app = {
     // ACTUALIZAR UI
     // ─────────────────────────────────────────────────────────────────────
     actualizarUI: function() {
-        // Info de licencia (home)
         var infoLic = document.getElementById('licencia-info');
         if (infoLic) {
             if (this.licencia.tipo === 'DEMO') {
@@ -82,7 +81,6 @@ const app = {
             }
         }
         
-        // Info de licencia (pantalla licencia)
         var infoLicDetail = document.getElementById('licencia-info-detail');
         if (infoLicDetail) {
             if (this.licencia.tipo === 'DEMO') {
@@ -93,13 +91,11 @@ const app = {
             }
         }
         
-        // Info de usuario
         var infoUser = document.getElementById('usuario-info');
         if (infoUser && this.userData.nombre) {
             infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + (this.userData.empresa || '') + ' • ' + (this.userData.puesto || '');
         }
         
-        // Habilitar botón de examen
         var btnExamen = document.getElementById('btn-comenzar');
         if (btnExamen) {
             var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -107,7 +103,6 @@ const app = {
             btnExamen.style.opacity = datosOk ? '1' : '0.5';
         }
         
-        // Control de visibilidad de botones según plan
         var btnCasosMaster = document.getElementById('btn-casos-master');
         if (btnCasosMaster) {
             if (this.licencia.features && this.licencia.features.casosElite) {
@@ -128,7 +123,7 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // LICENCIAS CON ID + CLAVE
+    // LICENCIAS
     // ─────────────────────────────────────────────────────────────────────
     cargarLicencia: function() {
         try {
@@ -152,73 +147,46 @@ const app = {
             var ahora = new Date();
             var expiracion = new Date(this.licencia.expiracion);
             if (ahora > expiracion) {
-                console.log('Licencia expirada');
                 this.licencia = { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} };
                 this.guardarLicencia();
-                alert('⚠️ Tu licencia ha expirada.\n\nHas vuelto a la versión DEMO.');
+                alert('⚠️ Tu licencia ha expirado.\n\nHas vuelto a la versión DEMO.');
             }
         }
     },
 
     validarLicencia: function(clienteId, clave) {
-        // Validar formato de clave
         if (!/^RS-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clave)) {
             return Promise.resolve({ valido: false, error: 'Formato: RS-XXXX-YYYY-ZZZZ' });
         }
-        // Validar formato de ID
         if (!/^[A-Z0-9_-]{5,}$/i.test(clienteId)) {
             return Promise.resolve({ valido: false, error: 'ID: mínimo 5 caracteres' });
         }
         
-        // BASE DE DATOS DE LICENCIAS CON FEATURES POR PLAN
         var licenciasValidas = {
-            // PLAN PRO
             'RS-A3F8-C2E9-B1D4': { 
                 clienteId: 'CONSTRUCTORA_AZTECA_001', 
                 tipo: 'FULL', 
                 duracion: 365,
-                features: {
-                    whiteLabel: false,
-                    predictivo: false,
-                    auditoria: false,
-                    casosElite: true,
-                    casosPericial: false
-                }
+                features: { whiteLabel: false, predictivo: false, auditoria: false, casosElite: true, casosPericial: false }
             },
-            // PLAN ENTERPRISE (con White Label + Predictivo)
             'RS-2D5F-8A1C-4E7B': { 
                 clienteId: 'SEGURIDAD_INDUSTRIAL_MX', 
                 tipo: 'EMPRESARIAL', 
                 duracion: 365,
-                features: {
-                    whiteLabel: true,
-                    predictivo: true,
-                    auditoria: false,
-                    casosElite: true,
-                    casosPericial: false
-                }
+                features: { whiteLabel: true, predictivo: true, auditoria: false, casosElite: true, casosPericial: false }
             },
-            // PLAN PRO+
             'RS-9C2E-5B8D-1F4A': { 
                 clienteId: 'CAPACITACION_PRO_2026', 
                 tipo: 'FULL', 
                 duracion: 180,
-                features: {
-                    whiteLabel: false,
-                    predictivo: false,
-                    auditoria: false,
-                    casosElite: true,
-                    casosPericial: false
-                }
+                features: { whiteLabel: false, predictivo: false, auditoria: false, casosElite: true, casosPericial: false }
             }
         };
         
         var licenciaData = licenciasValidas[clave.toUpperCase()];
-        
         if (!licenciaData) {
             return Promise.resolve({ valido: false, error: 'Clave inválida' });
         }
-        
         if (licenciaData.clienteId.toUpperCase() !== clienteId.toUpperCase()) {
             return Promise.resolve({ valido: false, error: 'ID no coincide con esta clave' });
         }
@@ -242,41 +210,29 @@ const app = {
         var clienteId = idEl ? idEl.value.trim().toUpperCase() : '';
         var clave = keyEl ? keyEl.value.trim().toUpperCase() : '';
         
-        if (!clienteId || !clave) { 
-            alert('⚠️ Ingresa ID y clave'); 
-            return; 
-        }
+        if (!clienteId || !clave) { alert('⚠️ Ingresa ID y clave'); return; }
         
-        // VERIFICACIÓN DE SEGURIDAD: Si ya hay licencia activa
         if (this.licencia.tipo !== 'DEMO' && this.licencia.expiracion) {
             var hoy = new Date();
             var vence = new Date(this.licencia.expiracion);
-            
             if (hoy < vence) {
                 if (this.licencia.clave === clave) {
                     alert('✅ Esta licencia ya está activa.\nVence: ' + vence.toLocaleDateString('es-MX'));
                     return;
                 } else {
-                    var confirmar = confirm('⚠️ Ya tienes una licencia activa hasta ' + vence.toLocaleDateString('es-MX') + '.\n\nActivar esta nueva licencia reemplazará la actual.\n\n¿Continuar?');
+                    var confirmar = confirm('⚠️ Ya tienes una licencia activa hasta ' + vence.toLocaleDateString('es-MX') + '.\n\n¿Continuar?');
                     if (!confirmar) return;
                 }
             }
         }
         
         var btn = document.querySelector('#license-screen .btn-primary');
-        if (btn) { 
-            btn.disabled = true; 
-            btn.textContent = '⏳ Validando...'; 
-        }
+        if (btn) { btn.disabled = true; btn.textContent = '⏳ Validando...'; }
         
         this.validarLicencia(clienteId, clave).then(function(res) {
-            if (btn) { 
-                btn.disabled = false; 
-                btn.textContent = '🔓 Activar Licencia'; 
-            }
+            if (btn) { btn.disabled = false; btn.textContent = '🔓 Activar Licencia'; }
             
             if (res.valido) {
-                // GUARDAR LICENCIA CON FEATURES
                 self.licencia = { 
                     tipo: res.tipo, 
                     clave: clave, 
@@ -287,17 +243,15 @@ const app = {
                 };
                 self.guardarLicencia();
                 
-                // Si tiene White Label, aplicar configuración guardada
                 if (res.features.whiteLabel) {
                     self.aplicarConfiguracionWhiteLabel();
                 }
                 
                 var fecha = new Date(res.expiracion).toLocaleDateString('es-MX');
-                alert('✅ Licencia ' + res.tipo + ' activada\n\nCliente: ' + res.clienteId + '\nVálida hasta: ' + fecha + '\n\nFeatures activas:\n• Casos MASTER: ' + (res.features.casosElite ? '✅' : '❌') + '\n• White Label: ' + (res.features.whiteLabel ? '✅' : '❌') + '\n• Dashboard Predictivo: ' + (res.features.predictivo ? '✅' : '❌'));
+                alert('✅ Licencia ' + res.tipo + ' activada\n\nCliente: ' + res.clienteId + '\nVálida hasta: ' + fecha);
                 
                 if (idEl) idEl.value = '';
                 if (keyEl) keyEl.value = '';
-                
                 self.actualizarUI();
             } else {
                 alert('❌ ' + res.error);
@@ -345,124 +299,37 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN: Categoría → Nivel → Examen
-    // ─────────────────────────────────────────────────────────────────────
-    irASeleccionarExamen: function() {
-        var self = this;
-        var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
-        if (!datosOk) { alert('Completa tus datos primero'); this.mostrarDatosUsuario(); return; }
-        if (!this.verificarLicenciaExamen()) return;
-        
-        document.getElementById('categorias-view').style.display = 'block';
-        document.getElementById('niveles-view').style.display = 'none';
-        
-        var list = document.getElementById('categorias-list');
-        if (!list) return;
-        list.innerHTML = '';
-        
-        CATEGORIAS.forEach(function(cat) {
-            var item = document.createElement('div');
-            item.className = 'exam-item';
-            item.innerHTML = '<h4>' + cat.icono + ' ' + cat.nombre + '</h4><p>' + cat.norma + '</p><small>' + cat.descripcion + '</small>';
-            item.onclick = function() { self.mostrarNiveles(cat); };
-            list.appendChild(item);
-        });
-        
-        this.mostrarPantalla('select-exam-screen');
-    },
-
-    mostrarNiveles: function(categoria) {
-        var self = this;
-        document.getElementById('categorias-view').style.display = 'none';
-        document.getElementById('niveles-view').style.display = 'block';
-        
-        document.getElementById('categoria-titulo').textContent = categoria.icono + ' ' + categoria.nombre;
-        document.getElementById('categoria-norma').textContent = categoria.norma;
-        
-        var list = document.getElementById('niveles-list');
-        list.innerHTML = '';
-        
-        categoria.niveles.forEach(function(nivel) {
-            var item = document.createElement('div');
-            item.className = 'exam-item';
-            item.innerHTML = '<h4>👤 ' + nivel.nombre + '</h4><p>Examen de ' + categoria.nombre.toLowerCase() + '</p>';
-            item.onclick = function() { self.iniciarExamen(nivel.examId); };
-            list.appendChild(item);
-        });
-    },
-
-    volverACategorias: function() {
-        document.getElementById('categorias-view').style.display = 'block';
-        document.getElementById('niveles-view').style.display = 'none';
-    },
-
-    iniciarExamen: function(examId) {
-        var self = this;
-        cargarExamen(examId).then(function(exam) {
-            self.examenActual = exam; self.respuestasUsuario = []; self.preguntaActual = 0; self.resultadoActual = null; self.respuestaTemporal = null;
-            var t = document.getElementById('exam-title'), n = document.getElementById('exam-norma');
-            if (t) t.textContent = exam.titulo; if (n) n.textContent = exam.norma;
-            self.detenerTimer(); self.iniciarTimerExamen(); self.mostrarPantalla('exam-screen'); self.mostrarPregunta(); self.guardarExamenProgreso();
-        }).catch(function() { alert('Error cargando examen'); });
-    },
-
-    mostrarPregunta: function() {
-        if (!this.examenActual) return;
-        var p = this.examenActual.preguntas[this.preguntaActual], total = this.examenActual.preguntas.length;
-        var progreso = ((this.preguntaActual + 1) / total) * 100;
-        var bar = document.getElementById('progress-bar'), txt = document.getElementById('progress-text'), q = document.getElementById('question-text'), cont = document.getElementById('options-container');
-        if (bar) bar.innerHTML = '<div class="progress-bar-fill" style="width:' + progreso + '%"></div>';
-        if (txt) txt.textContent = 'Pregunta ' + (this.preguntaActual + 1) + ' de ' + total;
-        if (q) q.textContent = p.texto;
-        if (!cont) return; cont.innerHTML = '';
-        var self = this;
-        p.opciones.forEach(function(opt, idx) {
-            var btn = document.createElement('button');
-            btn.className = 'option-btn' + (self.respuestaTemporal === idx ? ' selected' : '');
-            btn.textContent = String.fromCharCode(65 + idx) + ') ' + opt;
-            btn.onclick = function() { self.seleccionarRespuesta(idx); };
-            cont.appendChild(btn);
-        });
-        if (this.respuestaTemporal !== null) {
-            var btnC = document.createElement('button');
-            btnC.className = 'btn btn-primary btn-continuar'; btnC.textContent = 'Continuar';
-            btnC.onclick = function() { self.confirmarRespuesta(); };
-            cont.appendChild(btnC);
-        }
-    },
-
-    seleccionarRespuesta: function(idx) { this.respuestaTemporal = idx; this.mostrarPregunta(); },
-
-    confirmarRespuesta: function() {
-        if (this.respuestaTemporal === null) return;
-        if (this.preguntaActual === this.examenActual.preguntas.length - 1 && !confirm('Finalizar examen?')) return;
-        this.respuestasUsuario.push(this.respuestaTemporal); this.respuestaTemporal = null; this.preguntaActual++;
-        this.guardarExamenProgreso();
-        if (this.preguntaActual < this.examenActual.preguntas.length) { this.mostrarPregunta(); }
-        else { this.detenerTimer(); this.mostrarResultado(); this.eliminarExamenGuardado(); }
-    },
-
-    // ─────────────────────────────────────────────────────────────────────
     // TIMER EXAMEN
     // ─────────────────────────────────────────────────────────────────────
     iniciarTimerExamen: function() {
-        var self = this; this.tiempoInicio = Date.now(); this.tiempoRestante = this.tiempoLimite;
+        var self = this; 
+        this.tiempoInicio = Date.now(); 
+        this.tiempoRestante = this.tiempoLimite;
         this.timerExamen = setInterval(function() {
             self.tiempoRestante = self.tiempoLimite - (Date.now() - self.tiempoInicio);
-            if (self.tiempoRestante <= 0) { clearInterval(self.timerExamen); self.timerExamen = null; alert('Tiempo agotado'); self.mostrarResultado(); self.eliminarExamenGuardado(); return; }
+            if (self.tiempoRestante <= 0) { 
+                clearInterval(self.timerExamen); 
+                self.timerExamen = null; 
+                alert('Tiempo agotado'); 
+                self.mostrarResultado(); 
+                self.eliminarExamenGuardado(); 
+                return; 
+            }
             self.actualizarTimerUI();
-            if (self.tiempoRestante <= 300000 && self.tiempoRestante > 240000) alert('Quedan 5 minutos');
         }, 1000);
     },
     
     actualizarTimerUI: function() {
-        var el = document.getElementById('exam-timer'); if (!el) return;
+        var el = document.getElementById('exam-timer'); 
+        if (!el) return;
         var min = Math.floor(this.tiempoRestante / 60000), seg = Math.floor((this.tiempoRestante % 60000) / 1000);
         el.textContent = min + ':' + (seg < 10 ? '0' : '') + seg;
         el.style.color = this.tiempoRestante <= 300000 ? '#f44336' : '#666';
     },
     
-    detenerTimer: function() { if (this.timerExamen) { clearInterval(this.timerExamen); this.timerExamen = null; } },
+    detenerTimer: function() { 
+        if (this.timerExamen) { clearInterval(this.timerExamen); this.timerExamen = null; } 
+    },
 
     // ─────────────────────────────────────────────────────────────────────
     // TIMER CASOS MASTER
@@ -470,7 +337,7 @@ const app = {
     iniciarTimerCaso: function() {
         var self = this;
         this.tiempoCasoInicio = Date.now();
-        this.tiempoCasoRestante = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos) ? 
+        this.tiempoCasoRestante = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos) ?
             this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos * 60 * 1000 : this.tiempoCasoLimite;
         
         var timerEl = document.getElementById('caso-timer');
@@ -486,7 +353,6 @@ const app = {
         
         this.timerCaso = setInterval(function() {
             self.tiempoCasoRestante = self.tiempoCasoLimite - (Date.now() - self.tiempoCasoInicio);
-            
             if (self.tiempoCasoRestante <= 0) {
                 clearInterval(self.timerCaso);
                 self.timerCaso = null;
@@ -494,12 +360,7 @@ const app = {
                 self.enviarRespuestasCaso();
                 return;
             }
-            
             self.actualizarTimerCasoUI();
-            
-            if (self.tiempoCasoRestante <= 300000 && self.tiempoCasoRestante > 240000) {
-                alert('⚠️ Quedan 5 minutos');
-            }
         }, 1000);
     },
     
@@ -520,129 +381,6 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // PROGRESO GUARDADO
-    // ─────────────────────────────────────────────────────────────────────
-    guardarExamenProgreso: function() {
-        if (this.examenActual) {
-            this.examenGuardado = { examenId: this.examenActual.id, respuestas: this.respuestasUsuario.slice(), preguntaActual: this.preguntaActual, fecha: new Date().toISOString() };
-            localStorage.setItem('rayoshield_progreso', JSON.stringify(this.examenGuardado));
-        }
-    },
-    
-    cargarExamenGuardado: function() { try { var s = localStorage.getItem('rayoshield_progreso'); if (s) this.examenGuardado = JSON.parse(s); } catch(e) {} },
-    
-    restaurarExamenGuardado: function() {
-        if (!this.examenGuardado) return;
-        var self = this;
-        cargarExamen(this.examenGuardado.examenId).then(function(exam) {
-            self.examenActual = exam; self.respuestasUsuario = self.examenGuardado.respuestas; self.preguntaActual = self.examenGuardado.preguntaActual;
-            var t = document.getElementById('exam-title'), n = document.getElementById('exam-norma');
-            if (t) t.textContent = exam.titulo; if (n) n.textContent = exam.norma;
-            self.detenerTimer(); self.iniciarTimerExamen(); self.mostrarPantalla('exam-screen'); self.mostrarPregunta();
-        });
-    },
-    
-    eliminarExamenGuardado: function() { this.examenGuardado = null; localStorage.removeItem('rayoshield_progreso'); },
-
-    // ─────────────────────────────────────────────────────────────────────
-    // RESULTADOS EXAMEN
-    // ─────────────────────────────────────────────────────────────────────
-    mostrarResultado: function() {
-        if (!this.examenActual) return;
-        this.detenerTimer();
-        this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
-        var icon = document.getElementById('result-icon'), title = document.getElementById('result-title'), score = document.getElementById('score-number');
-        var ac = document.getElementById('aciertos'), tot = document.getElementById('total'), min = document.getElementById('min-score');
-        var st = document.getElementById('result-status'), btn = document.getElementById('btn-certificado');
-        if (icon) icon.textContent = getIconoResultado(this.resultadoActual.estado);
-        if (title) title.textContent = (this.resultadoActual.estado === 'Aprobado' ? 'APROBADO' : 'REPROBADO') + (this.licencia.tipo === 'DEMO' ? ' (DEMO)' : '');
-        if (score) score.textContent = this.resultadoActual.score + '%';
-        if (ac) ac.textContent = this.resultadoActual.aciertos; if (tot) tot.textContent = this.resultadoActual.total; if (min) min.textContent = this.resultadoActual.minScore;
-        if (st) { st.textContent = this.resultadoActual.estado; st.className = 'score ' + getColorEstado(this.resultadoActual.estado); }
-        if (btn) { btn.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none'; btn.textContent = this.licencia.tipo === 'DEMO' ? 'Certificado (DEMO)' : 'Descargar Certificado'; }
-        this.mostrarPantalla('result-screen'); this.guardarEnHistorial(); this.consumirExamen();
-    },
-
-    descargarCertificado: function() {
-        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { alert('Solo para aprobados'); return; }
-        var self = this;
-        generarCertificado(this.userData, this.examenActual, this.resultadoActual).then(function(url) {
-            var a = document.createElement('a'); a.download = 'certificado_' + Date.now() + '.png'; a.href = url; a.click();
-        }).catch(function() { alert('Error generando certificado'); });
-    },
-
-    // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR INSIGNIA
-    // ─────────────────────────────────────────────────────────────────────
-    descargarInsignia: function() {
-        if (!this.casoActual || !this.resultadoCaso) {
-            alert('❌ No hay insignia disponible');
-            return;
-        }
-        if (!this.resultadoCaso.aprobado) {
-            alert('⚠️ Debes aprobar el caso para obtener la insignia');
-            return;
-        }
-        var self = this;
-        generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
-            var a = document.createElement('a');
-            a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
-            a.href = url;
-            a.click();
-        }).catch(function() {
-            alert('❌ Error generando insignia');
-        });
-    },
-
-    // ─────────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN
-    // ─────────────────────────────────────────────────────────────────────
-    volverHome: function() { 
-        this.detenerTimer(); 
-        this.detenerTimerCaso();
-        this.examenActual = null; 
-        this.respuestasUsuario = []; 
-        this.preguntaActual = 0; 
-        this.resultadoActual = null; 
-        this.respuestaTemporal = null; 
-        this.mostrarPantalla('home-screen'); 
-    },
-    
-    mostrarDatosUsuario: function() {
-        var e = document.getElementById('user-empresa'), n = document.getElementById('user-nombre'), c = document.getElementById('user-curp'), p = document.getElementById('user-puesto');
-        if (e) e.value = this.userData.empresa || ''; if (n) n.value = this.userData.nombre || ''; if (c) c.value = this.userData.curp || ''; if (p) p.value = this.userData.puesto || '';
-        this.mostrarPantalla('user-data-screen');
-    },
-    
-    mostrarHistorial: function() {
-        var list = document.getElementById('history-list'); if (!list) return;
-        var hist = this.obtenerHistorial();
-        if (hist.length === 0) { list.innerHTML = '<p style="text-align:center;color:#666">Sin exámenes</p>'; }
-        else { list.innerHTML = ''; hist.slice(-10).reverse().forEach(function(item) {
-            var d = document.createElement('div'); d.className = 'history-item';
-            d.innerHTML = '<div><strong>' + item.examen + '</strong><br><small>' + new Date(item.fecha).toLocaleDateString('es-MX') + '</small></div><span class="score ' + getColorEstado(item.estado) + '">' + item.score + '%</span>';
-            list.appendChild(d);
-        }); }
-        this.mostrarPantalla('history-screen');
-    },
-    
-    mostrarLicencia: function() {
-        var el = document.getElementById('licencia-info-detail');
-        if (el) {
-            if (this.licencia.tipo === 'DEMO') {
-                el.textContent = '📋 DEMO: ' + this.licencia.examenesRestantes + '/3 exámenes hoy';
-            } else if (this.licencia.tipo === 'FULL') {
-                var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
-                el.textContent = '✅ FULL\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
-            } else if (this.licencia.tipo === 'EMPRESARIAL') {
-                var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
-                el.textContent = '🏢 EMPRESARIAL\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp + '\n⚠️ Sin control de dispositivos (honesto)';
-            }
-        }
-        this.mostrarPantalla('license-screen');
-    },
-
-    // ─────────────────────────────────────────────────────────────────────
     // CASOS CRÍTICOS - INVESTIGACIÓN MASTER
     // ─────────────────────────────────────────────────────────────────────
     irACasosMaster: function() {
@@ -656,7 +394,7 @@ const app = {
         list.innerHTML = '';
         
         if (typeof CASOS_INVESTIGACION === 'undefined' || CASOS_INVESTIGACION.length === 0) {
-            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos de investigación disponibles aún.</p>';
+            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos disponibles.</p>';
             return;
         }
         
@@ -664,7 +402,7 @@ const app = {
         CASOS_INVESTIGACION.forEach(function(caso) {
             var item = document.createElement('div');
             item.className = 'exam-item';
-            item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:#666;font-size:14px;margin-top:5px;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
+            item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p>';
             item.onclick = function() { self.cargarCasoMaster(caso.id); };
             list.appendChild(item);
         });
@@ -690,7 +428,6 @@ const app = {
         document.getElementById('caso-industria').textContent = this.casoActual.industria;
         document.getElementById('caso-tiempo').textContent = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos ? this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos : 25) + ' min';
         
-        // Descripción del evento (CON VALIDACIÓN)
         var desc = this.casoActual.descripcion_evento || {};
         document.getElementById('caso-descripcion').innerHTML = 
             '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
@@ -724,12 +461,12 @@ const app = {
         preguntasEl.innerHTML = '';
         this.respuestasCaso = {};
         
+        // ✅ SWITCH CORREGIDO - SOLO RENDERIZA, NO COLECTA RESPUESTAS
         this.casoActual.preguntas.forEach(function(pregunta, idx) {
             var preguntaDiv = document.createElement('div');
             preguntaDiv.className = 'pregunta-master';
             preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' (' + pregunta.tipo.replace('_', ' ') + ') - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
             
-            // ✅ SWITCH ACTUALIZADO CON TODOS LOS TIPOS DE PREGUNTAS
             switch(pregunta.tipo) {
                 case 'analisis_multiple':
                 case 'deteccion_omisiones':
@@ -747,7 +484,7 @@ const app = {
                     preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
                     break;
                 case 'plan_accion':
-                case 'evaluacion_correctivas':  // ← ¿ESTÁ ESTO?
+                case 'evaluacion_correctivas':
                     preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
                     break;
                 case 'ordenamiento_dinamico':
@@ -765,11 +502,12 @@ const app = {
         });
         
         document.getElementById('btn-enviar-caso').style.display = 'inline-block';
-        
-        // ✅ INICIAR TIMER DEL CASO
         this.iniciarTimerCaso();
     },
-    
+
+    // ─────────────────────────────────────────────────────────────────────
+    // RENDER FUNCTIONS
+    // ─────────────────────────────────────────────────────────────────────
     renderAnalisisMultiple: function(pregunta) {
         var container = document.createElement('div');
         var self = this;
@@ -803,7 +541,7 @@ const app = {
         var container = document.createElement('div');
         var textarea = document.createElement('textarea');
         textarea.className = 'respuesta-abierta';
-        textarea.placeholder = 'Escribe tu análisis sistémico aquí... (mínimo 20 caracteres)';
+        textarea.placeholder = 'Escribe tu análisis sistémico aquí...';
         textarea.id = 'respuesta-' + pregunta.id;
         container.appendChild(textarea);
         if (pregunta.feedback_guiado) {
@@ -867,10 +605,9 @@ const app = {
     renderOrdenamientoDinamico: function(pregunta) {
         var container = document.createElement('div');
         var self = this;
-        
         var instrucciones = document.createElement('p');
         instrucciones.style.cssText = 'color: #666; font-size: 14px; margin: 10px 0;';
-        instrucciones.textContent = 'Arrastra los elementos para ordenarlos en la secuencia correcta';
+        instrucciones.textContent = 'Arrastra los elementos para ordenarlos';
         container.appendChild(instrucciones);
         
         var ordenContainer = document.createElement('div');
@@ -920,12 +657,10 @@ const app = {
                 this.style.borderColor = '#ddd';
                 var fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
                 var toIdx = parseInt(this.dataset.index);
-                
                 if (fromIdx !== toIdx) {
                     var items = Array.from(ordenContainer.children);
                     var fromItem = items[fromIdx];
                     var toItem = items[toIdx];
-                    
                     if (fromIdx < toIdx) {
                         ordenContainer.insertBefore(fromItem, toItem.nextSibling);
                     } else {
@@ -967,51 +702,46 @@ const app = {
     
     renderCalculoTecnico: function(pregunta) {
         var container = document.createElement('div');
-        
         if (pregunta.variables) {
             var variablesDiv = document.createElement('div');
             variablesDiv.style.cssText = 'background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;';
-            
             Object.keys(pregunta.variables).forEach(function(variable) {
-                var valor = Array.isArray(pregunta.variables[variable]) ? 
-                    pregunta.variables[variable][0] : pregunta.variables[variable];
+                var valor = Array.isArray(pregunta.variables[variable]) ? pregunta.variables[variable][0] : pregunta.variables[variable];
                 var p = document.createElement('p');
                 p.style.cssText = 'margin: 5px 0; font-size: 14px;';
                 p.innerHTML = '<strong>' + variable + ':</strong> ' + valor;
                 variablesDiv.appendChild(p);
             });
-            
             container.appendChild(variablesDiv);
         }
-        
         var inputDiv = document.createElement('div');
         inputDiv.style.cssText = 'margin: 15px 0;';
-        
         var input = document.createElement('input');
         input.type = 'number';
         input.id = 'respuesta-' + pregunta.id;
         input.placeholder = 'Ingresa tu respuesta';
         input.style.cssText = 'width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;';
-        
         inputDiv.appendChild(input);
         container.appendChild(inputDiv);
-        
         if (pregunta.ayuda) {
             var ayudaDiv = document.createElement('div');
             ayudaDiv.style.cssText = 'background: #E3F2FD; padding: 12px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #2196F3;';
             ayudaDiv.innerHTML = '<strong>💡 Ayuda:</strong> ' + pregunta.ayuda;
             container.appendChild(ayudaDiv);
         }
-        
         return container;
     },
-    
+
+    // ─────────────────────────────────────────────────────────────────────
+    // ENVIAR RESPUESTAS (SOLO AQUÍ SE COLECTAN RESPUESTAS)
+    // ─────────────────────────────────────────────────────────────────────
     enviarRespuestasCaso: function() {
         if (!this.casoActual) return;
         
         var respuestasPorPregunta = {};
         var self = this;
         
+        // ✅ AQUÍ SÍ SE COLECTAN LAS RESPUESTAS
         this.casoActual.preguntas.forEach(function(pregunta) {
             switch(pregunta.tipo) {
                 case 'analisis_multiple':
@@ -1023,13 +753,11 @@ const app = {
                     var checks = document.querySelectorAll('input[name="pregunta-' + pregunta.id + '"]:checked');
                     respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
                     break;
-                    
                 case 'respuesta_abierta_guiada':
                 case 'redaccion_tecnica':
                     var textarea = document.getElementById('respuesta-' + pregunta.id);
                     respuestasPorPregunta[pregunta.id] = [textarea ? textarea.value : ''];
                     break;
-                    
                 case 'analisis_responsabilidad':
                     var respuestas = [];
                     pregunta.roles.forEach(function(role, idx) {
@@ -1038,19 +766,16 @@ const app = {
                     });
                     respuestasPorPregunta[pregunta.id] = respuestas;
                     break;
-                    
                 case 'plan_accion':
                 case 'evaluacion_correctivas':
                     var checks = document.querySelectorAll('input[name="plan-' + pregunta.id + '"]:checked');
                     respuestasPorPregunta[pregunta.id] = Array.from(checks).map(function(c) { return parseInt(c.value); });
                     break;
-                    
                 case 'ordenamiento_dinamico':
                 case 'matriz_priorizacion':
                     var inputOrden = document.getElementById('respuesta-' + pregunta.id);
                     respuestasPorPregunta[pregunta.id] = inputOrden && inputOrden.value ? JSON.parse(inputOrden.value) : [];
                     break;
-                    
                 case 'calculo_tecnico':
                     var inputCalculo = document.getElementById('respuesta-' + pregunta.id);
                     respuestasPorPregunta[pregunta.id] = [inputCalculo ? parseFloat(inputCalculo.value) : 0];
@@ -1058,7 +783,6 @@ const app = {
             }
         });
         
-        // Evaluar con Smart Evaluation V2
         var resultado = SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual);
         this.resultadoCaso = resultado;
         this.mostrarResultadoCaso(resultado);
@@ -1069,22 +793,16 @@ const app = {
         resultadoEl.style.display = 'block';
         resultadoEl.scrollIntoView({ behavior: 'smooth' });
         
-        // DETENER TIMER
         this.detenerTimerCaso();
         
-        // Si tiene feature predictivo, usar Dashboard Engine
         if (this.licencia.features && this.licencia.features.predictivo && typeof DashboardEngine !== 'undefined') {
             resultadoEl.innerHTML = DashboardEngine.generar(resultado);
         } else {
-            // Vista básica para planes sin predictivo
             var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
             var icono = resultado.aprobado ? '✅' : '📚';
             var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
-            
-            // Determinar insignia según puntaje
             var insignia = this.obtenerInsigniaPorPuntaje(resultado.porcentaje);
             
-            // Botones condicionales
             var botonesHTML = '';
             if (resultado.aprobado) {
                 botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
@@ -1107,16 +825,36 @@ const app = {
     
     obtenerInsigniaPorPuntaje: function(puntaje) {
         if (puntaje >= 95) {
-            return { nombre: 'PERICIAL', icono: '⚖️', descripcion: 'Excelencia en investigación de incidentes', color: '#D4AF37' };
+            return { nombre: 'PERICIAL', icono: '⚖️', descripcion: 'Excelencia en investigación', color: '#D4AF37' };
         } else if (puntaje >= 90) {
-            return { nombre: 'ELITE', icono: '🥇', descripcion: 'Competencia avanzada en análisis SHE', color: '#9C27B0' };
+            return { nombre: 'ELITE', icono: '🥇', descripcion: 'Competencia avanzada', color: '#9C27B0' };
         } else if (puntaje >= 80) {
-            return { nombre: 'MASTER', icono: '🥈', descripcion: 'Competencia sólida en investigación', color: '#2196F3' };
+            return { nombre: 'MASTER', icono: '🥈', descripcion: 'Competencia sólida', color: '#2196F3' };
         } else if (puntaje >= 75) {
             return { nombre: 'AVANZADO', icono: '🥉', descripcion: 'Competencia en desarrollo', color: '#4CAF50' };
         } else {
             return { nombre: 'PARTICIPACIÓN', icono: '📚', descripcion: 'Continúa practicando', color: '#FF9800' };
         }
+    },
+    
+    descargarInsignia: function() {
+        if (!this.casoActual || !this.resultadoCaso) {
+            alert('❌ No hay insignia disponible');
+            return;
+        }
+        if (!this.resultadoCaso.aprobado) {
+            alert('⚠️ Debes aprobar el caso');
+            return;
+        }
+        var self = this;
+        generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
+            var a = document.createElement('a');
+            a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.href = url;
+            a.click();
+        }).catch(function() {
+            alert('❌ Error generando insignia');
+        });
     },
     
     volverAListaCasos: function() {
@@ -1161,7 +899,7 @@ const app = {
         var config = { nombre: nombre, logo: logo, color: color, email: email };
         localStorage.setItem('rayoshield_wl_config', JSON.stringify(config));
         this.aplicarConfiguracionWhiteLabel();
-        alert('✅ Marca actualizada correctamente. Recarga la página para ver cambios globales.');
+        alert('✅ Marca actualizada correctamente. Recarga la página.');
     },
     
     mostrarPanelWhiteLabel: function() {
@@ -1181,12 +919,160 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // INFORMACIÓN
+    // NAVEGACIÓN BÁSICA
     // ─────────────────────────────────────────────────────────────────────
+    volverHome: function() {
+        this.detenerTimer();
+        this.detenerTimerCaso();
+        this.examenActual = null;
+        this.respuestasUsuario = [];
+        this.preguntaActual = 0;
+        this.resultadoActual = null;
+        this.respuestaTemporal = null;
+        this.mostrarPantalla('home-screen');
+    },
+    
     mostrarInfo: function() {
         this.mostrarPantalla('info-screen');
     },
     
+    mostrarDatosUsuario: function() {
+        var e = document.getElementById('user-empresa'), n = document.getElementById('user-nombre'), c = document.getElementById('user-curp'), p = document.getElementById('user-puesto');
+        if (e) e.value = this.userData.empresa || '';
+        if (n) n.value = this.userData.nombre || '';
+        if (c) c.value = this.userData.curp || '';
+        if (p) p.value = this.userData.puesto || '';
+        this.mostrarPantalla('user-data-screen');
+    },
+    
+    mostrarHistorial: function() {
+        var list = document.getElementById('history-list');
+        if (!list) return;
+        var hist = this.obtenerHistorial();
+        if (hist.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:#666">Sin exámenes</p>';
+        } else {
+            list.innerHTML = '';
+            hist.slice(-10).reverse().forEach(function(item) {
+                var d = document.createElement('div');
+                d.className = 'history-item';
+                d.innerHTML = '<div><strong>' + item.examen + '</strong><br><small>' + new Date(item.fecha).toLocaleDateString('es-MX') + '</small></div><span class="score ' + (item.estado === 'Aprobado' ? 'score-aprobado' : 'score-reprobado') + '">' + item.score + '%</span>';
+                list.appendChild(d);
+            });
+        }
+        this.mostrarPantalla('history-screen');
+    },
+    
+    mostrarLicencia: function() {
+        this.mostrarPantalla('license-screen');
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // HISTORIAL
+    // ─────────────────────────────────────────────────────────────────────
+    guardarEnHistorial: function() {
+        var hist = this.obtenerHistorial();
+        hist.push({ 
+            examen: this.examenActual ? this.examenActual.titulo : 'Desconocido', 
+            norma: this.examenActual ? this.examenActual.norma : '', 
+            score: this.resultadoActual ? this.resultadoActual.score : 0, 
+            estado: this.resultadoActual ? this.resultadoActual.estado : '', 
+            fecha: this.resultadoActual ? this.resultadoActual.fecha : new Date().toISOString(), 
+            usuario: this.userData.nombre 
+        });
+        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
+    },
+    
+    obtenerHistorial: function() { 
+        try { 
+            var h = localStorage.getItem('rayoshield_historial'); 
+            return h ? JSON.parse(h) : []; 
+        } catch(e) { 
+            return []; 
+        } 
+    },
+    
+    cargarHistorial: function() { 
+        console.log('Historial:', this.obtenerHistorial().length, 'exámenes'); 
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // PROGRESO GUARDADO
+    // ─────────────────────────────────────────────────────────────────────
+    guardarExamenProgreso: function() {
+        if (this.examenActual) {
+            this.examenGuardado = { 
+                examenId: this.examenActual.id, 
+                respuestas: this.respuestasUsuario.slice(), 
+                preguntaActual: this.preguntaActual, 
+                fecha: new Date().toISOString() 
+            };
+            localStorage.setItem('rayoshield_progreso', JSON.stringify(this.examenGuardado));
+        }
+    },
+    
+    cargarExamenGuardado: function() { 
+        try { 
+            var s = localStorage.getItem('rayoshield_progreso'); 
+            if (s) this.examenGuardado = JSON.parse(s); 
+        } catch(e) {} 
+    },
+    
+    eliminarExamenGuardado: function() { 
+        this.examenGuardado = null; 
+        localStorage.removeItem('rayoshield_progreso'); 
+    },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // RESULTADOS EXAMEN
+    // ─────────────────────────────────────────────────────────────────────
+    mostrarResultado: function() {
+        if (!this.examenActual) return;
+        this.detenerTimer();
+        this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
+        
+        var icon = document.getElementById('result-icon'), 
+            title = document.getElementById('result-title'), 
+            score = document.getElementById('score-number');
+        var ac = document.getElementById('aciertos'), 
+            tot = document.getElementById('total'), 
+            min = document.getElementById('min-score');
+        var st = document.getElementById('result-status'), 
+            btn = document.getElementById('btn-certificado');
+        
+        if (icon) icon.textContent = getIconoResultado(this.resultadoActual.estado);
+        if (title) title.textContent = (this.resultadoActual.estado === 'Aprobado' ? 'APROBADO' : 'REPROBADO') + (this.licencia.tipo === 'DEMO' ? ' (DEMO)' : '');
+        if (score) score.textContent = this.resultadoActual.score + '%';
+        if (ac) ac.textContent = this.resultadoActual.aciertos;
+        if (tot) tot.textContent = this.resultadoActual.total;
+        if (min) min.textContent = this.resultadoActual.minScore;
+        if (st) { st.textContent = this.resultadoActual.estado; st.className = 'score ' + getColorEstado(this.resultadoActual.estado); }
+        if (btn) { 
+            btn.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none'; 
+            btn.textContent = this.licencia.tipo === 'DEMO' ? 'Certificado (DEMO)' : 'Descargar Certificado'; 
+        }
+        
+        this.mostrarPantalla('result-screen');
+        this.guardarEnHistorial();
+        this.consumirExamen();
+    },
+
+    descargarCertificado: function() {
+        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { 
+            alert('Solo para aprobados'); 
+            return; 
+        }
+        var self = this;
+        generarCertificado(this.userData, this.examenActual, this.resultadoActual).then(function(url) {
+            var a = document.createElement('a'); 
+            a.download = 'certificado_' + Date.now() + '.png'; 
+            a.href = url; 
+            a.click();
+        }).catch(function() { 
+            alert('Error generando certificado'); 
+        });
+    },
+
     // ─────────────────────────────────────────────────────────────────────
     // IMPRIMIR DASHBOARD
     // ─────────────────────────────────────────────────────────────────────
@@ -1203,37 +1089,48 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // HISTORIAL
-    // ─────────────────────────────────────────────────────────────────────
-    guardarEnHistorial: function() {
-        var hist = this.obtenerHistorial();
-        hist.push({ examen: this.examenActual ? this.examenActual.titulo : 'Desconocido', norma: this.examenActual ? this.examenActual.norma : '', score: this.resultadoActual ? this.resultadoActual.score : 0, estado: this.resultadoActual ? this.resultadoActual.estado : '', fecha: this.resultadoActual ? this.resultadoActual.fecha : new Date().toISOString(), usuario: this.userData.nombre });
-        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
-    },
-    
-    obtenerHistorial: function() { try { var h = localStorage.getItem('rayoshield_historial'); return h ? JSON.parse(h) : []; } catch(e) { return []; } },
-    
-    cargarHistorial: function() { console.log('Historial:', this.obtenerHistorial().length, 'exámenes'); },
-
-    // ─────────────────────────────────────────────────────────────────────
     // PWA INSTALL
     // ─────────────────────────────────────────────────────────────────────
     initPWAInstall: function() {
         var self = this;
-        window.addEventListener('beforeinstallprompt', function(e) { console.log('PWA instalable'); e.preventDefault(); self.deferredPrompt = e; var c = document.getElementById('pwa-install-container'); if (c) c.style.display = 'block'; });
-        window.addEventListener('appinstalled', function() { console.log('PWA instalada'); self.deferredPrompt = null; var c = document.getElementById('pwa-install-container'); if (c) c.style.display = 'none'; });
+        window.addEventListener('beforeinstallprompt', function(e) { 
+            console.log('PWA instalable'); 
+            e.preventDefault(); 
+            self.deferredPrompt = e; 
+            var c = document.getElementById('pwa-install-container'); 
+            if (c) c.style.display = 'block'; 
+        });
+        window.addEventListener('appinstalled', function() { 
+            console.log('PWA instalada'); 
+            self.deferredPrompt = null; 
+            var c = document.getElementById('pwa-install-container'); 
+            if (c) c.style.display = 'none'; 
+        });
     },
     
     instalarPWA: function() {
         var self = this;
-        if (!this.deferredPrompt) { alert('Menú navegador → "Agregar a pantalla principal"'); return; }
+        if (!this.deferredPrompt) { 
+            alert('Menú navegador → "Agregar a pantalla principal"'); 
+            return; 
+        }
         this.deferredPrompt.prompt();
-        this.deferredPrompt.userChoice.then(function(r) { console.log('Instalación:', r.outcome); self.deferredPrompt = null; var c = document.getElementById('pwa-install-container'); if (c) c.style.display = 'none'; });
+        this.deferredPrompt.userChoice.then(function(r) { 
+            console.log('Instalación:', r.outcome); 
+            self.deferredPrompt = null; 
+            var c = document.getElementById('pwa-install-container'); 
+            if (c) c.style.display = 'none'; 
+        });
     }
 };
 
 // Iniciar cuando DOM esté listo
-document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
-window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+document.addEventListener('DOMContentLoaded', function() { 
+    console.log('DOM listo'); 
+    app.init(); 
+});
 
-
+window.addEventListener('beforeunload', function() { 
+    if (app.timerExamen) clearInterval(app.timerExamen); 
+    if (app.timerCaso) clearInterval(app.timerCaso); 
+});
