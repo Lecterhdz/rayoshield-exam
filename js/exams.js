@@ -112,6 +112,56 @@ const CASOS_INVESTIGACION = [
         descripcion: 'Investigación de accidente grave por trabajo con equipos energizados sin controles',
         tiempo_estimado: '30 min',
         requisito: 'Eléctricos Supervisor SHE aprobado'
+    },
+    {
+        id: 'case-loto-master-001',
+        titulo: 'Mantenimiento de Compresor con LOTO Incompleto',
+        categoria: 'Loto',
+        nivel: 'master',
+        icono: '🔒',
+        descripcion: 'Trabajador realiza mantenimiento con procedimiento de bloqueo incompleto',
+        tiempo_estimado: '30 min',
+        requisito: 'Examen NOM-004-STPS Supervisor aprobado'
+    },
+    {
+        id: 'case-incendio-master-001',
+        titulo: 'Incendio en Almacén de Químicos',
+        categoria: 'Incendios',
+        nivel: 'master',
+        icono: '🔥',
+        descripcion: 'Incendio se origina en almacén de químicos por incompatibilidad de productos',
+        tiempo_estimado: '30 min',
+        requisito: 'Examen NOM-002-STPS aprobado'
+    },
+        {
+        id: 'case-quimico-master-001',
+        titulo: 'Exposición a Solvente Tóxico sin Protección',
+        categoria: 'Quimicos',
+        nivel: 'master',
+        icono: '🧪',
+        descripcion: 'Trabajadores expuestos a solvente tóxico en espacio semi-confinado sin protección adecuada',
+        tiempo_estimado: '30 min',
+        requisito: 'Examen NOM-010-STPS aprobado'
+    },
+    {
+        id: 'case-maquinaria-master-001',
+        titulo: 'Atrapamiento en Prensa Hidráulica',
+        categoria: 'Maquinaria',
+        nivel: 'master',
+        icono: '⚙️',
+        descripcion: 'Operador sufre atrapamiento en prensa hidráulica por falla de guardas de seguridad',
+        tiempo_estimado: '30 min',
+        requisito: 'Examen NOM-004-STPS aprobado'
+    },
+    {
+        id: 'case-alturas-master-001',
+        titulo: 'Caída desde Andamio Inestable',
+        categoria: 'electricos',
+        nivel: 'master',
+        icono: '🏗️',
+        descripcion: 'Trabajador cae desde andamio mal instalado en trabajo de fachada',
+        tiempo_estimado: '30 min',
+        requisito: 'Examen NOM-009-STPS aprobado'
     }
     // Agrega más casos aquí conforme los crees
 ];
@@ -421,4 +471,5 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
