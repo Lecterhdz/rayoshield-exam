@@ -1,0 +1,266 @@
+{
+  "id": "case-corte-pericial-001",
+  "tipo": "investigacion_pericial",
+  "nivel": "pericial",
+  "titulo": "Dictamen Pericial para Audiencia Laboral - Despido Justificado",
+  "categoria": "legal_pericial",
+  "descripcion": "Caso PERICIAL para determinar si despido de trabajador por violación de seguridad fue justificado legalmente",
+  "tiempo_estimado": "60 min",
+  "requisito": "10 casos ELITE aprobados con 85%+",
+  
+  "fecha_evento": "2026-02-25",
+  "industria": "Manufactura / Automotriz",
+  
+  "descripcion_evento": {
+    "actividad": "Operación de prensa hidráulica de estampado",
+    "equipo": "Prensa hidráulica 300 toneladas con guardas de seguridad",
+    "evento": "Trabajador operó prensa con guarda removido intencionalmente",
+    "resultado": "Lesión menor (atrapamiento de dedo), despido del trabajador",
+    "clasificacion": "Incidente con demanda laboral por despido injustificado",
+    "area": "Línea de Estampado, Nave de Producción 2"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, reunión de seguridad (registro firmado)",
+    "07:00 - Trabajador reporta falla en guarda de seguridad",
+    "07:15 - Mantenimiento notificado, orden de trabajo abierta",
+    "07:30 - Supervisor instruye 'no operar hasta reparación'",
+    "08:00 - Supervisor sale de área por 15 minutos",
+    "08:10 - Trabajador remueve guarda intencionalmente",
+    "08:15 - Trabajador opera prensa con guarda removido",
+    "08:16 - Ocurre atrapamiento de dedo índice",
+    "08:20 - Compañeros activan parada de emergencia",
+    "08:25 - Brigada proporciona primeros auxilios",
+    "08:30 - Traslado a clínica de empresa",
+    "08:45 - Diagnóstico: fractura menor, sin amputación",
+    "09:00 - Investigación preliminar inicia",
+    "10:00 - Video de seguridad confirma remoción intencional",
+    "11:00 - Notificación de despido al trabajador",
+    "12:00 - Trabajador firma notificación con negativa",
+    "14:00 - Demanda laboral por despido injustificado presentada"
+  ],
+  
+  "energias_identificadas": {
+    "mecanica": "Prensa en movimiento - GUARDA REMOVIDO",
+    "electrica": "220V control - OPERATIVO",
+    "fisica": "Fuerza 300 toneladas - SIN PROTECCIÓN"
+  },
+  
+  "evidencia_forense": {
+    "documental": [
+      "Registro de reunión de seguridad (firma del trabajador)",
+      "Orden de trabajo de mantenimiento abierta",
+      "Instrucción escrita de no operar",
+      "Video de seguridad (timestamp verificable)",
+      "Reporte médico de lesión",
+      "Notificación de despido firmada"
+    ],
+    "testimonial": [
+      "Trabajador lesionado (demandante)",
+      "Supervisor directo",
+      "2 compañeros de área (testigos)",
+      "Técnico de mantenimiento",
+      "Médico de empresa"
+    ],
+    "fisica": [
+      "Video de cámaras de seguridad",
+      "Fotografías de guarda removido",
+      "Herramientas usadas para remoción",
+      "Prensa involucrada"
+    ]
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 10,
+      "pregunta": "Identifique los elementos que SUSTENTAN el despido justificado:",
+      "opciones": [
+        {"texto": "Video muestra remoción INTENCIONAL del guarda", "correcta": true},
+        {"texto": "Trabajador firmó capacitación en operación segura", "correcta": true},
+        {"texto": "Instrucción escrita de no operar estaba disponible", "correcta": true},
+        {"texto": "El trabajador tenía 5 años en la empresa", "correcta": false},
+        {"texto": "Reglamento interno prohíbe operación sin guardas", "correcta": true},
+        {"texto": "La lesión fue menor", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "deteccion_inconsistencias",
+      "peso": 15,
+      "pregunta": "Identifique inconsistencias en testimonios:",
+      "declaraciones": {
+        "trabajador": "El guarda ya estaba roto cuando llegué",
+        "video": "Muestra al trabajador removiendo guarda con herramienta",
+        "companero_1": "Lo vi quitar el guarda yo mismo",
+        "companero_2": "No estaba en el área cuando ocurrió"
+      },
+      "opciones": [
+        {"texto": "Trabajador dice guarda roto, video prueba remoción activa", "correcta": true},
+        {"texto": "Compañero 1 confirma testimonio contrario al trabajador", "correcta": true},
+        {"texto": "Compañero 2 no estaba presente (testimonio no relevante)", "correcta": true},
+        {"texto": "El accidente fue a las 8 AM", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q3",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione la normativa APLICABLE al caso laboral:",
+      "opciones": [
+        {"texto": "Ley Federal del Trabajo, Art. 47 (Causas de rescisión)", "correcta": true},
+        {"texto": "NOM-004-STPS-2008, Art. 6.3 (Guardas de seguridad)", "correcta": true},
+        {"texto": "Reglamento Interior de Trabajo (capítulo de sanciones)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011 (Trabajo eléctrico)", "correcta": false},
+        {"texto": "Código Penal Federal (lesiones)", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "redaccion_tecnica",
+      "peso": 20,
+      "pregunta": "Elabore dictamen pericial para audiencia laboral. Fundamente si el despido fue justificado según LFT Art. 47.",
+      "feedback_guiado": "Considere: evidencia video, capacitación firmada, reglamento interno, nexo causal",
+      "longitud_minima": 250
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_responsabilidad",
+      "peso": 15,
+      "pregunta": "Determine responsabilidad de cada parte:",
+      "roles": [
+        {
+          "rol": "Trabajador Lesionado",
+          "opciones": [
+            {"nivel": "Total - Violación intencional de procedimiento"},
+            {"nivel": "Parcial - Presión por producción"},
+            {"nivel": "Nula - Víctima del sistema"}
+          ]
+        },
+        {
+          "rol": "Supervisor",
+          "opciones": [
+            {"nivel": "Parcial - Salió del área sin asegurar cumplimiento"},
+            {"nivel": "Total - No supervisó adecuadamente"},
+            {"nivel": "Nula - Dio instrucción escrita correcta"}
+          ]
+        },
+        {
+          "rol": "Empresa",
+          "opciones": [
+            {"nivel": "Nula - Proveyó capacitación y procedimiento"},
+            {"nivel": "Parcial - Cultura de producción sobre seguridad"},
+            {"nivel": "Total - No aseguró cumplimiento"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Q6",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 10,
+      "pregunta": "Ordene elementos de prueba por PESO LEGAL (mayor a menor):",
+      "opciones": [
+        "Video de seguridad con timestamp verificable",
+        "Documento firmado por trabajador (capacitación)",
+        "Testimonio de testigos presenciales",
+        "Reglamento Interior de Trabajo firmado",
+        "Instrucción escrita de no operar",
+        "Reporte médico de lesión",
+        "Testimonio del trabajador demandante"
+      ]
+    },
+    {
+      "id": "Q7",
+      "tipo": "identificacion_sesgos",
+      "peso": 10,
+      "pregunta": "Identifique sesgos en la investigación:",
+      "opciones": [
+        {"texto": "Sesgo de confirmación: Buscar evidencia que apoye despido", "correcta": true},
+        {"texto": "Sesgo de autoridad: Creer testimonio de supervisor sobre trabajador", "correcta": true},
+        {"texto": "Sesgo del resultado: Juzgar por lesión menor no por riesgo", "correcta": true},
+        {"texto": "El trabajador usaba uniforme azul", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q8",
+      "tipo": "plan_accion",
+      "peso": 10,
+      "pregunta": "Seleccione acciones para DEFENDER legalmente el despido:",
+      "opciones": [
+        {
+          "texto": "Preservar video de seguridad original (cadena de custodia)",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Recopilar todas las capacitaciones firmadas por trabajador",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Obtener testimonios escritos de testigos presenciales",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Contratar abogado laboral especializado",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Ofrecer reinstalación al trabajador",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    },
+    {
+      "id": "Q9",
+      "tipo": "calculo_tecnico",
+      "peso": 10,
+      "pregunta": "Calcule costo potencial de perder demanda laboral:",
+      "variables": {
+        "salario_diario": "$850 MXN",
+        "antiguedad": "5 años",
+        "indemnizacion_lft": "3 meses + 20 días por año + salarios caídos",
+        "salarios_caidos": "$850 x 180 días (6 meses promedio juicio)",
+        "honorarios_abogado": "$50,000 MXN",
+        "costo_despido": "$127,500 MXN (3 meses)"
+      },
+      "respuesta_correcta": "$2,177,500 MXN",
+      "formula": "(3 meses + 20días/año x 5 años + salarios caídos) x salario + honorarios",
+      "ayuda": "3 meses ($76,500) + 100 días ($85,000) + 180 días ($153,000) + honorarios ($50,000) = $364,500 MXN base, más posibles actualizaciones"
+    },
+    {
+      "id": "Q10",
+      "tipo": "redaccion_tecnica",
+      "peso": 15,
+      "pregunta": "Elabore conclusiones finales para presentación ante Junta de Conciliación y Arbitraje. Incluya recomendaciones para prevenir casos similares.",
+      "feedback_guiado": "Considere: fuerza probatoria, elementos LFT Art. 47, prevención de responsabilidad empresarial",
+      "longitud_minima": 250
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_pericial": 95,
+    "tiempo_estimado_minutos": 60,
+    "complejidad": "muy_alta",
+    "requiere_justificacion": true,
+    "nivel_legal": "laboral"
+  },
+  
+  "consecuencias_potenciales": {
+    "legales": "Demanda laboral, posible reinstalación o indemnización incrementada",
+    "administrativas": "Precedente para futuros casos de despido en empresa",
+    "operativas": "Impacto en cultura de disciplina de seguridad",
+    "reputacionales": "Posible daño a imagen como empleador",
+    "economicas": "$300,000 - $2,000,000 MXN según resolución"
+  },
+  
+  "conclusion_oficial": "El despido parece justificado según evidencia (video, capacitación firmada, reglamento). Sin embargo, empresa debe demostrar que: 1) Trabajador conocía procedimiento, 2) Violación fue intencional, 3) Sanción es proporcional. Recomendación: Fortalecer cadena de custodia de evidencia y documentación de capacitaciones.",
+  
+  "leccion_aprendida": "Despido por violación de seguridad requiere EVIDENCIA DOCUMENTAL SÓLIDA. Video con timestamp, capacitaciones firmadas, reglamento conocido y sanción proporcional son esenciales para defender legalmente. La prevención mediante capacitación y supervisión es más barata que litigio."
+}

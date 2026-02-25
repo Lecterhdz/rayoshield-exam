@@ -1,0 +1,275 @@
+{
+  "id": "case-legal-pericial-001",
+  "tipo": "investigacion_pericial",
+  "nivel": "pericial",
+  "titulo": "Accidente Fatal con Responsabilidad Penal - Análisis Forense",
+  "categoria": "legal_pericial",
+  "descripcion": "Caso PERICIAL con implicaciones legales penales, requiere análisis de evidencia forense y determinación de responsabilidades legales",
+  "tiempo_estimado": "60 min",
+  "requisito": "10 casos ELITE aprobados con 85%+",
+  
+  "fecha_evento": "2026-02-20",
+  "industria": "Construcción / Infraestructura",
+  
+  "descripcion_evento": {
+    "actividad": "Demolición controlada de estructura de concreto",
+    "equipo": "Excavadora hidráulica con martillo demoledor, andamios temporales",
+    "evento": "Colapso prematuro de estructura durante demolición",
+    "resultado": "3 trabajadores fallecidos, 2 lesionados graves, daño material $5M MXN",
+    "clasificacion": "Accidente fatal múltiple con responsabilidad penal",
+    "area": "Obra de Demolición, Zona Urbana Centro"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, reunión de seguridad (sin registro firmado)",
+    "06:30 - Supervisor recibe instrucciones verbales de gerente",
+    "07:00 - Inicio de demolición sin permiso municipal actualizado",
+    "07:30 - Trabajadores reportan grietas en estructura adyacente",
+    "07:45 - Supervisor instruye 'continuar, no hay problema'",
+    "08:00 - Ingeniero residente llega a obra, observa condiciones",
+    "08:15 - Ingeniero solicita paro, gerente lo contradice por teléfono",
+    "08:30 - Continuación de trabajos sin evaluación estructural",
+    "08:45 - Colapso parcial de estructura",
+    "08:46 - Colapso total, trabajadores atrapados",
+    "08:50 - Activación de alarma de emergencia",
+    "09:00 - Llegada de brigada externa",
+    "09:30 - Rescate de primeros cuerpos (2 fallecidos)",
+    "10:15 - Rescate de tercer cuerpo (1 fallecido)",
+    "10:30 - Traslado de lesionados a hospital",
+    "11:00 - Notificación a STPS y Fiscalía",
+    "12:00 - Preservación de área para investigación"
+  ],
+  
+  "energias_identificadas": {
+    "gravitacional": "Estructura inestable - SIN EVALUACIÓN",
+    "mecanica": "Equipo de demolición - SIN PROCEDIMIENTO",
+    "fisica": "Vibraciones - SIN MONITOREO",
+    "quimica": "Polvo de concreto - SIN PROTECCIÓN"
+  },
+  
+  "evidencia_forense": {
+    "documental": [
+      "Permiso de demolición vencido (30 días)",
+      "Bitácora de seguridad sin firmas de trabajadores",
+      "Instrucciones de gerente por WhatsApp (capturas disponibles)",
+      "Reporte de grietas sin acción correctiva"
+    ],
+    "testimonial": [
+      "3 sobrevivientes (lesionados)",
+      "Supervisor directo",
+      "Ingeniero residente",
+      "Gerente de proyecto",
+      "Trabajadores de obra adyacente"
+    ],
+    "fisica": [
+      "Fotografías de grietas previas al colapso",
+      "Videos de cámaras de seguridad",
+      "Restos de estructura colapsada",
+      "Equipo de demolición involucrado"
+    ]
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 10,
+      "pregunta": "Identifique las violaciones NORMATIVAS críticas detectadas:",
+      "opciones": [
+        {"texto": "Permiso de demolición vencido (violación administrativa)", "correcta": true},
+        {"texto": "Bitácora de seguridad sin firmas (violación NOM-031)", "correcta": true},
+        {"texto": "Continuación de trabajo tras reporte de condición insegura", "correcta": true},
+        {"texto": "El equipo era de color amarillo", "correcta": false},
+        {"texto": "Sin evaluación estructural previa a demolición", "correcta": true},
+        {"texto": "Instrucciones contradictorias por escrito", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "deteccion_inconsistencias",
+      "peso": 15,
+      "pregunta": "Identifique las inconsistencias CRÍTICAS entre testimonios y evidencia:",
+      "declaraciones": {
+        "gerente": "Nunca instruí continuar con condiciones inseguras",
+        "supervisor": "El gerente me dijo por teléfono que continuara",
+        "ingeniero": "Solicité paro por escrito, no fue atendido",
+        "evidencia": "Capturas de WhatsApp muestran instrucción de continuar"
+      },
+      "opciones": [
+        {"texto": "Gerente niega instrucción pero WhatsApp prueba lo contrario", "correcta": true},
+        {"texto": "Ingeniero reporta paro por escrito sin respuesta documentada", "correcta": true},
+        {"texto": "Supervisor confirma instrucción verbal contradictoria", "correcta": true},
+        {"texto": "El accidente ocurrió en lunes", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q3",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione las NOM aplicables y artículos específicos violados:",
+      "opciones": [
+        {"texto": "NOM-031-STPS-2011, Art. 5.2 (Comisión de Seguridad e Higiene)", "correcta": true},
+        {"texto": "NOM-006-STPS-2014, Art. 6.1 (Operación de maquinaria)", "correcta": true},
+        {"texto": "NOM-009-STPS-2011, Art. 8.3 (Trabajo en alturas)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011, Art. 4.1 (Trabajo eléctrico)", "correcta": false},
+        {"texto": "NOM-001-STPS-2008, Art. 3.2 (Condiciones de seguridad)", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "redaccion_tecnica",
+      "peso": 20,
+      "pregunta": "Redacte el dictamen pericial de causa raíz considerando aspectos legales. Fundamente con evidencia documental.",
+      "feedback_guiado": "Considere: cadena de mando, instrucciones contradictorias, omisión de paro, responsabilidad penal potencial",
+      "longitud_minima": 200
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_responsabilidad",
+      "peso": 15,
+      "pregunta": "Determine el nivel de responsabilidad LEGAL de cada rol:",
+      "roles": [
+        {
+          "rol": "Gerente de Proyecto",
+          "opciones": [
+            {"nivel": "Penal - Instrucción directa de continuar con riesgo"},
+            {"nivel": "Administrativa - Omisión de supervisión"},
+            {"nivel": "Nula - No estaba en sitio"}
+          ]
+        },
+        {
+          "rol": "Supervisor Directo",
+          "opciones": [
+            {"nivel": "Penal - Ejecución de instrucción insegura"},
+            {"nivel": "Administrativa - Siguió órdenes superiores"},
+            {"nivel": "Nula - Solo cumplió instrucciones"}
+          ]
+        },
+        {
+          "rol": "Ingeniero Residente",
+          "opciones": [
+            {"nivel": "Administrativa - Solicitó paro sin asegurar cumplimiento"},
+            {"nivel": "Penal - No detuvo trabajos físicamente"},
+            {"nivel": "Nula - Cumplió su deber al reportar"}
+          ]
+        },
+        {
+          "rol": "Trabajadores",
+          "opciones": [
+            {"nivel": "Nula - Víctimas del accidente"},
+            {"nivel": "Administrativa - No se negaron a trabajar"},
+            {"nivel": "Penal - Aceptaron condición insegura"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Q6",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 10,
+      "pregunta": "Ordene los pasos de investigación PERICIAL según protocolo fiscal:",
+      "opciones": [
+        "Preservar área y evidencia física",
+        "Notificar a autoridades (STPS, Fiscalía)",
+        "Recopilar evidencia documental",
+        "Entrevistar testigos por separado",
+        "Analizar inconsistencias en testimonios",
+        "Elaborar dictamen pericial técnico",
+        "Presentar dictamen a autoridad competente",
+        "Comparecer en audiencia si es requerido"
+      ]
+    },
+    {
+      "id": "Q7",
+      "tipo": "identificacion_sesgos",
+      "peso": 10,
+      "pregunta": "Identifique los sesgos que afectaron la toma de decisiones:",
+      "opciones": [
+        {"texto": "Sesgo de producción: Priorizar cronograma sobre seguridad", "correcta": true},
+        {"texto": "Sesgo de autoridad: Supervisor siguió instrucción sin cuestionar", "correcta": true},
+        {"texto": "Sesgo de normalización: 'Siempre hemos demolido así'", "correcta": true},
+        {"texto": "Sesgo de optimismo: 'No va a pasar nada'", "correcta": true},
+        {"texto": "El clima estaba nublado", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q8",
+      "tipo": "plan_accion",
+      "peso": 10,
+      "pregunta": "Seleccione las acciones correctivas LEGALMENTE DEFENDIBLES:",
+      "opciones": [
+        {
+          "texto": "Implementar procedimiento escrito de paro de trabajos con autoridad delegada",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar a todos los niveles en responsabilidad legal STPS",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Establecer cadena de mando escrita para instrucciones críticas",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Contratar más supervisores",
+          "jerarquia": "administrativo",
+          "prioridad": "4"
+        },
+        {
+          "texto": "Sancionar únicamente a trabajadores",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    },
+    {
+      "id": "Q9",
+      "tipo": "calculo_tecnico",
+      "peso": 10,
+      "pregunta": "Calcule el costo total del accidente considerando multas potenciales:",
+      "variables": {
+        "multa_stps": "$2,500,000 MXN (máxima por accidente fatal)",
+        "indemnizacion_familias": "$1,500,000 MXN x 3 fallecidos",
+        "gastos_medicos": "$800,000 MXN (2 lesionados graves)",
+        "paro_obra": "$500,000 MXN/día x 30 días",
+        "daño_reputacional": "$5,000,000 MXN (estimado)",
+        "costo_prevencion": "$350,000 MXN (hubiera prevenido el accidente)"
+      },
+      "respuesta_correcta": "$17,800,000 MXN",
+      "formula": "Multa + Indemnización + Médicos + Paro + Reputacional",
+      "ayuda": "Suma: 2.5M + 4.5M + 0.8M + 15M + 5M = $27,800,000 MXN"
+    },
+    {
+      "id": "Q10",
+      "tipo": "redaccion_tecnica",
+      "peso": 15,
+      "pregunta": "Elabore conclusiones periciales para presentación ante autoridad fiscal. Incluya recomendaciones de prevención de responsabilidad penal.",
+      "feedback_guiado": "Considere: elementos del tipo penal, nexo causal, omisiones, recomendaciones legales",
+      "longitud_minima": 250
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_pericial": 95,
+    "tiempo_estimado_minutos": 60,
+    "complejidad": "muy_alta",
+    "requiere_justificacion": true,
+    "nivel_legal": "penal"
+  },
+  
+  "consecuencias_potenciales": {
+    "legales": "Responsabilidad penal para gerente y supervisor, prisión 3-8 años por homicidio culposo",
+    "administrativas": "Clausura definitiva de obra, multas STPS hasta $5M MXN",
+    "operativas": "Pérdida de licitaciones futuras, cancelación de contratos",
+    "reputacionales": "Daño irreversible a imagen corporativa",
+    "humanas": "3 familias afectadas permanentemente"
+  },
+  
+  "conclusion_oficial": "El accidente fue 100% prevenible. Existe responsabilidad penal potencial para gerente (instrucción directa) y supervisor (ejecución). Las omisiones incluyen: permiso vencido, sin evaluación estructural, ignorar reporte de condición insegura, instrucciones contradictorias. Se recomienda investigación fiscal por homicidio culposo.",
+  
+  "leccion_aprendida": "Responsabilidad legal en seguridad industrial es PERSONAL y PENAL. Instrucciones verbales no eximen responsabilidad. El paro de trabajos inseguros es OBLIGATORIO y debe estar documentado. La prevención es siempre más barata que el accidente."
+}
