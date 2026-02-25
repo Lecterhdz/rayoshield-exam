@@ -676,7 +676,40 @@ const app = {
             var a = document.createElement('a'); a.download = 'certificado_' + Date.now() + '.png'; a.href = url; a.click();
         }).catch(function() { alert('Error generando certificado'); });
     },
-
+    // ─────────────────────────────────────────────────────────────────────
+    // DESCARGAR CERTIFICADO DE CASO (CON/SIN MARCA DE AGUA)
+    // ─────────────────────────────────────────────────────────────────────
+    descargarCertificadoCaso: function(conMarcaDeAgua) {
+        if (!this.casoActual || !this.resultadoCaso) {
+            alert('❌ No hay certificado disponible');
+            return;
+        }
+        if (!this.resultadoCaso.aprobado) {
+            alert('⚠️ Debes aprobar el caso para obtener el certificado');
+            return;
+        }
+    
+        var self = this;
+    
+        // ✅ DETERMINAR NIVEL DEL CERTIFICADO
+        var nivelCertificado = '';
+        if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
+        else if (this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
+        else if (this.casoActual.nivel === 'elite') nivelCertificado = 'ELITE';
+        else if (this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
+        else nivelCertificado = 'COMPLETADO';
+    
+        // ✅ GENERAR CERTIFICADO CON EL NIVEL CORRECTO
+        generarCertificadoCaso(this.userData, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
+            var a = document.createElement('a');
+            var nombreArchivo = 'RayoShield_CERTIFICADO_' + nivelCertificado + '_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = nombreArchivo;
+            a.href = url;
+            a.click();
+        }).catch(function() {
+            alert('❌ Error generando certificado');
+        });
+    },
     // ─────────────────────────────────────────────────────────────────────
     // DESCARGAR INSIGNIA
     // ─────────────────────────────────────────────────────────────────────
@@ -1337,6 +1370,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
