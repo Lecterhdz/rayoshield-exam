@@ -1019,10 +1019,16 @@ const app = {
         resultadoEl.scrollIntoView({ behavior: 'smooth' });
         
         this.detenerTimerCaso();
-        
+        // Si tiene feature predictivo, usar Dashboard Engine
         if (this.licencia.features && this.licencia.features.predictivo && typeof DashboardEngine !== 'undefined') {
             resultadoEl.innerHTML = DashboardEngine.generar(resultado);
-        } else {
+        } 
+        // Si tiene dashboard básico (CONSULTOR)
+        else if (this.licencia.features && this.licencia.features.casosElite && typeof DashboardBasico !== 'undefined') {
+            resultadoEl.innerHTML = DashboardBasico.generar(resultado);
+        }
+        // Vista básica (PROFESIONAL)
+        else {
             var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
             var icono = resultado.aprobado ? '✅' : '📚';
             var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
@@ -1180,3 +1186,4 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
