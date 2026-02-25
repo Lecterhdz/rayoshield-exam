@@ -92,7 +92,7 @@ const CASOS_INVESTIGACION = [
       requisito: 'Examen NOM-018-STPS aprobado'
     },
     
-    // CASOS MASTER (ya existentes)
+    // CASOS MASTER
     {
         id: 'case-loto-energia-residual-001',
         titulo: 'Liberación de Energía Residual - Sistema Hidráulico',
@@ -162,7 +162,37 @@ const CASOS_INVESTIGACION = [
         descripcion: 'Trabajador cae desde andamio mal instalado en trabajo de fachada',
         tiempo_estimado: '30 min',
         requisito: 'Examen NOM-009-STPS aprobado'
+    },
+    
+    // Casos ELITE
+    {
+      id: 'case-loto-elite-001',
+      icono: '🔒',
+      titulo: 'LOTO con Información Contradictoria',
+      nivel: 'elite',
+      tiempo_estimado: '40 min',
+      descripcion: 'Caso con testimonios contradictorios que requieren juicio profesional',
+      requisito: '5 casos MASTER aprobados con 80%+'
+    },
+    {
+      id: 'case-multiple-elite-001',
+      icono: '⚠️',
+      titulo: 'Incidente Múltiple con Víctimas Secundarias',
+      nivel: 'elite',
+      tiempo_estimado: '40 min',
+      descripcion: 'Rescate fallido que generó víctimas secundarias',
+      requisito: '5 casos MASTER aprobados con 80%+'
+    },
+    {
+      id: 'case-cadena-elite-001',
+      icono: '⚙️',
+      titulo: 'Cadena de Fallos con Análisis de ROI',
+      nivel: 'elite',
+      tiempo_estimado: '40 min',
+      descripcion: 'Análisis de costo-beneficio de controles preventivos',
+      requisito: '5 casos MASTER aprobados con 80%+'
     }
+    
     // Agrega más casos aquí conforme los crees
 ];
 
@@ -471,5 +501,6 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
 
