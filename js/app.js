@@ -359,10 +359,17 @@ const app = {
                     clienteId: res.clienteId, 
                     expiracion: res.expiracion, 
                     examenesRestantes: 9999,
-                    features: res.features
+                    features: res.features || {}  // ✅ Por si viene undefined
                 };
                 self.guardarLicencia();
-                
+                // ✅ Verificar que features no esté vacío
+                if (!self.licencia.features || Object.keys(self.licencia.features).length === 0) {
+                    console.log('Features vacías, inicializando...');
+                    // Forzar reinicio para que init() las inicialice
+                    localStorage.removeItem('rayoshield_licencia');
+                    location.reload();
+                    return;
+                }
                 if (res.features.whiteLabel) {
                     self.aplicarConfiguracionWhiteLabel();
                 }
@@ -1330,6 +1337,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
