@@ -286,12 +286,37 @@ function evaluarAnalisisMultiple(respuestasUsuario, pregunta) {
     return { puntaje: Math.round(puntaje), feedback: feedback };
 }
 
-// Evaluar pregunta de tipo "respuesta_abierta_guiada" (keyword matching)
-function evaluarRespuestaAbierta(respuestaUsuario, pregunta) {
-    if (!respuestaUsuario || respuestaUsuario.trim().length < 20) {
-        return { 
-            puntaje: 0, 
-            feedback: ['⚠️ Tu respuesta es muy breve. Explica con más detalle el análisis sistémico.'] 
+    // Evaluar pregunta de tipo "respuesta_abierta_guiada" (keyword matching)
+    function evaluarRespuestaAbierta(pregunta, respuestaUsuario) {
+        var puntaje = 0;
+        var feedback = '';
+    
+        // ✅ La respuesta viene como array: ['texto del usuario']
+        var texto = respuestaUsuario && respuestaUsuario[0] ? respuestaUsuario[0] : '';
+    
+        var longitudMinima = pregunta.longitud_minima || 50;
+    
+        if (!texto || texto.trim().length === 0) {
+            puntaje = 0;
+            feedback = '❌ No proporcionaste respuesta';
+        }
+        else if (texto.length < longitudMinima) {
+            puntaje = pregunta.peso * 0.3;
+            feedback = '⚠️ Tu respuesta es muy breve. Explica con más detalle el análisis sistémico (mínimo ' + longitudMinima + ' caracteres)';
+        }
+        else if (texto.length >= longitudMinima && texto.length < longitudMinima * 2) {
+            puntaje = pregunta.peso * 0.7;
+            feedback = '✅ Respuesta aceptable, pero podrías profundizar más en el análisis';
+        }
+        else {
+            puntaje = pregunta.peso;
+            feedback = '✅ Excelente: Tu respuesta demuestra análisis sistémico profundo';
+        }
+    
+        return {
+            puntaje: puntaje,
+            feedback: feedback,
+            longitud: texto.length
         };
     }
     
@@ -521,6 +546,7 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
         evaluacion: 'Cada inconsistencia detectada suma puntos'
     }
 };
+
 
 
 
