@@ -44,6 +44,19 @@ const app = {
     init: function() {
         console.log('RayoShield iniciado');
         this.cargarLicencia();
+
+        // ✅ Inicializar features para DEMO si no existen
+        if (this.licencia.tipo === 'DEMO' && !this.licencia.features) {
+            this.licencia.features = {
+                casosBasicos: true,
+                casosMaster: false,
+                casosElite: false,
+                casosPericial: false,
+                whiteLabel: false,
+                predictivo: false
+            };
+        }
+
         this.cargarDatosUsuario();
         this.cargarHistorial();
         this.cargarExamenGuardado();
@@ -1279,6 +1292,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
