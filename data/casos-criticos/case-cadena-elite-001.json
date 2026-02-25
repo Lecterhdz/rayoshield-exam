@@ -1,0 +1,184 @@
+{
+  "id": "case-cadena-elite-001",
+  "tipo": "investigacion_elite",
+  "nivel": "elite",
+  "titulo": "Cadena de Fallos con Análisis de ROI",
+  "categoria": "analisis_sistemico",
+  "descripcion": "Caso ELITE con análisis de costo-beneficio de controles preventivos",
+  "tiempo_estimado": "40 min",
+  "requisito": "5 casos MASTER aprobados con 80%+",
+  
+  "fecha_evento": "2026-02-15",
+  "industria": "Manufactura / Automatización",
+  
+  "descripcion_evento": {
+    "actividad": "Operación de celda robotizada de soldadura",
+    "equipo": "Robot industrial 6 ejes, celda con barreras de luz",
+    "evento": "Falla múltiple de controles con lesión grave",
+    "resultado": "1 trabajador con amputación de brazo, daño al equipo $500,000 MXN",
+    "clasificacion": "Accidente grave con falla de múltiples barreras",
+    "area": "Línea de Soldadura Robotizada, Nave 4"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, operación normal",
+    "08:00 - Primera falla: barrera de luz intermitente",
+    "08:15 - Operador reporta falla, supervisor dice 'sigue trabajando'",
+    "08:30 - Segunda falla: enclavamiento de puerta defectuoso",
+    "08:45 - Tercera falla: botón de emergencia no responde",
+    "09:00 - Operador ingresa a celda para limpiar",
+    "09:05 - Robot se activa inesperadamente",
+    "09:06 - Operador sufre amputación de brazo",
+    "09:10 - Alarma activada, brigada llega",
+    "09:20 - Paramédicos estabilizan",
+    "09:30 - Traslado a hospital especializado",
+    "10:00 - Investigación preliminar inicia"
+  ],
+  
+  "energias_identificadas": {
+    "electrica": "220V control - BLOQUEO FALLÓ",
+    "mecanica": "Robot 6 ejes - MOVIMIENTO INESPERADO",
+    "neumatica": "80 PSI - SIN BLOQUEO",
+    "cinetica": "Brazo robot en movimiento - SIN BARRERA"
+  },
+  
+  "historial_fallas_previas": [
+    "30 días antes: Barrera de luz falló 2 veces, no se corrigió",
+    "15 días antes: Enclavamiento reportado, orden de trabajo abierta",
+    "7 días antes: Botón de emergencia falló en prueba, no se actuó",
+    "1 día antes: Supervisor instruyó 'ignorar alarmas menores'"
+  ],
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 15,
+      "pregunta": "Seleccione las fallas de GESTIÓN que permitieron el accidente:",
+      "opciones": [
+        {"texto": "Fallas previas reportadas no fueron corregidas", "correcta": true},
+        {"texto": "Supervisor instruyó ignorar alarmas de seguridad", "correcta": true},
+        {"texto": "Sin procedimiento de paro por falla de seguridad", "correcta": true},
+        {"texto": "El robot era de marca reconocida", "correcta": false},
+        {"texto": "Mantenimiento preventivo no se realizó", "correcta": true},
+        {"texto": "Sin análisis de riesgo de la celda robotizada", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "calculo_tecnico",
+      "peso": 15,
+      "pregunta": "Calcule el ROI de implementar los controles preventivos:",
+      "variables": {
+        "costo_accidente": "$2,500,000 MXN (médico, indemnización, daño equipo, paro)",
+        "costo_controles": "$350,000 MXN (mantenimiento, sensores, capacitación)",
+        "probabilidad_anual": "0.5 (50% de que ocurra en un año sin controles)",
+        "periodo": "5 años"
+      },
+      "respuesta_correcta": "614%",
+      "formula": "ROI = ((Costo_Accidente × Probabilidad × Periodo) - Costo_Controles) / Costo_Controles × 100",
+      "ayuda": "ROI = (($2,500,000 × 0.5 × 5) - $350,000) / $350,000 × 100"
+    },
+    {
+      "id": "Q3",
+      "tipo": "redaccion_tecnica",
+      "peso": 20,
+      "pregunta": "Analice la cadena de fallos y explique por qué múltiples barreras fallaron simultáneamente.",
+      "feedback_guiado": "Considere: mantenimiento, cultura, presión por producción, gestión del cambio, liderazgo",
+      "longitud_minima": 120
+    },
+    {
+      "id": "Q4",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 15,
+      "pregunta": "Ordene las barreras de protección según jerarquía de controles (más a menos efectiva):",
+      "opciones": [
+        "Eliminar necesidad de ingreso a celda (automatización completa)",
+        "Enclavamiento físico que impida entrada con robot activo",
+        "Barrera de luz con paro automático",
+        "Procedimiento de bloqueo antes de ingreso",
+        "Capacitación en operación segura",
+        "Señalización de peligro",
+        "EPP (guantes, gafas)"
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione las NOM aplicables:",
+      "opciones": [
+        {"texto": "NOM-004-STPS-2008 (Sistemas de protección y dispositivos de seguridad)", "correcta": true},
+        {"texto": "NOM-006-STPS-2014 (Manejo y almacenamiento de materiales)", "correcta": false},
+        {"texto": "NOM-017-STPS-2008 (Equipo de protección personal)", "correcta": true},
+        {"texto": "NOM-031-STPS-2011 (Comisiones de seguridad)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011 (Trabajo con equipos energizados)", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q6",
+      "tipo": "identificacion_sesgos",
+      "peso": 10,
+      "pregunta": "Identifique los sesgos en la toma de decisiones:",
+      "opciones": [
+        {"texto": "Sesgo de normalización de desviación: 'Siempre ha funcionado así'", "correcta": true},
+        {"texto": "Sesgo de producción: Priorizar producción sobre seguridad", "correcta": true},
+        {"texto": "Sesgo de costo: 'Es muy caro reparar' vs costo del accidente", "correcta": true},
+        {"texto": "El accidente fue mala suerte", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q7",
+      "tipo": "evaluacion_correctivas",
+      "peso": 10,
+      "pregunta": "Evalúe la efectividad de las siguientes acciones:",
+      "opciones": [
+        {
+          "texto": "Reemplazar todas las barreras de luz y enclavamientos defectuosos",
+          "jerarquia": "ingenieria",
+          "clasificacion": "muy_efectiva"
+        },
+        {
+          "texto": "Implementar procedimiento de paro obligatorio por falla de seguridad",
+          "jerarquia": "administrativo",
+          "clasificacion": "muy_efectiva"
+        },
+        {
+          "texto": "Capacitar a supervisores en liderazgo de seguridad",
+          "jerarquia": "administrativo",
+          "clasificacion": "moderada"
+        },
+        {
+          "texto": "Colocar señalización de 'Peligro Robot'",
+          "jerarquia": "administrativo",
+          "clasificacion": "poco_efectiva"
+        },
+        {
+          "texto": "Entregar EPP adicional a operadores",
+          "jerarquia": "epp",
+          "clasificacion": "poco_efectiva"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_elite": 85,
+    "puntaje_aprobacion_pericial": 95,
+    "tiempo_estimado_minutos": 40,
+    "complejidad": "alta",
+    "requiere_justificacion": true
+  },
+  
+  "consecuencias_potenciales": {
+    "legales": "Responsabilidad penal para supervisor y gerente, multas STPS hasta $3M MXN",
+    "operativas": "Paro de línea 45 días, pérdida de producción $10M MXN",
+    "reputacionales": "Daño a imagen con clientes, auditorías adicionales",
+    "humanas": "1 trabajador con lesión permanente, impacto familiar"
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. La cadena de fallos incluye: fallas previas no corregidas, instrucción de ignorar alarmas, sin procedimiento de paro por falla de seguridad, y cultura que priorizaba producción. El ROI de controles preventivos (614%) demuestra que la inversión en seguridad es financieramente inteligente.",
+  
+  "leccion_aprendida": "Múltiples barreras requieren: 1) Mantenimiento preventivo de TODOS los controles, 2) Procedimiento de PARO OBLIGATORIO por falla de seguridad, 3) Liderazgo que prioriza seguridad sobre producción, 4) Análisis de ROI que demuestra que prevención es más barata que accidente."
+}

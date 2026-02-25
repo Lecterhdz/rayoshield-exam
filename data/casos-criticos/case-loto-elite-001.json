@@ -1,0 +1,189 @@
+{
+  "id": "case-loto-elite-001",
+  "tipo": "investigacion_elite",
+  "nivel": "elite",
+  "titulo": "LOTO con Información Contradictoria - Zona Gris",
+  "categoria": "loto",
+  "descripcion": "Caso ELITE con testimonios contradictorios que requieren juicio profesional avanzado",
+  "tiempo_estimado": "40 min",
+  "requisito": "5 casos MASTER aprobados con 80%+",
+  
+  "fecha_evento": "2026-02-10",
+  "industria": "Manufactura / Metalurgia",
+  
+  "descripcion_evento": {
+    "actividad": "Mantenimiento correctivo de prensa hidráulica 500 toneladas",
+    "equipo": "Prensa hidráulica industrial, sistema de energía múltiple",
+    "evento": "Liberación inesperada de energía durante mantenimiento",
+    "resultado": "2 trabajadores fallecidos, 1 lesionado grave",
+    "clasificacion": "Accidente fatal múltiple",
+    "area": "Nave de Prensado, Zona Industrial Norte"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, reunión de seguridad",
+    "07:00 - Reporte de falla en prensa #5",
+    "07:30 - Supervisor asigna mantenimiento correctivo",
+    "08:00 - Trabajadores llegan a prensa con equipo LOTO",
+    "08:15 - Primer testimonio: 'Aplicamos 3 candados'",
+    "08:30 - Segundo testimonio: 'Solo había 2 puntos de bloqueo'",
+    "08:45 - Tercer testimonio: 'El procedimiento no era claro'",
+    "09:00 - Energía se libera inesperadamente",
+    "09:05 - Accidente ocurre, alarma activada",
+    "09:15 - Brigada llega al sitio",
+    "09:30 - Paramédicos confirman 2 fallecidos",
+    "10:00 - STPS notificado, área preservada"
+  ],
+  
+  "energias_identificadas": {
+    "hidraulica": "5000 PSI - ESTADO DESCONOCIDO",
+    "electrica": "480V - BLOQUEADA (según testimonio 1)",
+    "mecanica": "Peso de 50 toneladas - SIN BLOQUEO FÍSICO",
+    "neumatica": "125 PSI - NO IDENTIFICADA EN PROCEDIMIENTO",
+    "termica": "Aceite hidráulico 80°C - SIN ENFRIAMIENTO"
+  },
+  
+  "testimonios_contradictorios": {
+    "trabajador_1": "Aplicamos todos los candados según procedimiento",
+    "trabajador_2": "El procedimiento solo mostraba 2 puntos, aplicamos 2",
+    "supervisor": "El procedimiento fue actualizado hace 6 meses",
+    "evidencia_fisica": "Se encontraron 3 candados, procedimiento muestra 2 puntos"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "deteccion_inconsistencias",
+      "peso": 15,
+      "pregunta": "Identifique las inconsistencias CRÍTICAS entre los testimonios y la evidencia física:",
+      "opciones": [
+        {"texto": "Testimonio 1 dice 3 candados, evidencia muestra 3 candados pero procedimiento muestra 2 puntos", "correcta": true},
+        {"texto": "Supervisor dice procedimiento actualizado, pero trabajadores no lo conocían", "correcta": true},
+        {"texto": "Energía neumática no estaba identificada en procedimiento original", "correcta": true},
+        {"texto": "El accidente ocurrió un lunes", "correcta": false},
+        {"texto": "Los trabajadores tenían 10 años de experiencia", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "analisis_multiple",
+      "peso": 15,
+      "pregunta": "Seleccione las fallas SISTÉMICAS que contribuyeron al accidente:",
+      "opciones": [
+        {"texto": "Procedimiento LOTO incompleto (no identificaba todas las energías)", "correcta": true},
+        {"texto": "Capacitación insuficiente en procedimiento actualizado", "correcta": true},
+        {"texto": "Sin verificación independiente de bloqueo", "correcta": true},
+        {"texto": "Los trabajadores llegaron tarde", "correcta": false},
+        {"texto": "Sin análisis de riesgo previo al mantenimiento", "correcta": true},
+        {"texto": "La prensa era de color verde", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q3",
+      "tipo": "redaccion_tecnica",
+      "peso": 20,
+      "pregunta": "Redacte la causa raíz del accidente considerando las contradicciones en los testimonios. Fundamente su análisis en términos sistémicos.",
+      "feedback_guiado": "Considere: procedimiento, capacitación, verificación, cultura de seguridad, gestión del cambio",
+      "longitud_minima": 120
+    },
+    {
+      "id": "Q4",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione las NOM violadas y los artículos específicos:",
+      "opciones": [
+        {"texto": "NOM-004-STPS-2008, Art. 6.3 (Sistemas de protección)", "correcta": true},
+        {"texto": "NOM-004-STPS-2008, Art. 8.1 (Procedimiento de bloqueo)", "correcta": true},
+        {"texto": "NOM-031-STPS-2011, Art. 5.2 (Comisión de seguridad)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011, Art. 4.1 (Trabajo eléctrico)", "correcta": false},
+        {"texto": "NOM-017-STPS-2008, Art. 5.1 (EPP)", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 15,
+      "pregunta": "Ordene las acciones de investigación POST-ACCIDENTE según prioridad:",
+      "opciones": [
+        "Preservar el área y evidencia física",
+        "Notificar a autoridades (STPS, fiscalía)",
+        "Entrevistar testigos por separado",
+        "Revisar procedimientos y registros de capacitación",
+        "Analizar inconsistencias en testimonios",
+        "Identificar causas raíz sistémicas",
+        "Desarrollar plan de acciones correctivas",
+        "Implementar y verificar efectividad de acciones"
+      ]
+    },
+    {
+      "id": "Q6",
+      "tipo": "identificacion_sesgos",
+      "peso": 10,
+      "pregunta": "Identifique los sesgos cognitivos presentes en la investigación:",
+      "opciones": [
+        {"texto": "Sesgo de confirmación: Buscar evidencia que apoye la teoría inicial de 'error del trabajador'", "correcta": true},
+        {"texto": "Sesgo de disponibilidad: Sobrestimar incidentes recientes similares", "correcta": true},
+        {"texto": "Sesgo del sobreviviente: Basar conclusiones solo en testimonios de sobrevivientes", "correcta": true},
+        {"texto": "El accidente fue causado por mala suerte", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q7",
+      "tipo": "plan_accion",
+      "peso": 10,
+      "pregunta": "Seleccione las acciones correctivas MÁS EFECTIVAS para prevenir recurrencia:",
+      "opciones": [
+        {
+          "texto": "Revisar y actualizar TODOS los procedimientos LOTO con identificación completa de energías",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Instalar sistemas de enclavamiento físico que impidan operación con guardas abiertos",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Implementar verificación independiente de bloqueo por supervisor antes de iniciar trabajo",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Capacitar a TODO el personal en procedimientos actualizados con evaluación práctica",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Sancionar a los trabajadores sobrevivientes",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        },
+        {
+          "texto": "Realizar auditorías mensuales de cumplimiento LOTO",
+          "jerarquia": "administrativo",
+          "prioridad": "3"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion_elite": 85,
+    "puntaje_aprobacion_pericial": 95,
+    "tiempo_estimado_minutos": 40,
+    "complejidad": "alta",
+    "requiere_justificacion": true
+  },
+  
+  "consecuencias_potenciales": {
+    "legales": "Responsabilidad penal para supervisores y gerentes, multas STPS hasta $2M MXN",
+    "operativas": "Paro de producción 30 días, pérdida de contratos",
+    "reputacionales": "Daño severo a imagen corporativa, pérdida de certificaciones",
+    "humanas": "2 familias afectadas, impacto psicológico en trabajadores"
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. Las causas raíz incluyen: procedimiento LOTO incompleto, capacitación insuficiente en procedimiento actualizado, sin verificación independiente de bloqueo, y cultura que priorizaba producción sobre seguridad. Las inconsistencias en testimonios reflejan fallas en el sistema de gestión, no errores individuales.",
+  
+  "leccion_aprendida": "LOTO efectivo requiere: 1) Identificar TODAS las fuentes de energía (incluyendo residuales), 2) Procedimientos actualizados y conocidos por todos, 3) Verificación independiente antes de trabajar, 4) Cultura que permite 'parar si es inseguro' sin represalias."
+}
