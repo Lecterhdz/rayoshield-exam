@@ -182,7 +182,7 @@ const app = {
 
         
             // PLAN DEMO (1 caso básico)
-            'DEMO': {
+            'RS-DEMO-2026-DEMO': {
                 clienteId: 'DEMO_USER',
                 tipo: 'DEMO',
                 duracion: 1,
@@ -1273,6 +1273,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
