@@ -1,0 +1,109 @@
+{
+  "id": "case-espacio-confinado-basico-001",
+  "tipo": "investigacion_basico",
+  "nivel": "basico",
+  "titulo": "Entrada a Tanque sin Medición de Gases",
+  "categoria": "espacios_confinados",
+  "descripcion": "Trabajador entra a tanque de almacenamiento sin medición previa de atmósfera",
+  "tiempo_estimado": "15 min",
+  "requisito": "Examen NOM-033-STPS aprobado",
+  
+  "fecha_evento": "2026-01-24",
+  "industria": "Química / Almacenamiento",
+  
+  "descripcion_evento": {
+    "actividad": "Limpieza interior de tanque de almacenamiento",
+    "equipo": "Tanque vertical 5000 litros, producto químico residual",
+    "evento": "Desmayo por atmósfera deficiente en oxígeno",
+    "resultado": "Hipoxia, hospitalización 7 días",
+    "clasificacion": "Incidente de alto potencial",
+    "area": "Almacén de Químicos, Zona C"
+  },
+  
+  "linea_tiempo": [
+    "07:30 - Inicio de turno, asignación de limpieza de tanque",
+    "08:00 - Trabajador llega al tanque sin equipo de medición",
+    "08:10 - Abre tapa del tanque, no ventila",
+    "08:15 - Entra al tanque sin arnés ni línea de vida",
+    "08:17 - Trabajador se desmaya por falta de oxígeno",
+    "08:20 - Compañero observa y activa alarma",
+    "08:25 - Brigada de rescate llega con equipo adecuado",
+    "08:30 - Rescate realizado con equipo de respiración",
+    "08:40 - Paramédicos estabilizan al trabajador",
+    "09:00 - Traslado a hospital"
+  ],
+  
+  "energias_identificadas": {
+    "quimica": "Vapores químicos - SIN MEDIR",
+    "atmosferica": "Oxígeno < 19.5% - DEFICIENTE",
+    "fisica": "Espacio confinado - SIN PERMISO"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 30,
+      "pregunta": "Seleccione los requisitos que NO se cumplieron antes de la entrada:",
+      "opciones": [
+        {"texto": "Medición de atmósfera (oxígeno, gases inflamables, tóxicos)", "correcta": true},
+        {"texto": "Permiso de entrada a espacios confinados", "correcta": true},
+        {"texto": "Ventilación del espacio", "correcta": true},
+        {"texto": "El trabajador tenía uniforme limpio", "correcta": false},
+        {"texto": "Arnés y línea de vida disponibles", "correcta": true},
+        {"texto": "Vigía exterior designado", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 40,
+      "pregunta": "¿Qué procedimiento debió seguirse antes de permitir la entrada al tanque?",
+      "feedback_guiado": "Considere: permiso, medición, ventilación, equipo de rescate, vigía",
+      "longitud_minima": 50
+    },
+    {
+      "id": "Q3",
+      "tipo": "plan_accion",
+      "peso": 30,
+      "pregunta": "Seleccione las acciones correctivas ESENCIALES:",
+      "opciones": [
+        {
+          "texto": "Implementar sistema de permisos por escrito para espacios confinados",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Comprar medidor de gases multirrango",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar a todo el personal en NOM-033",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Instalar ventilación forzada permanente",
+          "jerarquia": "ingenieria",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Prohibir entrada a todos los tanques",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 70,
+    "tiempo_estimado_minutos": 15
+  },
+  
+  "conclusion_oficial": "El incidente fue prevenible. La entrada a espacios confinados requierepermiso escrito, medición de atmósfera, ventilación, equipo de rescate y vigía exterior. Ninguno de estos controles estuvo presente.",
+  
+  "leccion_aprendida": "NUNCA entre a un espacio confinado sin permiso escrito, medición de atmósfera, ventilación adecuada y vigía exterior designado."
+}

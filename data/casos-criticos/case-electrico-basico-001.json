@@ -1,0 +1,109 @@
+{
+  "id": "case-electrico-basico-001",
+  "tipo": "investigacion_basico",
+  "nivel": "basico",
+  "titulo": "Conexión Eléctrica sin Desenergizar",
+  "categoria": "electricos",
+  "descripcion": "Electricista realiza conexión en tablero energizado sin EPP adecuado",
+  "tiempo_estimado": "15 min",
+  "requisito": "Examen NOM-029-STPS aprobado",
+  
+  "fecha_evento": "2026-01-25",
+  "industria": "Comercial / Mantenimiento",
+  
+  "descripcion_evento": {
+    "actividad": "Instalación de breaker en tablero eléctrico",
+    "equipo": "Tablero eléctrico 220V, breaker 30A",
+    "evento": "Descarga eléctrica por contacto directo",
+    "resultado": "Quemaduras de 2do grado en mano derecha",
+    "clasificacion": "Accidente con lesión",
+    "area": "Cuarto Eléctrico, Edificio Administrativo"
+  },
+  
+  "linea_tiempo": [
+    "09:00 - Reporte de falla en circuito de aire acondicionado",
+    "09:15 - Electricista asignado para reparar",
+    "09:30 - Electricista llega al tablero sin guantes dieléctricos",
+    "09:35 - Decide no desenergizar para no afectar oficinas",
+    "09:40 - Inicia trabajo con tablero energizado",
+    "09:42 - Destornillador hace contacto entre fases",
+    "09:43 - Descarga eléctrica, electricista grita",
+    "09:45 - Compañeros cortan energía principal",
+    "09:50 - Primeros auxilios aplicados",
+    "10:00 - Traslado a centro médico"
+  ],
+  
+  "energias_identificadas": {
+    "electrica": "220V AC - ENERGIZADO",
+    "termica": "Arco eléctrico - SIN PROTECCIÓN",
+    "mecanica": "Herramienta inadecuada - SIN AISLAR"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 30,
+      "pregunta": "Seleccione las violaciones a NOM-029-STPS identificadas:",
+      "opciones": [
+        {"texto": "Trabajar con equipos energizados sin justificación", "correcta": true},
+        {"texto": "No usar guantes dieléctricos certificados", "correcta": true},
+        {"texto": "No usar herramienta con aislamiento", "correcta": true},
+        {"texto": "El electricista tenía 10 años de experiencia", "correcta": false},
+        {"texto": "No tener procedimiento de trabajo seguro", "correcta": true},
+        {"texto": "El tablero era de marca reconocida", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 40,
+      "pregunta": "¿Qué debió hacer el electricista antes de iniciar el trabajo?",
+      "feedback_guiado": "Considere: desenergizar, verificar ausencia de tensión, EPP, procedimiento",
+      "longitud_minima": 50
+    },
+    {
+      "id": "Q3",
+      "tipo": "plan_accion",
+      "peso": 30,
+      "pregunta": "Seleccione las acciones correctivas ADECUADAS:",
+      "opciones": [
+        {
+          "texto": "Implementar política de 'cero trabajo en caliente' salvo excepción justificada",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Entregar EPP dieléctrico certificado a todo electricista",
+          "jerarquia": "epp",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar en NOM-029-STPS anualmente",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Comprar herramienta con aislamiento certificado",
+          "jerarquia": "ingenieria",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Despedir al electricista",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 70,
+    "tiempo_estimado_minutos": 15
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. El trabajo con equipos energizados solo se justifica cuando la desenergización crea riesgos adicionales. En este caso, no había justificación válida para trabajar en caliente.",
+  
+  "leccion_aprendida": "SIEMPRE desenergice antes de trabajar en equipos eléctricos. El trabajo en caliente solo se permite con justificación escrita, procedimiento seguro y EPP adecuado."
+}

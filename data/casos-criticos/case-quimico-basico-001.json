@@ -1,0 +1,109 @@
+{
+  "id": "case-quimico-basico-001",
+  "tipo": "investigacion_basico",
+  "nivel": "basico",
+  "titulo": "Manejo de Químico sin Hoja de Seguridad",
+  "categoria": "quimicos",
+  "descripcion": "Trabajador maneja producto químico sin conocer sus peligros ni usar EPP adecuado",
+  "tiempo_estimado": "15 min",
+  "requisito": "Examen NOM-018-STPS aprobado",
+  
+  "fecha_evento": "2026-01-26",
+  "industria": "Manufactura / Limpieza",
+  
+  "descripcion_evento": {
+    "actividad": "Dilución de producto químico para limpieza industrial",
+    "equipo": "Contenedor de ácido clorhídrico 30%, sin etiqueta",
+    "evento": "Salpicadura de químico en ojos y piel",
+    "resultado": "Quemaduras químicas, lesión ocular temporal",
+    "clasificacion": "Accidente con lesión",
+    "area": "Cuarto de Limpieza, Planta de Producción"
+  },
+  
+  "linea_tiempo": [
+    "08:00 - Inicio de turno, asignación de limpieza de pisos",
+    "08:15 - Trabajador busca producto de limpieza en almacén",
+    "08:20 - Encuentra contenedor sin etiqueta legible",
+    "08:25 - No consulta hoja de seguridad (no disponible)",
+    "08:30 - No usa goggles ni guantes químicos",
+    "08:35 - Abre contenedor, producto salpica por presión",
+    "08:36 - Químico contacta ojos y piel del trabajador",
+    "08:40 - Compañeros llevan a estación de lavado de ojos",
+    "08:50 - Paramédicos evalúan y estabilizan",
+    "09:00 - Traslado a oftalmólogo de urgencia"
+  ],
+  
+  "energias_identificadas": {
+    "quimica": "Ácido clorhídrico 30% - SIN ETIQUETA",
+    "fisica": "Presión en contenedor - SIN PRECAUCIÓN",
+    "biologica": "Exposición a corrosivo - SIN EPP"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 30,
+      "pregunta": "Seleccione las violaciones a NOM-018-STPS identificadas:",
+      "opciones": [
+        {"texto": "Contenedor sin etiqueta de identificación", "correcta": true},
+        {"texto": "Hoja de seguridad no disponible en el área", "correcta": true},
+        {"texto": "Trabajador sin capacitación en manejo de químicos", "correcta": true},
+        {"texto": "El producto era de marca conocida", "correcta": false},
+        {"texto": "No usar EPP adecuado (goggles, guantes)", "correcta": true},
+        {"texto": "No haber estación de lavado de ojos", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 40,
+      "pregunta": "¿Qué información debió estar disponible antes de manejar el producto?",
+      "feedback_guiado": "Considere: etiqueta, hoja de seguridad, EPP, procedimiento de emergencia",
+      "longitud_minima": 50
+    },
+    {
+      "id": "Q3",
+      "tipo": "plan_accion",
+      "peso": 30,
+      "pregunta": "Seleccione las acciones correctivas PRIORITARIAS:",
+      "opciones": [
+        {
+          "texto": "Etiquetar todos los contenedores según NOM-018",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Disponibilizar hojas de seguridad en cada área",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar a todo el personal en manejo seguro de químicos",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Entregar EPP químico adecuado (goggles, guantes, delantal)",
+          "jerarquia": "epp",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Prohibir todo uso de químicos",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 70,
+    "tiempo_estimado_minutos": 15
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. Todo producto químico debe tener etiqueta visible, hoja de seguridad disponible, y el personal debe estar capacitado y usar EPP adecuado antes del manejo.",
+  
+  "leccion_aprendida": "NUNCA maneje un producto químico sin: 1) Etiqueta legible, 2) Hoja de seguridad disponible, 3) EPP adecuado, 4) Capacitación previa."
+}

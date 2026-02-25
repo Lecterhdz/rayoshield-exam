@@ -1,0 +1,114 @@
+{
+  "id": "case-loto-basico-001",
+  "tipo": "investigacion_basico",
+  "nivel": "basico",
+  "titulo": "Mantenimiento de Bomba sin LOTO",
+  "categoria": "loto",
+  "descripcion": "Trabajador realiza mantenimiento en bomba sin aplicar procedimiento de bloqueo/etiquetado",
+  "tiempo_estimado": "15 min",
+  "requisito": "Examen NOM-004-STPS aprobado",
+  
+  "fecha_evento": "2026-01-20",
+  "industria": "Manufactura / Bombeo",
+  
+  "descripcion_evento": {
+    "actividad": "Mantenimiento preventivo de bomba centrífuga",
+    "equipo": "Bomba centrífuga 10 HP, sistema de agua industrial",
+    "evento": "Activación accidental de bomba durante mantenimiento",
+    "resultado": "Atrapamiento de mano en acoplamiento, fractura expuesta",
+    "clasificacion": "Accidente incapacitante",
+    "area": "Sala de Bombeo 2, Planta Industrial"
+  },
+  
+  "linea_tiempo": [
+    "07:00 - Inicio de turno, reunión de seguridad",
+    "08:00 - Supervisor asigna mantenimiento de bomba",
+    "08:15 - Trabajador llega a sala de bombeo sin candados LOTO",
+    "08:20 - Inicia desmontaje de bomba sin bloquear energía",
+    "08:25 - Operador en cuarto de control activa bomba por error",
+    "08:26 - Accidente ocurre, trabajador grita",
+    "08:30 - Compañeros activan alarma de emergencia",
+    "08:35 - Brigada llega al sitio",
+    "08:45 - Paramédicos estabilizan al trabajador",
+    "09:00 - Traslado a hospital"
+  ],
+  
+  "energias_identificadas": {
+    "electrica": "480V - ENERGIZADA",
+    "mecanica": "Acoplamiento giratorio - SIN BLOQUEAR",
+    "hidraulica": "Presión de agua - SIN DRENAR"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 30,
+      "pregunta": "Seleccione las fallas CRÍTICAS que contribuyeron al accidente:",
+      "opciones": [
+        {"texto": "No se aplicó procedimiento de bloqueo/etiquetado (LOTO)", "correcta": true},
+        {"texto": "Trabajador no tenía candado personal LOTO", "correcta": true},
+        {"texto": "No se verificó ausencia de energía antes de trabajar", "correcta": true},
+        {"texto": "El trabajador llegó tarde ese día", "correcta": false},
+        {"texto": "La bomba era de color azul en lugar de gris", "correcta": false},
+        {"texto": "No había señalización de peligro en el equipo", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 40,
+      "pregunta": "¿Cuál fue la causa raíz de este accidente? Describa en términos sistémicos (no culpe al trabajador).",
+      "feedback_guiado": "Considere: ¿Existía procedimiento? ¿Se proporcionó equipo LOTO? ¿Hubo supervisión?",
+      "longitud_minima": 50
+    },
+    {
+      "id": "Q3",
+      "tipo": "plan_accion",
+      "peso": 30,
+      "pregunta": "Seleccione las acciones correctivas MÁS EFECTIVAS para prevenir recurrencia:",
+      "opciones": [
+        {
+          "texto": "Implementar auditorías diarias de cumplimiento LOTO",
+          "jerarquia": "administrativo",
+          "prioridad": "2",
+          "correcta": true
+        },
+        {
+          "texto": "Instalar sistema de enclavamiento que impida activar bomba con tapa abierta",
+          "jerarquia": "ingenieria",
+          "prioridad": "1",
+          "correcta": true
+        },
+        {
+          "texto": "Capacitar al trabajador en procedimiento LOTO",
+          "jerarquia": "administrativo",
+          "prioridad": "3",
+          "correcta": false
+        },
+        {
+          "texto": "Entregar candados LOTO a todo el personal de mantenimiento",
+          "jerarquia": "administrativo",
+          "prioridad": "1",
+          "correcta": true
+        },
+        {
+          "texto": "Colocar señalización de 'Peligro' en la bomba",
+          "jerarquia": "administrativo",
+          "prioridad": "4",
+          "correcta": false
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 70,
+    "tiempo_estimado_minutos": 15
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. La falla principal fue la ausencia de un sistema de bloqueo/etiquetado (LOTO) efectivo. Se requiere implementación inmediata de controles de ingeniería y administrativos.",
+  
+  "leccion_aprendida": "SIEMPRE aplique LOTO antes de cualquier mantenimiento. La energía debe ser bloqueada, verificada y comprobada antes de trabajar en equipos."
+}

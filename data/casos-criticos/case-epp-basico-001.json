@@ -1,0 +1,113 @@
+{
+  "id": "case-epp-basico-001",
+  "tipo": "investigacion_basico",
+  "nivel": "basico",
+  "titulo": "Trabajo en Altura sin Arnés",
+  "categoria": "alturas",
+  "descripcion": "Trabajador realiza trabajo en plataforma elevada sin usar arnés de seguridad",
+  "tiempo_estimado": "15 min",
+  "requisito": "Examen NOM-009-STPS aprobado",
+  
+  "fecha_evento": "2026-01-22",
+  "industria": "Construcción",
+  
+  "descripcion_evento": {
+    "actividad": "Instalación de ductos en techo de nave industrial",
+    "equipo": "Plataforma elevadora tipo tijera, 4 metros de altura",
+    "evento": "Caída de trabajador desde plataforma",
+    "resultado": "Fractura de vértebras, hospitalización 14 días",
+    "clasificacion": "Accidente grave",
+    "area": "Nave Industrial 3, Zona de Techos"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno",
+    "07:00 - Reunión de seguridad (se mencionó uso de arnés)",
+    "08:00 - Trabajador recibe asignación de trabajo en altura",
+    "08:15 - Trabajador sube a plataforma sin arnés",
+    "08:20 - Supervisor observa pero no corrige",
+    "08:30 - Trabajador se inclina para alcanzar ducto",
+    "08:31 - Pierde equilibrio y cae de la plataforma",
+    "08:35 - Compañeros activan emergencia",
+    "08:45 - Paramédicos llegan al sitio",
+    "09:00 - Traslado a hospital"
+  ],
+  
+  "energias_identificadas": {
+    "gravitacional": "Altura 4 metros - SIN PROTECCIÓN",
+    "mecanica": "Plataforma elevadora - SIN BARRERAS"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 30,
+      "pregunta": "Seleccione las violaciones de seguridad identificadas:",
+      "opciones": [
+        {"texto": "No se usó arnés de seguridad", "correcta": true},
+        {"texto": "No había punto de anclaje disponible", "correcta": true},
+        {"texto": "El supervisor no corrigió la condición insegura", "correcta": true},
+        {"texto": "La plataforma era de color amarillo", "correcta": false},
+        {"texto": "El trabajador no tenía certificación de alturas", "correcta": true},
+        {"texto": "Hacía calor ese día", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 40,
+      "pregunta": "¿Qué barreras de protección fallaron? Describa al menos 2.",
+      "feedback_guiado": "Considere: EPP, supervisión, procedimiento, capacitación",
+      "longitud_minima": 50
+    },
+    {
+      "id": "Q3",
+      "tipo": "plan_accion",
+      "peso": 30,
+      "pregunta": "Seleccione las acciones correctivas PRIORITARIAS:",
+      "opciones": [
+        {
+          "texto": "Instalar puntos de anclaje certificados en todas las plataformas",
+          "jerarquia": "ingenieria",
+          "prioridad": "1",
+          "correcta": true
+        },
+        {
+          "texto": "Entregar arneses a todo el personal",
+          "jerarquia": "epp",
+          "prioridad": "1",
+          "correcta": true
+        },
+        {
+          "texto": "Capacitar en trabajo seguro en alturas",
+          "jerarquia": "administrativo",
+          "prioridad": "2",
+          "correcta": true
+        },
+        {
+          "texto": "Sancionar al trabajador",
+          "jerarquia": "administrativo",
+          "prioridad": "4",
+          "correcta": false
+        },
+        {
+          "texto": "Prohibir todo trabajo en alturas",
+          "jerarquia": "administrativo",
+          "prioridad": "5",
+          "correcta": false
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 70,
+    "tiempo_estimado_minutos": 15
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible con el uso correcto de EPP y supervisión adecuada. Se requiere implementación de puntos de anclaje y capacitación obligatoria.",
+  
+  "leccion_aprendida": "SIEMPRE use arnés conectado a punto de anclaje certificado cuando trabaje a 2 metros o más de altura."
+}
