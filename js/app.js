@@ -105,11 +105,8 @@ const app = {
         
         var btnCasosMaster = document.getElementById('btn-casos-master');
         if (btnCasosMaster) {
-            if (this.licencia.features && this.licencia.features.casosElite) {
-                btnCasosMaster.style.display = 'inline-block';
-            } else {
-                btnCasosMaster.style.display = 'none';
-            }
+        // ✅ TODOS los planes tienen acceso a casos (al menos 1 básico)
+         btnCasosMaster.style.display = 'inline-block';
         }
         
         var btnWhiteLabel = document.getElementById('btn-white-label');
@@ -168,22 +165,39 @@ const app = {
                 clienteId: 'CONSTRUCTORA_AZTECA_001', 
                 tipo: 'FULL', 
                 duracion: 365,
-                features: { whiteLabel: false, predictivo: false, auditoria: false, casosElite: true, casosPericial: false }
+                features: { whiteLabel: false, predictivo: false, auditoria: false, casosMaster: true, casosElite: true, casosPericial: false, casosBasicos: true, }
             },
             'RS-2D5F-8A1C-4E7B': { 
                 clienteId: 'SEGURIDAD_INDUSTRIAL_MX', 
                 tipo: 'EMPRESARIAL', 
                 duracion: 365,
-                features: { whiteLabel: true, predictivo: true, auditoria: false, casosElite: true, casosPericial: false }
+                features: { whiteLabel: true, predictivo: true, auditoria: false, casosMaster: true, casosElite: true, casosPericial: false, casosBasicos: true, }
             },
             'RS-9C2E-5B8D-1F4A': { 
                 clienteId: 'CAPACITACION_PRO_2026', 
                 tipo: 'FULL', 
                 duracion: 180,
-                features: { whiteLabel: false, predictivo: false, auditoria: false, casosElite: true, casosPericial: false }
+                features: { whiteLabel: false, predictivo: false, auditoria: false, casosMaster: true, casosElite: true, casosPericial: false, casosBasicos: true, }
             },
 
-        // PLAN PROFESIONAL
+        
+            // PLAN DEMO (1 caso básico)
+            'DEMO': {
+                clienteId: 'DEMO_USER',
+                tipo: 'DEMO',
+                duracion: 1,
+                features: {
+                    whiteLabel: false,
+                    predictivo: false,
+                    auditoria: false,
+                    casosBasicos: true,      // ✅ 1 caso básico
+                    casosMaster: false,
+                    casosElite: false,
+                    casosPericial: false
+                }
+            },                    
+            
+            // PLAN PROFESIONAL
             'RS-PROF-2026-A1B2': {
                 clienteId: 'PROFESIONAL_001',
                 tipo: 'PROFESIONAL',
@@ -194,7 +208,8 @@ const app = {
                     auditoria: false,
                     casosElite: false,
                     casosPericial: false,
-                    casosMaster: true,
+                    casosMaster: true,          // ✅ 5 casos MASTER
+                    casosBasicos: true,         // ✅ 5 caso básico
                     insignias: false,
                     dashboard: false
                 }
@@ -209,9 +224,10 @@ const app = {
                     whiteLabel: false,
                     predictivo: false,
                     auditoria: false,
-                    casosElite: true,
+                    casosElite: true,           // ✅ 3 casos ELITE
                     casosPericial: false,
-                    casosMaster: true,
+                    casosMaster: true,          // ✅ 5 casos MASTER
+                    casosBasicos: true,         // ✅ 5 caso básico
                     insignias: true,
                     dashboard: 'basico'
                 }
@@ -226,9 +242,10 @@ const app = {
                     whiteLabel: true,
                     predictivo: true,
                     auditoria: false,
-                    casosElite: true,
-                    casosPericial: true,
-                    casosMaster: true,
+                    casosElite: true,           // ✅ 3 casos ELITE
+                    casosPericial: true,        // ✅ 2 casos PERICIAL
+                    casosMaster: true,          // ✅ 5 casos MASTER
+                    casosBasicos: true,         // ✅ 5 caso básico
                     insignias: true,
                     dashboard: 'predictivo',
                     multiUsuario: 50
@@ -684,14 +701,31 @@ const app = {
         }
         
         var self = this;
-        CASOS_INVESTIGACION.forEach(function(caso) {
-            var item = document.createElement('div');
-            item.className = 'exam-item';
-            item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:#666;font-size:14px;margin-top:5px;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
-            item.onclick = function() { self.cargarCasoMaster(caso.id); };
-            list.appendChild(item);
-        });
+
         
+        // ✅ FILTRAR CASOS SEGÚN PLAN
+        var nivelMaximo = 'basico'; // DEMO por defecto
+        if (this.licencia.tipo === 'PROFESIONAL') nivelMaximo = 'master';
+        else if (this.licencia.tipo === 'CONSULTOR') nivelMaximo = 'elite';
+        else if (this.licencia.tipo === 'EMPRESARIAL') nivelMaximo = 'pericial';
+    
+        CASOS_INVESTIGACION.forEach(function(caso) {
+            // ✅ Verificar si el usuario tiene acceso a este nivel
+            var tieneAcceso = false;
+            if (caso.nivel === 'basico' && self.licencia.features.casosBasicos) tieneAcceso = true;
+            else if (caso.nivel === 'master' && self.licencia.features.casosMaster) tieneAcceso = true;
+            else if (caso.nivel === 'elite' && self.licencia.features.casosElite) tieneAcceso = true;
+            else if (caso.nivel === 'pericial' && self.licencia.features.casosPericial) tieneAcceso = true;
+        
+            if (tieneAcceso) {
+                var item = document.createElement('div');
+                item.className = 'exam-item';
+                item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:#666;font-size:14px;margin-top:5px;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
+                item.onclick = function() { self.cargarCasoMaster(caso.id); };
+                list.appendChild(item);
+            }
+        });
+    
         this.mostrarPantalla('casos-master-screen');
     },
     
