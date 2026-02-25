@@ -187,7 +187,7 @@ const app = {
             'RS-PROF-2026-A1B2': {
                 clienteId: 'PROFESIONAL_001',
                 tipo: 'PROFESIONAL',
-                duracion: 365,
+                duracion: 30,
                 features: {
                     whiteLabel: false,
                     predictivo: false,
@@ -204,7 +204,7 @@ const app = {
             'RS-CONS-2026-C3D4': {
                 clienteId: 'CONSULTOR_001',
                 tipo: 'CONSULTOR',
-                duracion: 365,
+                duracion: 30,
                 features: {
                     whiteLabel: false,
                     predictivo: false,
@@ -221,7 +221,7 @@ const app = {
             'RS-EMPR-2026-E5F6': {
                 clienteId: 'EMPRESARIAL_001',
                 tipo: 'EMPRESARIAL',
-                duracion: 365,
+                duracion: 30,
                 features: {
                     whiteLabel: true,
                     predictivo: true,
@@ -1238,5 +1238,6 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
