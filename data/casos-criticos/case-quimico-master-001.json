@@ -1,0 +1,135 @@
+{
+  "id": "case-quimico-master-001",
+  "tipo": "investigacion_master",
+  "nivel": "master",
+  "titulo": "Exposición a Solvente Tóxico sin Protección",
+  "categoria": "quimicos",
+  "descripcion": "Trabajadores expuestos a solvente tóxico en espacio semi-confinado sin protección adecuada",
+  "tiempo_estimado": "30 min",
+  "requisito": "Examen NOM-010-STPS aprobado",
+  
+  "fecha_evento": "2026-02-01",
+  "industria": "Pintura / Recubrimientos",
+  
+  "descripcion_evento": {
+    "actividad": "Aplicación de recubrimiento con solvente en tanque",
+    "equipo": "Tanque de mezcla 5000L, sistema de ventilación portátil",
+    "evento": "Exposición aguda a vapores orgánicos",
+    "resultado": "4 trabajadores hospitalizados por intoxicación, 1 en estado crítico",
+    "clasificacion": "Incidente de alto potencial con exposición tóxica",
+    "area": "Área de Mezcla, Planta de Pinturas"
+  },
+  
+  "linea_tiempo": [
+    "07:00 - Inicio de turno, se asigna trabajo de recubrimiento",
+    "07:30 - Trabajadores ingresan a tanque sin medición de atmósfera",
+    "08:00 - Ventilación portátil se apaga por falla mecánica",
+    "08:15 - Trabajadores reportan mareo pero continúan trabajo",
+    "08:30 - Primer trabajador colapsa dentro del tanque",
+    "08:35 - Compañeros intentan rescate sin equipo de protección",
+    "08:40 - Segundo y tercer trabajador colapsan",
+    "08:45 - Supervisor activa alarma de emergencia",
+    "08:50 - Brigada llega con equipo de respiración",
+    "09:00 - Rescate completado, paramédicos en sitio",
+    "09:15 - Traslado de trabajadores a hospital"
+  ],
+  
+  "energias_identificadas": {
+    "quimica": "Vapores orgánicos - SIN MEDICIÓN",
+    "fisica": "Espacio semi-confinado - SIN PERMISO",
+    "biologica": "Exposición tóxica - SIN EPP ADECUADO"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 20,
+      "pregunta": "Seleccione las fallas CRÍTICAS identificadas:",
+      "opciones": [
+        {"texto": "No se midió atmósfera antes de ingresar", "correcta": true},
+        {"texto": "Ventilación insuficiente para el volumen del tanque", "correcta": true},
+        {"texto": "Trabajadores no usaron equipo de respiración autónoma", "correcta": true},
+        {"texto": "El tanque era de color azul", "correcta": false},
+        {"texto": "No había permiso de entrada a espacio confinado", "correcta": true},
+        {"texto": "Rescate intentado sin protección por compañeros", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 25,
+      "pregunta": "Describa las fallas en el sistema de gestión de seguridad que permitieron este incidente.",
+      "feedback_guiado": "Considere: permisos, medición, EPP, capacitación, procedimiento de rescate, supervisión",
+      "longitud_minima": 80
+    },
+    {
+      "id": "Q3",
+      "tipo": "diagnostico_sistema",
+      "peso": 20,
+      "pregunta": "Seleccione las relaciones causa-efecto CORRECTAS:",
+      "opciones": [
+        {"texto": "Sin medición de atmósfera → No se detectó concentración tóxica → Exposición", "correcta": true},
+        {"texto": "Ventilación insuficiente → Acumulación de vapores → Intoxicación", "correcta": true},
+        {"texto": "Sin EPP adecuado → Inhalación directa → Hospitalización", "correcta": true},
+        {"texto": "Tanque de 5000L → Incidente automático", "correcta": false},
+        {"texto": "Rescate sin protección → Múltiples víctimas secundarias", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Seleccione las acciones correctivas MÁS EFECTIVAS:",
+      "opciones": [
+        {
+          "texto": "Implementar sistema de permiso de entrada a espacios confinados",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Instalar sistema de ventilación forzada permanente",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Proveer equipo de respiración autónoma para trabajos con solventes",
+          "jerarquia": "epp",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar en procedimientos de rescate seguro",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Prohibir todo trabajo con solventes",
+          "jerarquia": "administrativo",
+          "prioridad": "5"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_normativo",
+      "peso": 10,
+      "pregunta": "Seleccione las NOM aplicables:",
+      "opciones": [
+        {"texto": "NOM-010-STPS-2014 (Agentes químicos contaminantes)", "correcta": true},
+        {"texto": "NOM-033-STPS-2015 (Espacios confinados)", "correcta": true},
+        {"texto": "NOM-017-STPS-2008 (Equipo de protección personal)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011 (Trabajo con equipos energizados)", "correcta": false}
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 75,
+    "tiempo_estimado_minutos": 30
+  },
+  
+  "conclusion_oficial": "El incidente fue prevenible. Múltiples fallas en el sistema de gestión permitieron la exposición: sin permiso de espacio confinado, sin medición de atmósfera, ventilación insuficiente, EPP inadecuado y rescate inseguro que generó víctimas secundarias.",
+  
+  "leccion_aprendida": "Trabajo con químicos tóxicos requiere: 1) Permiso de espacio confinado, 2) Medición de atmósfera continua, 3) Ventilación adecuada, 4) EPP adecuado (respiración autónoma), 5) Procedimiento de rescate seguro, 6) Vigía exterior designado."
+}

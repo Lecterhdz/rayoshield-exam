@@ -1,0 +1,165 @@
+{
+  "id": "case-loto-master-001",
+  "tipo": "investigacion_master",
+  "nivel": "master",
+  "titulo": "Mantenimiento de Compresor con LOTO Incompleto",
+  "categoria": "loto",
+  "descripcion": "Trabajador realiza mantenimiento en compresor industrial con procedimiento de bloqueo incompleto",
+  "tiempo_estimado": "30 min",
+  "requisito": "Examen NOM-004-STPS Supervisor aprobado",
+  
+  "fecha_evento": "2026-01-28",
+  "industria": "Manufactura / Neumática",
+  
+  "descripcion_evento": {
+    "actividad": "Mantenimiento preventivo de compresor de aire industrial 50 HP",
+    "equipo": "Compresor de tornillo, sistema de aire a 125 PSI",
+    "evento": "Liberación inesperada de energía almacenada durante desmontaje",
+    "resultado": "Proyección de componente, fractura de brazo y lesiones faciales",
+    "clasificacion": "Accidente grave con lesión incapacitante",
+    "area": "Sala de Compresores, Planta de Manufactura"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, reunión de seguridad",
+    "07:00 - Supervisor asigna mantenimiento de compresor",
+    "07:30 - Trabajador recibe procedimiento de LOTO escrito",
+    "08:00 - Trabajador bloquea energía eléctrica en tablero",
+    "08:15 - NO verifica presión residual en sistema neumático",
+    "08:20 - Inicia desmontaje de válvulas",
+    "08:25 - Energía almacenada se libera inesperadamente",
+    "08:26 - Componente se proyecta, impacta al trabajador",
+    "08:30 - Compañeros activan alarma de emergencia",
+    "08:35 - Brigada llega al sitio con equipo de primeros auxilios",
+    "08:45 - Paramédicos estabilizan al trabajador",
+    "09:00 - Traslado a hospital especializado"
+  ],
+  
+  "energias_identificadas": {
+    "electrica": "480V - BLOQUEADA",
+    "neumatica": "125 PSI - NO BLOQUEADA/VERIFICADA",
+    "mecanica": "Volantes de inercia - SIN BLOQUEO",
+    "termica": "Temperatura de operación 80°C - SIN ENFRIAMIENTO"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 20,
+      "pregunta": "Seleccione las fallas CRÍTICAS en el procedimiento de LOTO aplicado:",
+      "opciones": [
+        {"texto": "No se identificaron todas las fuentes de energía (neumática omitida)", "correcta": true},
+        {"texto": "No se verificó ausencia de energía residual antes de trabajar", "correcta": true},
+        {"texto": "El trabajador no tenía capacitación en LOTO", "correcta": false},
+        {"texto": "No se bloquearon energías mecánicas almacenadas", "correcta": true},
+        {"texto": "El procedimiento escrito era incorrecto", "correcta": false},
+        {"texto": "No se realizó verificación de bloqueo (try-out)", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 25,
+      "pregunta": "Describa la causa raíz del accidente en términos sistémicos. Considere fallas en el procedimiento, supervisión y verificación.",
+      "feedback_guiado": "Considere: ¿El procedimiento identificaba todas las energías? ¿Hubo verificación independiente? ¿La supervisión validó el bloqueo?",
+      "longitud_minima": 80
+    },
+    {
+      "id": "Q3",
+      "tipo": "analisis_responsabilidad",
+      "peso": 15,
+      "pregunta": "Evalúe el nivel de responsabilidad de cada rol en este incidente:",
+      "roles": [
+        {
+          "rol": "Trabajador afectado",
+          "opciones": [
+            {"nivel": "Alta - No siguió procedimiento completo"},
+            {"nivel": "Media - Siguió procedimiento incompleto"},
+            {"nivel": "Baja - Procedimiento era deficiente"}
+          ]
+        },
+        {
+          "rol": "Supervisor directo",
+          "opciones": [
+            {"nivel": "Alta - No verificó bloqueo completo"},
+            {"nivel": "Media - Asignó trabajo sin validar"},
+            {"nivel": "Baja - Confío en procedimiento escrito"}
+          ]
+        },
+        {
+          "rol": "Gerencia de Mantenimiento",
+          "opciones": [
+            {"nivel": "Alta - Procedimiento incompleto"},
+            {"nivel": "Media - Sin auditorías de LOTO"},
+            {"nivel": "Baja - Proveyó procedimiento escrito"}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Seleccione las acciones correctivas MÁS EFECTIVAS según jerarquía de controles:",
+      "opciones": [
+        {
+          "texto": "Revisar y actualizar todos los procedimientos de LOTO para identificar TODAS las energías",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Instalar válvulas de bloqueo permanente en líneas neumáticas",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Implementar verificación independiente de bloqueo por supervisor",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Capacitar a todo el personal en identificación de energías múltiples",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Entregar más candados de colores al personal",
+          "jerarquia": "epp",
+          "prioridad": "5"
+        },
+        {
+          "texto": "Instalar indicadores visuales de presión residual",
+          "jerarquia": "ingenieria",
+          "prioridad": "2"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 15,
+      "pregunta": "Ordene los pasos CORRECTOS para un procedimiento de LOTO completo:",
+      "opciones": [
+        "Notificar a todo el personal afectado",
+        "Identificar TODAS las fuentes de energía",
+        "Apagar equipo normalmente",
+        "Aislar energías (válvulas, breakers)",
+        "Aplicar candados y etiquetas personales",
+        "Liberar energías residuales (drenar, descargar)",
+        "Verificar ausencia de energía (try-out)",
+        "Iniciar trabajo seguro"
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 75,
+    "tiempo_estimado_minutos": 30
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. La falla principal fue la identificación incompleta de fuentes de energía. El procedimiento de LOTO solo consideró energía eléctrica, omitiendo energía neumática almacenada. Se requiere revisión de todos los procedimientos para identificar energías múltiples.",
+  
+  "leccion_aprendida": "LOTO efectivo requiere: 1) Identificar TODAS las energías (eléctrica, neumática, hidráulica, mecánica, térmica, química), 2) Aislar cada fuente, 3) Verificar ausencia de energía residual, 4) Try-out antes de trabajar."
+}

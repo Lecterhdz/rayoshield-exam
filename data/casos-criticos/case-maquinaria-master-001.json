@@ -1,0 +1,150 @@
+{
+  "id": "case-maquinaria-master-001",
+  "tipo": "investigacion_master",
+  "nivel": "master",
+  "titulo": "Atrapamiento en Prensa Hidráulica",
+  "categoria": "maquinaria",
+  "descripcion": "Operador sufre atrapamiento en prensa hidráulica por falla de guardas de seguridad",
+  "tiempo_estimado": "30 min",
+  "requisito": "Examen NOM-004-STPS aprobado",
+  
+  "fecha_evento": "2026-02-03",
+  "industria": "Metalmecánica / Estampado",
+  
+  "descripcion_evento": {
+    "actividad": "Operación de prensa hidráulica para estampado de piezas",
+    "equipo": "Prensa hidráulica 200 toneladas, sistema de dos botones",
+    "evento": "Atrapamiento de mano por ciclo inesperado de prensa",
+    "resultado": "Amputación parcial de dedos, hospitalización 14 días",
+    "clasificacion": "Accidente grave con lesión permanente",
+    "area": "Línea de Estampado, Nave 2"
+  },
+  
+  "linea_tiempo": [
+    "06:00 - Inicio de turno, operador asignado a prensa #3",
+    "06:30 - Operador nota que guarda de seguridad está dañado",
+    "06:35 - Reporta a supervisor, continúa trabajando",
+    "07:00 - Supervisor dice 'trabaja con cuidado, luego se repara'",
+    "08:00 - Sensor de presencia falla intermitentemente",
+    "08:15 - Operador ajusta pieza con mano dentro de zona de peligro",
+    "08:16 - Prensa cicla inesperadamente por falla de sensor",
+    "08:17 - Operador grita, compañeros activan parada de emergencia",
+    "08:20 - Liberan presión hidráulica para liberar mano",
+    "08:30 - Paramédicos estabilizan al operador",
+    "08:45 - Traslado a hospital especializado en manos"
+  ],
+  
+  "energias_identificadas": {
+    "hidraulica": "200 toneladas de presión - SIN BLOQUEO",
+    "mecanica": "Prensa en movimiento - GUARDA DAÑADA",
+    "electrica": "Sensor de presencia - FALLANDO"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 20,
+      "pregunta": "Seleccione las violaciones a NOM-004-STPS:",
+      "opciones": [
+        {"texto": "Operar maquinaria con guarda de seguridad dañado", "correcta": true},
+        {"texto": "Permitir trabajo con sensor de presencia fallando", "correcta": true},
+        {"texto": "Supervisor autorizó continuar con condición insegura", "correcta": true},
+        {"texto": "La prensa era de color verde", "correcta": false},
+        {"texto": "No se bloqueó energía antes de ajustar pieza", "correcta": true},
+        {"texto": "El operador tenía 10 años de experiencia", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 25,
+      "pregunta": "Analice las fallas en la cultura de seguridad que permitieron este incidente.",
+      "feedback_guiado": "Considere: normalización de desviaciones, presión por producción, reporte sin acción, liderazgo",
+      "longitud_minima": 80
+    },
+    {
+      "id": "Q3",
+      "tipo": "identificacion_sesgos",
+      "peso": 15,
+      "pregunta": "Identifique los sesgos cognitivos presentes en las decisiones:",
+      "opciones": [
+        {"texto": "Normalización de la desviación: 'Siempre ha funcionado así'", "correcta": true},
+        {"texto": "Sesgo de producción: Priorizar producción sobre seguridad", "correcta": true},
+        {"texto": "Sesgo de experiencia: 'Tengo 10 años, no me pasará'", "correcta": true},
+        {"texto": "El operador llegó tarde ese día", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Seleccione las acciones correctivas MÁS EFECTIVAS:",
+      "opciones": [
+        {
+          "texto": "Instalar sistema de enclavamiento que impida operar con guarda dañado",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Implementar política de 'parar si es inseguro' sin represalias",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar a supervisores en liderazgo de seguridad",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Auditoría diaria de guardas y sensores de seguridad",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Entregar guantes de protección al operador",
+          "jerarquia": "epp",
+          "prioridad": "5"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "evaluacion_correctivas",
+      "peso": 15,
+      "pregunta": "Evalúe la efectividad de las siguientes acciones propuestas:",
+      "opciones": [
+        {
+          "texto": "Reparar guarda antes de continuar operación",
+          "jerarquia": "ingenieria",
+          "clasificacion": "muy_efectiva"
+        },
+        {
+          "texto": "Colocar señalización de 'Cuidado'",
+          "jerarquia": "administrativo",
+          "clasificacion": "poco_efectiva"
+        },
+        {
+          "texto": "Reemplazar sensor de presencia defectuoso",
+          "jerarquia": "ingenieria",
+          "clasificacion": "muy_efectiva"
+        },
+        {
+          "texto": "Dar advertencia verbal al operador",
+          "jerarquia": "administrativo",
+          "clasificacion": "poco_efectiva"
+        }
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 75,
+    "tiempo_estimado_minutos": 30
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. La causa raíz fue la normalización de condiciones inseguras: guarda dañado y sensor fallando fueron reportados pero no corregidos. La cultura de priorizar producción sobre seguridad permitió que el operador trabajara en condiciones peligrosas.",
+  
+  "leccion_aprendida": "Maquinaria requiere: 1) Guardas de seguridad funcionales SIEMPRE, 2) Sensores de presencia verificados diariamente, 3) Política de 'parar si es inseguro', 4) Supervisores que priorizan seguridad sobre producción, 5) Reporte de condiciones sin represalias."
+}

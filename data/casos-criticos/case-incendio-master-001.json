@@ -1,0 +1,141 @@
+{
+  "id": "case-incendio-master-001",
+  "tipo": "investigacion_master",
+  "nivel": "master",
+  "titulo": "Incendio en Almacén de Químicos",
+  "categoria": "incendios",
+  "descripcion": "Incendio se origina en almacén de químicos por incompatibilidad de productos",
+  "tiempo_estimado": "30 min",
+  "requisito": "Examen NOM-002-STPS aprobado",
+  
+  "fecha_evento": "2026-01-30",
+  "industria": "Química / Almacenamiento",
+  
+  "descripcion_evento": {
+    "actividad": "Almacenamiento de productos químicos en bodega general",
+    "equipo": "Estanterías metálicas, 200 tambores de 200L",
+    "evento": "Incendio por reacción química incompatible",
+    "resultado": "Pérdida total de bodega, 3 trabajadores con lesiones por humo",
+    "clasificacion": "Incidente de alto potencial con daño material mayor",
+    "area": "Bodega de Químicos, Zona Norte"
+  },
+  
+  "linea_tiempo": [
+    "08:00 - Recepción de nuevos productos químicos",
+    "08:30 - Montacarguista almacena tambores sin verificar compatibilidad",
+    "09:00 - Supervisor nota olor inusual pero no investiga",
+    "09:15 - Humo comienza a salir de estantería C-4",
+    "09:20 - Trabajadores activan alarma de incendio",
+    "09:25 - Brigada intenta extinguir con extintor incorrecto",
+    "09:30 - Fuego se propaga a estanterías adyacentes",
+    "09:35 - Evacuación completa de la planta",
+    "09:45 - Bomberos externos llegan al sitio",
+    "10:30 - Incendio controlado",
+    "11:00 - Inicio de investigación preliminar"
+  ],
+  
+  "energias_identificadas": {
+    "quimica": "Reacción incompatible - SIN SEGREGACIÓN",
+    "termica": "Calor de reacción - SIN VENTILACIÓN",
+    "fisica": "Tambores dañados - SIN INSPECCIÓN"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 20,
+      "pregunta": "Seleccione las violaciones a NOM-002-STPS identificadas:",
+      "opciones": [
+        {"texto": "Almacenamiento de químicos incompatibles sin segregación", "correcta": true},
+        {"texto": "No se contó con Hojas de Seguridad disponibles", "correcta": true},
+        {"texto": "Extintor incorrecto para tipo de fuego químico", "correcta": true},
+        {"texto": "La bodega tenía 5 años de antigüedad", "correcta": false},
+        {"texto": "No había señalización de incompatibilidades", "correcta": true},
+        {"texto": "El montacarguista no tenía licencia", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 25,
+      "pregunta": "¿Qué controles de ingeniería y administrativos debieron existir para prevenir este incidente?",
+      "feedback_guiado": "Considere: segregación física, señalización, ventilación, capacitación, procedimientos de recepción",
+      "longitud_minima": 80
+    },
+    {
+      "id": "Q3",
+      "tipo": "deteccion_inconsistencias",
+      "peso": 15,
+      "pregunta": "Identifique las inconsistencias en las declaraciones:",
+      "declaraciones": {
+        "montacarguista": "Seguí el procedimiento de almacenamiento",
+        "supervisor": "Nunca recibí capacitación en compatibilidad química",
+        "gerente": "Todos los empleados están capacitados",
+        "evidencia": "No hay registros de capacitación en el archivo"
+      },
+      "opciones": [
+        {"texto": "El montacarguista dice que siguió procedimiento pero no había procedimiento escrito", "correcta": true},
+        {"texto": "El gerente dice que todos están capacitados pero no hay registros", "correcta": true},
+        {"texto": "El supervisor admite no tener capacitación contradiciendo al gerente", "correcta": true},
+        {"texto": "El incendio ocurrió en lunes", "correcta": false}
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Seleccione las acciones correctivas PRIORITARIAS:",
+      "opciones": [
+        {
+          "texto": "Implementar sistema de segregación física por compatibilidad química",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Instalar sistema de ventilación de emergencia en bodega",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar a todo el personal en compatibilidad química",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Actualizar procedimiento de recepción y almacenamiento",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Comprar más extintores",
+          "jerarquia": "epp",
+          "prioridad": "4"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione las NOM aplicables a este incidente:",
+      "opciones": [
+        {"texto": "NOM-002-STPS-2010 (Prevención y protección contra incendios)", "correcta": true},
+        {"texto": "NOM-018-STPS-2015 (Sistema de identificación de peligros)", "correcta": true},
+        {"texto": "NOM-004-STPS-2008 (Sistemas de protección y dispositivos de seguridad)", "correcta": false},
+        {"texto": "NOM-026-STPS-2008 (Colores y señales de seguridad)", "correcta": true},
+        {"texto": "NOM-029-STPS-2011 (Trabajo con equipos energizados)", "correcta": false}
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 75,
+    "tiempo_estimado_minutos": 30
+  },
+  
+  "conclusion_oficial": "El incendio fue prevenible. La causa raíz fue el almacenamiento de químicos incompatibles sin segregación adecuada. Fallas en procedimiento de recepción, capacitación insuficiente y falta de señalización contribuyeron al incidente.",
+  
+  "leccion_aprendida": "Almacenamiento seguro de químicos requiere: 1) Clasificar por compatibilidad, 2) Segregar físicamente incompatibles, 3) Señalizar claramente, 4) Capacitar personal, 5) Tener Hojas de Seguridad disponibles, 6) Extintores adecuados al tipo de riesgo."
+}

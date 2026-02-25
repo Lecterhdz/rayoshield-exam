@@ -1,0 +1,138 @@
+{
+  "id": "case-alturas-master-001",
+  "tipo": "investigacion_master",
+  "nivel": "master",
+  "titulo": "Caída desde Andamio Inestable",
+  "categoria": "alturas",
+  "descripcion": "Trabajador cae desde andamio mal instalado en trabajo de fachada",
+  "tiempo_estimado": "30 min",
+  "requisito": "Examen NOM-009-STPS aprobado",
+  
+  "fecha_evento": "2026-02-05",
+  "industria": "Construcción / Fachadas",
+  
+  "descripcion_evento": {
+    "actividad": "Instalación de fachada ventilada en edificio de 8 pisos",
+    "equipo": "Andamio tubular de 15 metros de altura",
+    "evento": "Colapso parcial de andamio por base inestable",
+    "resultado": "Caída de 12 metros, lesiones múltiples, hospitalización 30 días",
+    "clasificacion": "Accidente grave con lesión incapacitante permanente",
+    "area": "Fachada Norte, Edificio Corporativo"
+  },
+  
+  "linea_tiempo": [
+    "07:00 - Inicio de turno, se asigna trabajo en fachada",
+    "07:30 - Andamio instalado por trabajadores sin certificación",
+    "08:00 - Supervisor nota base inestable pero no corrige",
+    "08:15 - Trabajador sube sin inspeccionar andamio",
+    "08:30 - Viento aumenta a 40 km/h",
+    "08:45 - Andamio comienza a oscilar",
+    "08:50 - Base cede, andamio colapsa parcialmente",
+    "08:51 - Trabajador cae 12 metros",
+    "08:55 - Compañeros activan emergencia",
+    "09:00 - Paramédicos estabilizan en sitio",
+    "09:15 - Traslado a hospital de trauma"
+  ],
+  
+  "energias_identificadas": {
+    "gravitacional": "Caída 12 metros - SIN PROTECCIÓN",
+    "fisica": "Viento 40 km/h - SIN ANCLAJE",
+    "mecanica": "Andamio inestable - SIN INSPECCIÓN"
+  },
+  
+  "preguntas": [
+    {
+      "id": "Q1",
+      "tipo": "analisis_multiple",
+      "peso": 20,
+      "pregunta": "Seleccione las violaciones a NOM-009-STPS:",
+      "opciones": [
+        {"texto": "Andamio instalado por personal sin certificación", "correcta": true},
+        {"texto": "No se realizó inspección antes de usar", "correcta": true},
+        {"texto": "Base inestable no fue corregida", "correcta": true},
+        {"texto": "El edificio tenía 8 pisos", "correcta": false},
+        {"texto": "Trabajador sin arnés conectado", "correcta": true},
+        {"texto": "No se suspendió trabajo con viento alto", "correcta": true}
+      ]
+    },
+    {
+      "id": "Q2",
+      "tipo": "respuesta_abierta_guiada",
+      "peso": 25,
+      "pregunta": "Describa las fallas en el sistema de gestión de trabajo en alturas.",
+      "feedback_guiado": "Considere: certificación, inspección, arnés, condiciones climáticas, supervisión",
+      "longitud_minima": 80
+    },
+    {
+      "id": "Q3",
+      "tipo": "ordenamiento_dinamico",
+      "peso": 15,
+      "pregunta": "Ordene los pasos CORRECTOS para trabajo seguro en andamios:",
+      "opciones": [
+        "Verificar certificación de instaladores de andamio",
+        "Inspeccionar andamio antes de cada uso",
+        "Verificar base estable y nivelada",
+        "Instalar barandales y rodapiés",
+        "Conectar arnés a punto de anclaje independiente",
+        "Verificar condiciones climáticas",
+        "Suspender trabajo con viento > 35 km/h",
+        "Documentar inspección en bitácora"
+      ]
+    },
+    {
+      "id": "Q4",
+      "tipo": "plan_accion",
+      "peso": 25,
+      "pregunta": "Seleccione las acciones correctivas PRIORITARIAS:",
+      "opciones": [
+        {
+          "texto": "Implementar sistema de certificación para instaladores de andamios",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Instalar sistema de anclaje independiente para arneses",
+          "jerarquia": "ingenieria",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Implementar inspección diaria de andamios con bitácora",
+          "jerarquia": "administrativo",
+          "prioridad": "1"
+        },
+        {
+          "texto": "Capacitar en condiciones climáticas límite para alturas",
+          "jerarquia": "administrativo",
+          "prioridad": "2"
+        },
+        {
+          "texto": "Comprar más arneses",
+          "jerarquia": "epp",
+          "prioridad": "4"
+        }
+      ]
+    },
+    {
+      "id": "Q5",
+      "tipo": "analisis_normativo",
+      "peso": 15,
+      "pregunta": "Seleccione las NOM aplicables:",
+      "opciones": [
+        {"texto": "NOM-009-STPS-2011 (Trabajo en alturas)", "correcta": true},
+        {"texto": "NOM-031-STPS-2011 (Comisiones de seguridad)", "correcta": false},
+        {"texto": "NOM-017-STPS-2008 (Equipo de protección personal)", "correcta": true},
+        {"texto": "NOM-006-STPS-2014 (Manejo de materiales)", "correcta": true}
+      ]
+    }
+  ],
+  
+  "metadatos_evaluacion": {
+    "puntaje_maximo": 100,
+    "puntaje_aprobacion": 75,
+    "tiempo_estimado_minutos": 30
+  },
+  
+  "conclusion_oficial": "El accidente fue prevenible. Múltiples fallas permitieron el incidente: andamio instalado por personal no certificado, sin inspección previa, base inestable no corregida, trabajador sin arnés conectado y trabajo continuado con condiciones climáticas adversas.",
+  
+  "leccion_aprendida": "Trabajo en alturas requiere: 1) Andamios instalados por personal certificado, 2) Inspección antes de cada uso con bitácora, 3) Base estable y nivelada, 4) Arnés conectado a punto de anclaje independiente, 5) Suspender con viento > 35 km/h, 6) Supervisión que corrige condiciones inseguras."
+}
