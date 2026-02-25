@@ -233,6 +233,8 @@ body {
 
 .btn-warning:hover {
     background: linear-gradient(135deg, #7B1FA2 0%, #6A1B9A 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(156,39,176,0.4);
 }
 
 /* Danger - Rojo (Eliminar/Salir) */
@@ -1129,6 +1131,7 @@ body {
     margin-bottom: 25px !important;
     visibility: visible !important;
 }
+
 
 
 
