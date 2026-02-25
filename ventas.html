@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RayoShield PRO - Plataforma de Evaluación SHE</title>
+    <title>RayoShield PRO - Planes y Precios</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; }
@@ -26,7 +26,9 @@
             text-decoration: none;
             font-weight: bold;
             font-size: 18px;
+            transition: transform 0.3s;
         }
+        .hero .btn:hover { transform: translateY(-3px); }
         
         /* FEATURES */
         .features { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
@@ -41,7 +43,9 @@
             padding: 30px;
             background: #f5f7fa;
             border-radius: 15px;
+            transition: transform 0.3s;
         }
+        .feature-card:hover { transform: translateY(-5px); }
         .feature-card .icon { font-size: 48px; margin-bottom: 20px; }
         .feature-card h3 { color: #1a237e; margin-bottom: 15px; }
         
@@ -62,11 +66,14 @@
             text-align: center;
             box-shadow: 0 5px 25px rgba(0,0,0,0.1);
             position: relative;
+            transition: transform 0.3s;
         }
+        .pricing-card:hover { transform: translateY(-5px); }
         .pricing-card.destacado {
             border: 3px solid #2196F3;
             transform: scale(1.05);
         }
+        .pricing-card.destacado:hover { transform: scale(1.05) translateY(-5px); }
         .pricing-card .badge {
             position: absolute;
             top: 20px;
@@ -95,9 +102,7 @@
             padding: 10px 0;
             border-bottom: 1px solid #eee;
         }
-        .pricing-card ul li::before {
-            content: '✅ ';
-        }
+        .pricing-card ul li::before { content: '✅ '; }
         .pricing-card .btn {
             display: block;
             background: linear-gradient(135deg, #2196F3, #1976D2);
@@ -106,7 +111,27 @@
             border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
+            transition: opacity 0.3s;
         }
+        .pricing-card .btn:hover { opacity: 0.9; }
+        
+        /* OFERTAS */
+        .ofertas { padding: 60px 20px; background: #FFF3E0; text-align: center; }
+        .ofertas h2 { color: #E65100; margin-bottom: 40px; }
+        .ofertas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .oferta-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .oferta-card h4 { color: #1976D2; margin-bottom: 10px; }
+        .oferta-card p { color: #666; }
         
         /* TESTIMONIALS */
         .testimonials { padding: 80px 20px; max-width: 1200px; margin: 0 auto; }
@@ -129,6 +154,16 @@
         }
         .cta h2 { font-size: 36px; margin-bottom: 20px; }
         .cta p { font-size: 18px; opacity: 0.9; margin-bottom: 40px; }
+        .cta .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700, #FFA726);
+            color: #1a1a1a;
+            padding: 15px 40px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
         
         /* FOOTER */
         footer {
@@ -137,6 +172,8 @@
             padding: 40px 20px;
             text-align: center;
         }
+        footer a { color: white; text-decoration: none; margin: 0 10px; }
+        footer a:hover { text-decoration: underline; }
         
         /* RESPONSIVE */
         @media (max-width: 768px) {
@@ -256,20 +293,20 @@
     </section>
     
     <!-- OFERTAS -->
-    <section style="padding: 60px 20px; background: #FFF3E0; text-align: center;">
-        <h2 style="color: #E65100; margin-bottom: 40px;">🎉 Ofertas de Lanzamiento</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto;">
-            <div style="background: white; padding: 20px; border-radius: 10px;">
-                <h4 style="color: #1976D2;">🚀 Early Adopter</h4>
-                <p style="color: #666;">30% de descuento primeros 50 clientes</p>
+    <section class="ofertas">
+        <h2>🎉 Ofertas de Lanzamiento</h2>
+        <div class="ofertas-grid">
+            <div class="oferta-card">
+                <h4>🚀 Early Adopter</h4>
+                <p>30% de descuento primeros 50 clientes</p>
             </div>
-            <div style="background: white; padding: 20px; border-radius: 10px;">
-                <h4 style="color: #388E3C;">👥 Equipos</h4>
-                <p style="color: #666;">15% descuento 5+ licencias</p>
+            <div class="oferta-card">
+                <h4>👥 Equipos</h4>
+                <p>15% descuento 5+ licencias</p>
             </div>
-            <div style="background: white; padding: 20px; border-radius: 10px;">
-                <h4 style="color: #F57C00;">💳 Anual</h4>
-                <p style="color: #666;">2 meses gratis pago anual</p>
+            <div class="oferta-card">
+                <h4>💳 Anual</h4>
+                <p>2 meses gratis pago anual</p>
             </div>
         </div>
     </section>
@@ -299,9 +336,9 @@
     <footer>
         <p>© 2026 RayoShield. Todos los derechos reservados.</p>
         <p style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
-            <a href="app.html" style="color: white;">Acceder a la App</a> | 
-            <a href="#" style="color: white;">Términos y Condiciones</a> | 
-            <a href="#" style="color: white;">Política de Privacidad</a>
+            <a href="app.html">Acceder a la App</a> | 
+            <a href="#">Términos y Condiciones</a> | 
+            <a href="#">Política de Privacidad</a>
         </p>
     </footer>
 </body>
