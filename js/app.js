@@ -704,14 +704,10 @@ const app = {
 
         
         // ✅ FILTRAR CASOS SEGÚN PLAN
-        var nivelMaximo = 'basico'; // DEMO por defecto
-        if (this.licencia.tipo === 'PROFESIONAL') nivelMaximo = 'master';
-        else if (this.licencia.tipo === 'CONSULTOR') nivelMaximo = 'elite';
-        else if (this.licencia.tipo === 'EMPRESARIAL') nivelMaximo = 'pericial';
-    
         CASOS_INVESTIGACION.forEach(function(caso) {
             // ✅ Verificar si el usuario tiene acceso a este nivel
             var tieneAcceso = false;
+        
             if (caso.nivel === 'basico' && self.licencia.features.casosBasicos) tieneAcceso = true;
             else if (caso.nivel === 'master' && self.licencia.features.casosMaster) tieneAcceso = true;
             else if (caso.nivel === 'elite' && self.licencia.features.casosElite) tieneAcceso = true;
@@ -725,6 +721,11 @@ const app = {
                 list.appendChild(item);
             }
         });
+    
+        // ✅ Mensaje si no hay casos disponibles para este plan
+        if (list.children.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos disponibles para tu plan actual.<br><strong>Actualiza tu plan para acceder a más casos.</strong></p>';
+        }
     
         this.mostrarPantalla('casos-master-screen');
     },
@@ -1272,6 +1273,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
