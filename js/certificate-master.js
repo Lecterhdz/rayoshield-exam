@@ -471,60 +471,214 @@ function descargarCertificadoMaster(imageUrl, filename = 'certificado-master.png
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// GENERAR INSIGNIA PNG (400x400 - NO CERTIFICADO)
+// GENERAR INSIGNIA PNG (800x800 - METÁLICA PREMIUM)
 // ─────────────────────────────────────────────────────────────────────
 async function generarInsigniaPNG(userData, caso, resultado) {
     const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 400;
+    canvas.width = 800;
+    canvas.height = 800;
     const ctx = canvas.getContext('2d');
-    
-    // Fondo circular dorado
-    const gradient = ctx.createRadialGradient(200, 200, 0, 200, 200, 200);
-    gradient.addColorStop(0, '#FFD700');
-    gradient.addColorStop(1, '#B8860B');
-    ctx.fillStyle = gradient;
+    const centerX = 400;
+    const centerY = 400;
+    const radioPrincipal = 350;
+
+    // ✅ DETERMINAR NIVEL Y COLORES SEGÚN PUNTAJE
+    var nivel = 'MASTER';
+    var tipo = 'plata';
+    var emoji = '🥈';
+    var colorPrincipal = '#C0C0C0';
+    var colorSecundario = '#E8E8E8';
+    var colorTerciario = '#999999';
+    var fondo = '#F5F5F5';
+
+    if (resultado.porcentaje >= 95) {
+        nivel = 'PERICIAL'; tipo = 'platino'; emoji = '⚖️';
+        colorPrincipal = '#E5E4E2'; colorSecundario = '#F0F0F0'; colorTerciario = '#CCCCCC'; fondo = '#FAFAFA';
+    } else if (resultado.porcentaje >= 90) {
+        nivel = 'ELITE'; tipo = 'oro'; emoji = '🥇';
+        colorPrincipal = '#FFD700'; colorSecundario = '#FFA500'; colorTerciario = '#DAA520'; fondo = '#FFFDE7';
+    } else if (resultado.porcentaje >= 80) {
+        nivel = 'MASTER'; tipo = 'plata'; emoji = '🥈';
+        colorPrincipal = '#C0C0C0'; colorSecundario = '#E8E8E8'; colorTerciario = '#999999'; fondo = '#F5F5F5';
+    } else if (resultado.porcentaje >= 75) {
+        nivel = 'AVANZADO'; tipo = 'bronce'; emoji = '🥉';
+        colorPrincipal = '#CD7F32'; colorSecundario = '#B87333'; colorTerciario = '#A0522D'; fondo = '#FFF8E1';
+    } else {
+        nivel = 'PARTICIPACIÓN'; tipo = 'bronce'; emoji = '📚';
+        colorPrincipal = '#CD7F32'; colorSecundario = '#B87333'; colorTerciario = '#A0522D'; fondo = '#FFF3E0';
+    }
+
+    // ✅ FUNCIÓN GRADIENTE METÁLICO
+    function crearGradienteMetalico(ctx, x1, y1, x2, y2, tipo) {
+        const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+        if (tipo === 'bronce') {
+            grad.addColorStop(0, '#CD7F32'); grad.addColorStop(0.3, '#B87333'); grad.addColorStop(0.5, '#A0522D'); grad.addColorStop(0.7, '#B87333'); grad.addColorStop(1, '#CD7F32');
+        } else if (tipo === 'plata') {
+            grad.addColorStop(0, '#E8E8E8'); grad.addColorStop(0.3, '#C0C0C0'); grad.addColorStop(0.5, '#999999'); grad.addColorStop(0.7, '#C0C0C0'); grad.addColorStop(1, '#E8E8E8');
+        } else if (tipo === 'oro') {
+            grad.addColorStop(0, '#FFD700'); grad.addColorStop(0.3, '#FFA500'); grad.addColorStop(0.5, '#DAA520'); grad.addColorStop(0.7, '#FFA500'); grad.addColorStop(1, '#FFD700');
+        } else if (tipo === 'platino') {
+            grad.addColorStop(0, '#F0F0F0'); grad.addColorStop(0.3, '#E5E4E2'); grad.addColorStop(0.5, '#CCCCCC'); grad.addColorStop(0.7, '#E5E4E2'); grad.addColorStop(1, '#F0F0F0');
+        }
+        return grad;
+    }
+
+    // ✅ FUNCIÓN DIBUJAR ESTRELLA
+    function dibujarEstrella(ctx, x, y, radioExterno, radioInterno, puntas, color) {
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        for (let i = 0; i < puntas * 2; i++) {
+            const radio = i % 2 === 0 ? radioExterno : radioInterno;
+            const angulo = (Math.PI / puntas) * i - Math.PI / 2;
+            const px = x + Math.cos(angulo) * radio;
+            const py = y + Math.sin(angulo) * radio;
+            if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // 1. FONDO CON GRADIENTE RADIAL SUAVE
+    const gradienteFondo = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 500);
+    gradienteFondo.addColorStop(0, fondo);
+    gradienteFondo.addColorStop(1, '#ffffff');
+    ctx.fillStyle = gradienteFondo;
+    ctx.fillRect(0, 0, 800, 800);
+
+    // 2. RAYS DECORATIVOS (EFECTO DE BRILLO)
+    for (let i = 0; i < 16; i++) {
+        const angulo = (Math.PI * 2 / 16) * i;
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(angulo);
+        const gradRay = ctx.createLinearGradient(0, 0, 380, 0);
+        gradRay.addColorStop(0, 'rgba(255,255,255,0)');
+        gradRay.addColorStop(0.5, 'rgba(255,255,255,0.3)');
+        gradRay.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradRay;
+        ctx.beginPath();
+        ctx.moveTo(280, -15);
+        ctx.lineTo(380, 0);
+        ctx.lineTo(280, 15);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
+    // 3. SOMBRA EXTERIOR (EFECTO 3D)
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+    ctx.shadowBlur = 60;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 15;
+
+    // 4. CÍRCULO PRINCIPAL BLANCO
     ctx.beginPath();
-    ctx.arc(200, 200, 200, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, radioPrincipal, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
-    
-    // Borde
-    ctx.strokeStyle = '#FFA000';
-    ctx.lineWidth = 8;
-    ctx.beginPath();
-    ctx.arc(200, 200, 190, 0, Math.PI * 2);
+
+    // RESET SOMBRA
+    ctx.shadowColor = 'transparent';
+
+    // 5. BORDE METÁLICO CON GRADIENTE (EFECTO RELIEVE)
+    const gradienteBorde = crearGradienteMetalico(ctx, 0, 0, 800, 800, tipo);
+    ctx.strokeStyle = gradienteBorde;
+    ctx.lineWidth = 20;
     ctx.stroke();
+
+    // 6. BORDE DECORATIVO INTERIOR (MÚLTIPLES CAPAS PARA EFECTO 3D)
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 335, 0, Math.PI * 2);
+    ctx.strokeStyle = colorSecundario;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 330, 0, Math.PI * 2);
+    ctx.strokeStyle = colorTerciario;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // 7. CÍRCULO INTERIOR CON GRADIENTE RADIAL (EFECTO CÚPULA)
+    const gradienteInterior = ctx.createRadialGradient(centerX - 50, centerY - 50, 0, centerX, centerY, 280);
+    gradienteInterior.addColorStop(0, '#ffffff');
+    gradienteInterior.addColorStop(0.5, fondo);
+    gradienteInterior.addColorStop(1, '#f0f0f0');
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 280, 0, Math.PI * 2);
+    ctx.fillStyle = gradienteInterior;
+    ctx.fill();
+
+    // 8. ESTRELLAS DECORATIVAS (5 ESTRELLAS)
+    const posicionesEstrellas = [
+        { x: centerX, y: 140, radio: 38 },
+        { x: centerX - 280, y: 280, radio: 28 },
+        { x: centerX + 280, y: 280, radio: 28 },
+        { x: centerX - 200, y: 580, radio: 28 },
+        { x: centerX + 200, y: 580, radio: 28 }
+    ];
     
-    // Icono según nivel
-    var icono = '🥈';
-    var textoNivel = 'MASTER';
-    if (resultado.porcentaje >= 95) { icono = '⚖️'; textoNivel = 'PERICIAL'; }
-    else if (resultado.porcentaje >= 90) { icono = '🥇'; textoNivel = 'ELITE'; }
-    else if (resultado.porcentaje >= 80) { icono = '🥈'; textoNivel = 'MASTER'; }
-    else if (resultado.porcentaje >= 75) { icono = '🥉'; textoNivel = 'AVANZADO'; }
-    
-    // Icono
-    ctx.font = '80px Arial';
+    posicionesEstrellas.forEach(pos => {
+        dibujarEstrella(ctx, pos.x, pos.y, pos.radio, pos.radio * 0.4, 5, colorSecundario);
+    });
+
+    // 9. EMOJI/ICONO PRINCIPAL CON EFECTO 3D
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 15;
+    ctx.font = '180px "Segoe UI Emoji", Arial';
     ctx.textAlign = 'center';
-    ctx.fillText(icono, 200, 180);
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, centerX, 360);
+
+    // RESET SOMBRA
+    ctx.shadowColor = 'transparent';
+
+    // 10. NOMBRE DEL NIVEL CON GRADIENTE METÁLICO
+    ctx.font = 'bold 60px "Segoe UI", Arial';
+    const gradienteTexto = crearGradienteMetalico(ctx, centerX - 200, 0, centerX + 200, 0, tipo);
+    ctx.fillStyle = gradienteTexto;
+    ctx.fillText(nivel, centerX, 500);
+
+    // 11. LÍNEA DECORATIVA METÁLICA
+    ctx.beginPath();
+    ctx.moveTo(centerX - 150, 530);
+    ctx.lineTo(centerX + 150, 530);
+    ctx.strokeStyle = colorSecundario;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // 12. NOMBRE DEL USUARIO (DOS PALABRAS - NOMBRE Y APELLIDO)
+    ctx.font = 'bold 32px "Segoe UI", Arial';
+    ctx.fillStyle = '#333333';
+    var nombreCompleto = userData.nombre || 'Usuario';
+    var partesNombre = nombreCompleto.trim().split(/\s+/);
+    var nombreMostrar = partesNombre.length >= 2 ? partesNombre[0] + ' ' + partesNombre[1] : nombreCompleto;
+    ctx.fillText(nombreMostrar, centerX, 590);
+
+    // 13. FECHA DE EMISIÓN (MM/YYYY)
+    var fecha = new Date();
+    var mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
+    var anio = fecha.getFullYear().toString();
+    var fechaFormato = mes + '/' + anio;
     
-    // Nivel
-    ctx.font = 'bold 28px Arial';
-    ctx.fillStyle = '#1a237e';
-    ctx.fillText(textoNivel, 200, 260);
-    
-    // Nombre
-    ctx.font = '18px Arial';
-    ctx.fillStyle = '#333';
-    var nombre = userData.nombre ? userData.nombre.split(' ')[0] : 'Usuario';
-    ctx.fillText(nombre, 200, 320);
-    
-    // Año
-    ctx.font = '14px Arial';
-    ctx.fillStyle = '#666';
-    ctx.fillText(new Date().getFullYear(), 200, 360);
-    
-    return canvas.toDataURL('image/png');
+    ctx.font = '28px "Segoe UI", Arial';
+    ctx.fillStyle = '#666666';
+    ctx.fillText('Emisión: ' + fechaFormato, centerX, 640);
+
+    // 14. RAYOSHIELD PRO
+    ctx.font = 'bold 24px "Segoe UI", Arial';
+    ctx.fillStyle = '#999999';
+    ctx.fillText('🛡️ RayoShield PRO', centerX, 690);
+
+    // 15. BORDE FINAL EXTERIOR
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 345, 0, Math.PI * 2);
+    ctx.strokeStyle = colorPrincipal;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    return canvas.toDataURL('image/png', 1.0);
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -538,3 +692,4 @@ if (typeof window !== 'undefined') {
     window.generarInsigniaPNG = generarInsigniaPNG;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
+
