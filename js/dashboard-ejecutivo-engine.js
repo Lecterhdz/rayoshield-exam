@@ -98,7 +98,7 @@ const DashboardEngine = {
                 <div style="background: linear-gradient(135deg, #2196F3, #1976D2); padding: 30px; border-radius: 15px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(33,150,243,0.3);">
                     <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px; font-weight: 500;">SCORE BASE</div>
                     <div style="font-size: 64px; font-weight: 700; margin: 10px 0;">${scoreBase}%</div>
-                    <div style="font-size: 12px; opacity: 0.85;">Respuestas Correctas (scoring.js)</div>
+                    <div style="font-size: 12px; opacity: 0.85;">Respuestas Correctas (scoring)</div>
                 </div>
             
                 <!-- SCORE COMPETENCIAS -->
@@ -242,6 +242,9 @@ const DashboardEngine = {
 
             <!-- BOTONES -->
             <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 30px 0; padding-top: 25px; border-top: 2px solid #e0e0e0;">
+                <button onclick="app.descargarCertificadoCaso(false)" style="background: linear-gradient(135deg, #2196F3, #1976D2); color: white; padding: 14px 35px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(33,150,243,0.4);">
+                    📄 DESCARGAR CERTIFICADO
+                </button>
                 <button onclick="app.descargarInsignia()" style="background: linear-gradient(135deg, #D4AF37, #FFD700); color: #1a1a1a; padding: 14px 35px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; box-shadow: 0 4px 15px rgba(212,175,55,0.4);">
                     🏅 DESCARGAR INSIGNIA
                 </button>
@@ -256,9 +259,6 @@ const DashboardEngine = {
             <!-- FOOTER -->
             <div style="text-align: center; padding: 25px; border-top: 2px solid #e0e0e0; background: white; border-radius: 0 0 12px 12px; margin: 0 0 30px 0;">
                 <p style="margin: 0 0 8px 0; color: #1a237e; font-size: 12px; font-weight: 600;">${this.config.empresa} INTELLIGENCE ENGINE v4.1</p>
-                <p style="margin: 0 0 8px 0; color: #999; font-size: 11px;">
-                    📧 ${this.config.contacto.email} &nbsp;|&nbsp; 📞 ${this.config.contacto.telefono} &nbsp;|&nbsp; 🌐 ${this.config.contacto.web}
-                </p>
                 <p style="margin: 0; color: #bbb; font-size: 10px; font-style: italic;">Documento confidencial - Uso exclusivo para evaluación SHE</p>
             </div>
         </div>
@@ -447,4 +447,5 @@ if (typeof window !== 'undefined') {
     DashboardEngine.cargarConfig();
     console.log('✅ Executive Dashboard Engine v4.1 cargado');
 }
+
 
