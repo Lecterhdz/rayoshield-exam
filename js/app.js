@@ -670,11 +670,32 @@ const app = {
     },
 
     descargarCertificado: function() {
-        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { alert('Solo para aprobados'); return; }
+        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { 
+            alert('Solo para aprobados'); 
+            return; 
+        }
+    
         var self = this;
+    
+        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
+        if (typeof generarCertificado !== 'function') {
+            alert('❌ Error: Función de certificado no cargada. Recarga la página (Ctrl+F5).');
+            console.error('generarCertificado no está definida');
+            return;
+        }
+    
         generarCertificado(this.userData, this.examenActual, this.resultadoActual).then(function(url) {
-            var a = document.createElement('a'); a.download = 'certificado_' + Date.now() + '.png'; a.href = url; a.click();
-        }).catch(function() { alert('Error generando certificado'); });
+            var a = document.createElement('a');
+            var nombreArchivo = 'RayoShield_CERTIFICADO_EXAMEN_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = nombreArchivo;
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }).catch(function(err) {
+            console.error('Error generando certificado:', err);
+            alert('❌ Error generando certificado: ' + err.message);
+        });
     },
     // ─────────────────────────────────────────────────────────────────────
     // DESCARGAR CERTIFICADO DE CASO (CON/SIN MARCA DE AGUA)
@@ -1432,6 +1453,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
