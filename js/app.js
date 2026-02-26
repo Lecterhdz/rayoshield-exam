@@ -702,6 +702,7 @@ const app = {
         // ✅ GENERAR CERTIFICADO CON EL NIVEL CORRECTO
         if (typeof generarCertificadoCaso !== 'function') {
             alert('❌ Error: Función de certificado no cargada. Recarga la página.');
+            console.error('generarCertificadoCaso no está definida');
             return;
         }
     
@@ -710,10 +711,12 @@ const app = {
             var nombreArchivo = 'RayoShield_CERTIFICADO_' + nivelCertificado + '_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.download = nombreArchivo;
             a.href = url;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
         }).catch(function(err) {
-            console.error('Error:', err);
-            alert('❌ Error generando certificado');
+            console.error('Error generando certificado:', err);
+            alert('❌ Error generando certificado' + err.message);
         });
     },
     // ─────────────────────────────────────────────────────────────────────
@@ -1429,6 +1432,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
