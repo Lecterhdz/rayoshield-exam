@@ -255,10 +255,10 @@ async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarca
     
     // Línea de firmas
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 500, 1520);
-    ctx.lineTo(canvas.width / 2 - 100, 1520);
-    ctx.moveTo(canvas.width / 2 + 100, 1520);
-    ctx.lineTo(canvas.width / 2 + 500, 1520);
+    ctx.moveTo(canvas.width / 2 - 500, 1320);
+    ctx.lineTo(canvas.width / 2 - 100, 1320);
+    ctx.moveTo(canvas.width / 2 + 100, 1320);
+    ctx.lineTo(canvas.width / 2 + 500, 1320);
     ctx.strokeStyle = '#1a1a1a';
     ctx.lineWidth = 3;
     ctx.stroke();
@@ -267,18 +267,18 @@ async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarca
     ctx.font = 'italic 38px "Segoe UI", Arial';
     ctx.fillStyle = '#1a237e';
     ctx.textAlign = 'center';
-    ctx.fillText('_________________________', canvas.width / 2 - 300, 1500);
+    ctx.fillText('_________________________', canvas.width / 2 - 300, 1350);
     ctx.font = 'bold 32px "Segoe UI", Arial';
     ctx.fillStyle = '#1a1a1a';
-    ctx.fillText('Director SHE', canvas.width / 2 - 300, 1550);
+    ctx.fillText('Director SHE', canvas.width / 2 - 300, 1400);
     
     // Firma derecha
     ctx.font = 'italic 38px "Segoe UI", Arial';
     ctx.fillStyle = '#1a237e';
-    ctx.fillText('_________________________', canvas.width / 2 + 300, 1500);
+    ctx.fillText('_________________________', canvas.width / 2 + 300, 1350);
     ctx.font = 'bold 32px "Segoe UI", Arial';
     ctx.fillStyle = '#1a1a1a';
-    ctx.fillText('Instructor Certificado', canvas.width / 2 + 300, 1550);
+    ctx.fillText('Instructor Certificado', canvas.width / 2 + 300, 1400);
     
     // Fecha
     ctx.font = '30px "Segoe UI", Arial';
@@ -470,7 +470,6 @@ function descargarCertificadoMaster(imageUrl, filename = 'certificado-master.png
     link.click();
 }
 
-
 // ─────────────────────────────────────────────────────────────────────
 // GENERAR INSIGNIA PNG (400x400 - NO CERTIFICADO)
 // ─────────────────────────────────────────────────────────────────────
@@ -528,11 +527,6 @@ async function generarInsigniaPNG(userData, caso, resultado) {
     return canvas.toDataURL('image/png');
 }
 
-// Exportar
-if (typeof window !== 'undefined') {
-    window.generarInsigniaPNG = generarInsigniaPNG;
-}
-
 // ─────────────────────────────────────────────────────────────────────
 // EXPORTAR FUNCIONES (UNA SOLA VEZ AL FINAL)
 // ─────────────────────────────────────────────────────────────────────
@@ -541,7 +535,6 @@ if (typeof window !== 'undefined') {
     window.generarCertificadoCaso = generarCertificadoCaso;
     window.generarCertificadoMaster = generarCertificadoMaster;
     window.descargarCertificadoMaster = descargarCertificadoMaster;
+    window.generarInsigniaPNG = generarInsigniaPNG;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
-
-
