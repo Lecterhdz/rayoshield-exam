@@ -763,7 +763,55 @@ const app = {
             alert('❌ Error generando certificado: ' + err.message);
         });
     },
+    // ─────────────────────────────────────────────────────────────────────
+    // IMPRIMIR CERTIFICADO DE CASO
+    // ─────────────────────────────────────────────────────────────────────
+    imprimirCertificadoCaso: function(conMarcaDeAgua) {
+        if (!this.casoActual || !this.resultadoCaso) {
+            alert('❌ No hay certificado disponible');
+            return;
+        }
+        if (!this.resultadoCaso.aprobado) {
+            alert('⚠️ Debes aprobar el caso para imprimir el certificado');
+            return;
+        }
     
+        var self = this;
+    
+        // ✅ DETERMINAR NIVEL DEL CERTIFICADO
+        var nivelCertificado = '';
+        if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
+        else if (this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
+        else if (this.casoActual.nivel === 'elite') nivelCertificado = 'ELITE';
+        else if (this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
+        else nivelCertificado = 'COMPLETADO';
+    
+        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
+        if (typeof generarCertificadoCaso !== 'function') {
+            alert('❌ Error: Función de certificado no cargada. Recarga la página.');
+            console.error('generarCertificadoCaso no está definida');
+            return;
+        }
+    
+        // ✅ GENERAR CERTIFICADO Y ABRIR DIÁLOGO DE IMPRESIÓN
+        generarCertificadoCaso(this.userData, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
+            // Crear ventana emergente para imprimir
+            var printWindow = window.open('', '_blank');
+            printWindow.document.write('<html><head><title>Imprimir Certificado</title></head><body style="margin:0;padding:20px;text-align:center;">');
+            printWindow.document.write('<img src="' + url + '" style="max-width:100%;height:auto;" onload="window.print();">');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+        
+            // Cerrar ventana después de imprimir (opcional)
+            setTimeout(function() {
+                // printWindow.close(); // Descomentar si quieres cerrar automáticamente
+            }, 5000);
+        }).catch(function(err) {
+            console.error('Error generando certificado:', err);
+            alert('❌ Error generando certificado: ' + err.message);
+        });
+    },
     // ─────────────────────────────────────────────────────────────────────
     // DESCARGAR INSIGNIA
     // ─────────────────────────────────────────────────────────────────────
@@ -1560,5 +1608,6 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
