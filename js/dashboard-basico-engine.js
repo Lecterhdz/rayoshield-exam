@@ -1,6 +1,6 @@
 // ─────────────────────────────────────────────────────────────────────
-// RAYOSHIELD PRO - DASHBOARD BÁSICO ENGINE (v2.0)
-// Muestra Score Base + Competencias por separado
+// RAYOSHIELD PRO - DASHBOARD BÁSICO ENGINE (v3.0 - BOTONES CORREGIDOS)
+// Muestra Score Base + Competencias + Botones Correctos
 // ─────────────────────────────────────────────────────────────────────
 
 const DashboardBasico = {
@@ -56,17 +56,29 @@ const DashboardBasico = {
                 '</div>';
         }
         
-        // ✅ NOTA ACLARATORIA (IMPORTANTE)
+        // ✅ NOTA ACLARATORIA
         var notaHTML = '<div style="margin-top:20px;padding:15px;background:#E3F2FD;border-radius:10px;font-size:13px;border-left:4px solid #2196F3;">' +
             '<strong style="color:#1565C0;">📝 Nota sobre la evaluación:</strong>' +
             '<p style="margin:10px 0 0 0;color:#0D47A1;line-height:1.6;">' +
             'El <strong>Score Base (' + scoreBase + '%)</strong> refleja las respuestas correctas/incorrectas. ' +
             'El <strong>Score Competencias (' + scoreCompetencias + '%)</strong> evalúa las 5 dimensiones de competencia SHE. ' +
-            (scoreCompetencias > scoreBase ? 
-                '<br><br><strong>💡 Tu análisis fue excelente:</strong> Las dimensiones evaluadas muestran un desempeño superior al score base.' : 
-                '<br><br><strong>💡 Recomendación:</strong> Revisar las dimensiones con menos del 70%.') +
             '</p>' +
             '</div>';
+        
+        // ✅ BOTONES SEGÚN PLAN (consultar app.licencia.tipo)
+        var botonesHTML = '<div style="margin-top:30px;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">';
+        
+        // Botón Certificado (TODOS los planes)
+        botonesHTML += '<button onclick="app.descargarCertificadoCaso(false)" style="background:linear-gradient(135deg,#2196F3,#1976D2);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">📄 Descargar Certificado</button>';
+        
+        // Botón Insignia (solo CONSULTOR y EMPRESARIAL)
+        if (app.licencia && (app.licencia.tipo === 'CONSULTOR' || app.licencia.tipo === 'EMPRESARIAL')) {
+            botonesHTML += '<button onclick="app.descargarInsignia()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">🏅 Descargar Insignia</button>';
+        }
+        
+        botonesHTML += '<button onclick="app.imprimirDashboard()" style="background:linear-gradient(135deg,#607D8B,#546E7A);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ Imprimir</button>';
+        botonesHTML += '<button onclick="app.volverAListaCasos()" style="background:linear-gradient(135deg,#9E9E9E,#757575);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">🔄 Otro caso</button>';
+        botonesHTML += '</div>';
         
         // ✅ HTML COMPLETO
         return '<div class="dashboard-container" style="max-width:800px;margin:0 auto;padding:20px;font-family:\'Segoe UI\',Arial,sans-serif;">' +
@@ -113,10 +125,7 @@ const DashboardBasico = {
             notaHTML +
             
             // BOTONES
-            '<div style="margin-top:30px;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">' +
-            '<button onclick="app.imprimirDashboard()" style="background:linear-gradient(135deg,#607D8B,#546E7A);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">🖨️ Imprimir</button>' +
-            '<button onclick="app.volverAListaCasos()" style="background:linear-gradient(135deg,#9E9E9E,#757575);color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;cursor:pointer;">🔄 Otro caso</button>' +
-            '</div>' +
+            botonesHTML +
             
             '</div>';
     }
@@ -125,5 +134,5 @@ const DashboardBasico = {
 // Exportar
 if (typeof window !== 'undefined') {
     window.DashboardBasico = DashboardBasico;
-    console.log('✅ Dashboard Básico Engine v2.0 cargado - Score Base + Competencias');
+    console.log('✅ Dashboard Básico Engine v3.0 cargado - Botones corregidos');
 }
