@@ -1500,7 +1500,7 @@ const app = {
         var btnImprimir = document.querySelector('button[onclick*="imprimirDashboard"]');
         var btnOtroCaso = document.querySelector('button[onclick*="volverAListaCasos"]');
         // Los botones ya tienen onclick inline, no necesitan re-bind
-    }
+    },
     
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
@@ -1560,4 +1560,5 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
