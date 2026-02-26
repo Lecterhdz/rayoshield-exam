@@ -1221,8 +1221,36 @@ const app = {
                     break;
             }
         });
-        
-        var resultado = SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual);
+        // ✅ ARQUITECTURA HÍBRIDA SEGÚN PLAN
+        var resultado;
+    
+        // EMPRESARIAL: SmartEvaluationV2 para TODOS los casos
+        if (this.licencia.tipo === 'EMPRESARIAL' && typeof SmartEvaluationV2 !== 'undefined') {
+            resultado = SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual);
+        }
+        // CONSULTOR: SmartEvaluationV2 solo para ELITE+ (justifica dashboard)
+        else if (this.licencia.tipo === 'CONSULTOR' && 
+                 (this.casoActual.nivel === 'elite' || this.casoActual.nivel === 'pericial') &&
+                 typeof SmartEvaluationV2 !== 'undefined') {
+            resultado = SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual);
+        }
+        // DEMO + PROFESIONAL + CONSULTOR (básicos/master): scoring.js
+        else if (typeof evaluarCasoInvestigacion === 'function') {
+            resultado = evaluarCasoInvestigacion(respuestasPorPregunta, this.casoActual);
+        }
+        // Fallback
+        else {
+            resultado = {
+                puntajeTotal: 0,
+                puntajeMaximo: 100,
+                porcentaje: 0,
+                aprobado: false,
+                estado: 'Error',
+                feedback: ['❌ Error: Sistema de evaluación no cargado. Recarga (Ctrl+F5).'],
+                leccion: 'Error en la evaluación',
+                conclusion: 'Verifica que scoring.js esté cargado'
+            };
+        }
         this.resultadoCaso = resultado;
         this.mostrarResultadoCaso(resultado);
     },
@@ -1453,6 +1481,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
