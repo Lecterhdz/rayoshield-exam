@@ -779,20 +779,22 @@ const app = {
         
         var self = this;
         
-        if (typeof generarCertificadoMaster !== 'function') {
+        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
+        if (typeof generarInsigniaPNG !== 'function') {
             alert('❌ Error: Función de insignia no cargada. Recarga la página.');
-            console.error('generarCertificadoMaster no está definida');
+            console.error('generarInsigniaPNG no está definida');
             return;
         }
-        
-        generarCertificadoMaster(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
+    
+        generarInsigniaPNG(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
             var a = document.createElement('a');
             a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.href = url;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-        }).catch(function() {
+        }).catch(function(err) {
+            console.error('Error generando insignia:', err);
             alert('❌ Error generando insignia');
         });
     },
@@ -1471,14 +1473,34 @@ const app = {
     imprimirDashboard: function() {
         var dashboardEl = document.querySelector('.dashboard-container');
         if (dashboardEl) {
+            // ✅ Guardar estado actual
             var contenidoOriginal = document.body.innerHTML;
+            var scrollPos = window.scrollY;
+        
+            // ✅ Preparar para imprimir
             document.body.innerHTML = dashboardEl.outerHTML;
+        
+            // ✅ Imprimir
             window.print();
-            location.reload();
+        
+            // ✅ RESTAURAR estado (NO recargar)
+            document.body.innerHTML = contenidoOriginal;
+            window.scrollTo(0, scrollPos);
+        
+            // ✅ Re-bindear eventos si es necesario
+            this.reiniciarEventosDashboard();
         } else {
             window.print();
         }
     },
+
+    // ✅ NUEVA FUNCIÓN - Reiniciar eventos después de imprimir
+    reiniciarEventosDashboard: function() {
+        // Restaurar listeners de botones si se perdieron
+        var btnImprimir = document.querySelector('button[onclick*="imprimirDashboard"]');
+        var btnOtroCaso = document.querySelector('button[onclick*="volverAListaCasos"]');
+        // Los botones ya tienen onclick inline, no necesitan re-bind
+    }
     
     // ─────────────────────────────────────────────────────────────────────
     // HISTORIAL
@@ -1538,3 +1560,4 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
