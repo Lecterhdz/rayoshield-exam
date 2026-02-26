@@ -471,10 +471,12 @@ function descargarCertificadoMaster(imageUrl, filename = 'certificado-master.png
 
 // Exportar funciones
 if (typeof window !== 'undefined') {
+    window.generarHashCertificado = generarHashCertificado;  // ← AGREGAR ESTO
     window.generarCertificadoCaso = generarCertificadoCaso;
     window.generarCertificadoMaster = generarCertificadoMaster;
     window.descargarCertificadoMaster = descargarCertificadoMaster;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
+
 
 
