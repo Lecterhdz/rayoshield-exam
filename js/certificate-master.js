@@ -470,6 +470,69 @@ function descargarCertificadoMaster(imageUrl, filename = 'certificado-master.png
     link.click();
 }
 
+
+// ─────────────────────────────────────────────────────────────────────
+// GENERAR INSIGNIA PNG (400x400 - NO CERTIFICADO)
+// ─────────────────────────────────────────────────────────────────────
+async function generarInsigniaPNG(userData, caso, resultado) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+    
+    // Fondo circular dorado
+    const gradient = ctx.createRadialGradient(200, 200, 0, 200, 200, 200);
+    gradient.addColorStop(0, '#FFD700');
+    gradient.addColorStop(1, '#B8860B');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(200, 200, 200, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Borde
+    ctx.strokeStyle = '#FFA000';
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.arc(200, 200, 190, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Icono según nivel
+    var icono = '🥈';
+    var textoNivel = 'MASTER';
+    if (resultado.porcentaje >= 95) { icono = '⚖️'; textoNivel = 'PERICIAL'; }
+    else if (resultado.porcentaje >= 90) { icono = '🥇'; textoNivel = 'ELITE'; }
+    else if (resultado.porcentaje >= 80) { icono = '🥈'; textoNivel = 'MASTER'; }
+    else if (resultado.porcentaje >= 75) { icono = '🥉'; textoNivel = 'AVANZADO'; }
+    
+    // Icono
+    ctx.font = '80px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(icono, 200, 180);
+    
+    // Nivel
+    ctx.font = 'bold 28px Arial';
+    ctx.fillStyle = '#1a237e';
+    ctx.fillText(textoNivel, 200, 260);
+    
+    // Nombre
+    ctx.font = '18px Arial';
+    ctx.fillStyle = '#333';
+    var nombre = userData.nombre ? userData.nombre.split(' ')[0] : 'Usuario';
+    ctx.fillText(nombre, 200, 320);
+    
+    // Año
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(new Date().getFullYear(), 200, 360);
+    
+    return canvas.toDataURL('image/png');
+}
+
+// Exportar
+if (typeof window !== 'undefined') {
+    window.generarInsigniaPNG = generarInsigniaPNG;
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // EXPORTAR FUNCIONES (UNA SOLA VEZ AL FINAL)
 // ─────────────────────────────────────────────────────────────────────
@@ -480,4 +543,5 @@ if (typeof window !== 'undefined') {
     window.descargarCertificadoMaster = descargarCertificadoMaster;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
+
 
