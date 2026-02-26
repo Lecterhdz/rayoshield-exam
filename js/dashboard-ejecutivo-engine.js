@@ -22,72 +22,62 @@ const DashboardEngine = {
     },
 
     generar: function(resultado) {
-        var perfil = resultado.perfilCompetencial || { nivelGeneral: 'MASTER', puntajeGeneral: resultado.porcentaje || 80, fechaEvaluacion: new Date().toISOString(), validez: '2 años' };
-        var riesgo = resultado.riesgoPredictivo || { nivel: 'BAJO', color: '#4CAF50', probabilidadIncidente: 10, factoresRiesgo: [], recomendaciones: ['Mantener educación continua'] };
+        // ✅ SCORE BASE (de scoring.js - respuestas correctas)
+        var scoreBase = resultado.porcentaje || 0;
+    
+        // ✅ SCORE COMPETENCIAS (de SmartEvaluationV2 - 5 dimensiones)
+        var scoreCompetencias = resultado.puntajeCompetencias || scoreBase;
+    
+        var perfil = resultado.perfilCompetencial || { 
+            nivelGeneral: 'MASTER', 
+            puntajeGeneral: scoreCompetencias, 
+            fechaEvaluacion: new Date().toISOString(), 
+            validez: '2 años' 
+        };
+        var riesgo = resultado.riesgoPredictivo || { 
+            nivel: 'BAJO', 
+            color: '#4CAF50', 
+            probabilidadIncidente: 10, 
+            factoresRiesgo: [], 
+            recomendaciones: ['Mantener educación continua'] 
+        };
         var dimensiones = resultado.dimensiones || {};
-        var roi = this.calcularROI(perfil.puntajeGeneral);
-        var benchmark = this.generarBenchmarkData(perfil.puntajeGeneral);
-        var resumenEjecutivo = this.generarResumenEjecutivo(perfil, riesgo, dimensiones);
-        
+        var roi = this.calcularROI(scoreCompetencias);
+        var benchmark = this.generarBenchmarkData(scoreCompetencias);
+        var resumenEjecutivo = this.generarResumenEjecutivo(scoreBase, scoreCompetencias, perfil, riesgo, dimensiones);
+    
         return `
         <style>
             @media print {
-                body * {
-                    visibility: hidden;
-                }
-                .dashboard-container, .dashboard-container * {
-                    visibility: visible;
-                }
+                body * { visibility: hidden; }
+                .dashboard-container, .dashboard-container * { visibility: visible; }
                 .dashboard-container {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    margin: 0;
-                    padding: 20px !important;
-                    background: white !important;
+                    position: absolute; left: 0; top: 0; width: 100%;
+                    margin: 0; padding: 20px !important; background: white !important;
                     box-shadow: none !important;
                 }
-                .section-no-break {
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                }
-                .radar-chart-container, .benchmark-container, .kpi-grid, .risk-section {
-                    page-break-inside: avoid !important;
-                }
-                h1, h2, h3 {
-                    page-break-after: avoid !important;
-                }
+                .section-no-break { page-break-inside: avoid !important; }
+                .radar-chart-container, .benchmark-container, .kpi-grid, .risk-section, .scores-grid { page-break-inside: avoid !important; }
+                h1, h2, h3 { page-break-after: avoid !important; }
                 .header-premium {
                     background: #1a237e !important;
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
                 }
-                button {
-                    display: none !important;
-                }
+                button { display: none !important; }
             }
-            .section-no-break {
-                page-break-inside: avoid;
-                break-inside: avoid;
-            }
-            .kpi-grid {
+            .scores-grid {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+                grid-template-columns: 1fr 1fr;
                 gap: 20px;
             }
             @media (max-width: 768px) {
-                .kpi-grid {
-                    grid-template-columns: repeat(2, 1fr) !important;
-                }
-                .main-grid {
-                    grid-template-columns: 1fr !important;
-                }
+                .scores-grid, .main-grid { grid-template-columns: 1fr !important; }
             }
         </style>
-        
+    
         <div class="dashboard-container" style="font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); padding: 30px; max-width: 1200px; margin: 0 auto; box-shadow: 0 0 50px rgba(0,0,0,0.1);">
-            
+        
             <!-- HEADER EJECUTIVO PREMIUM -->
             <div class="header-premium section-no-break" style="background: ${this.config.colores.fondo}; color: white; padding: 40px 30px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 10px 40px rgba(26,35,126,0.4);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
@@ -98,13 +88,37 @@ const DashboardEngine = {
                             <p style="margin: 0; opacity: 0.9; font-size: 14px; font-weight: 300;">Evaluación de Nivel <span style="font-weight: 600; color: #FFD700;">${perfil.nivelGeneral}</span> | ${new Date(perfil.fechaEvaluacion).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                         </div>
                     </div>
-                    <div style="text-align: right;">
-                        <div style="background: rgba(255,255,255,0.15); padding: 20px 35px; border-radius: 10px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">
-                            <div style="font-size: 48px; font-weight: 700; line-height: 1; background: linear-gradient(135deg, #FFD700, #FFA726); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">${perfil.puntajeGeneral}</div>
-                            <div style="font-size: 12px; opacity: 0.85; font-weight: 500; margin-top: 5px;">PUNTAJE GLOBAL / 100</div>
-                        </div>
-                    </div>
                 </div>
+            </div>
+
+            <!-- SCORES SEPARADOS (BASE + COMPETENCIAS) -->
+            <div class="scores-grid section-no-break" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+            
+                <!-- SCORE BASE -->
+                <div style="background: linear-gradient(135deg, #2196F3, #1976D2); padding: 30px; border-radius: 15px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(33,150,243,0.3);">
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px; font-weight: 500;">SCORE BASE</div>
+                    <div style="font-size: 64px; font-weight: 700; margin: 10px 0;">${scoreBase}%</div>
+                    <div style="font-size: 12px; opacity: 0.85;">Respuestas Correctas (scoring.js)</div>
+                </div>
+            
+                <!-- SCORE COMPETENCIAS -->
+                <div style="background: linear-gradient(135deg, #9C27B0, #7B1FA2); padding: 30px; border-radius: 15px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(156,39,176,0.3);">
+                    <div style="font-size: 14px; opacity: 0.9; margin-bottom: 10px; font-weight: 500;">SCORE COMPETENCIAS</div>
+                    <div style="font-size: 64px; font-weight: 700; margin: 10px 0;">${scoreCompetencias}%</div>
+                    <div style="font-size: 12px; opacity: 0.85;">5 Dimensiones SHE (SmartEvaluationV2)</div>
+                </div>
+            </div>
+
+            <!-- NOTA ACLARATORIA -->
+            <div class="section-no-break" style="background: #E3F2FD; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #2196F3;">
+                <strong style="color: #1565C0;">📝 Nota sobre la evaluación:</strong>
+                <p style="margin: 10px 0 0 0; color: #0D47A1; line-height: 1.6; font-size: 13px;">
+                    El <strong>Score Base (${scoreBase}%)</strong> refleja las respuestas correctas/incorrectas. 
+                    El <strong>Score Competencias (${scoreCompetencias}%)</strong> evalúa las 5 dimensiones de competencia SHE.
+                    <strong>💡 Conclusión:</strong> ${scoreCompetencias > scoreBase ? 
+                        'Tu análisis demuestra competencias superiores al score base. Las dimensiones evaluadas muestran un desempeño excelente (' + scoreCompetencias + '%), aunque hubo ' + (100 - scoreBase) + '% de respuestas incorrectas.' : 
+                        'Ambos scores son consistentes. Se recomienda reforzar las dimensiones con menos del 80%.'}
+                </p>
             </div>
 
             <!-- RESUMEN EJECUTIVO -->
@@ -115,16 +129,16 @@ const DashboardEngine = {
 
             <!-- GRID PRINCIPAL: RADAR + BENCHMARK -->
             <div class="main-grid section-no-break" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin: 25px 0;">
-                
+            
                 <!-- GRÁFICA RADAR DE COMPETENCIAS -->
                 <div class="radar-chart-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08);">
                     <h2 style="color: #1a237e; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">🎯 PERFIL COMPETENCIAL</h2>
                     <p style="color: #888; margin: 0 0 20px 0; font-size: 12px;">5 dimensiones críticas</p>
-                    
+                
                     <div style="position: relative; height: 280px; display: flex; justify-content: center; align-items: center;">
                         ${this.generarGraficaRadarHTML(dimensiones)}
                     </div>
-                    
+                
                     <!-- Leyenda compacta -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
                         ${Object.keys(dimensiones).map(dim => {
@@ -134,8 +148,7 @@ const DashboardEngine = {
                                 '<div style="flex: 1;">' +
                                 '<div style="font-size: 11px; color: #666; font-weight: 500;">' + dim.charAt(0).toUpperCase() + dim.slice(1) + '</div>' +
                                 '<div style="font-size: 13px; font-weight: 700; color: #333;">' + data.porcentaje + '%</div>' +
-                                '</div>' +
-                                '</div>';
+                                '</div></div>';
                         }).join('')}
                     </div>
                 </div>
@@ -144,9 +157,9 @@ const DashboardEngine = {
                 <div class="benchmark-container" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08);">
                     <h2 style="color: #1a237e; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">📈 POSICIONAMIENTO VS INDUSTRIA</h2>
                     <p style="color: #888; margin: 0 0 20px 0; font-size: 12px;">Comparativa SHE</p>
-                    
+                
                     ${this.generarGraficaBarrasHTML(benchmark)}
-                    
+                
                     <div style="background: ${this.getColorPorPosicion(benchmark.posicion)}15; border-left: 4px solid ${this.getColorPorPosicion(benchmark.posicion)}; padding: 15px; border-radius: 8px; margin-top: 15px;">
                         <div style="font-size: 14px; font-weight: 600; color: ${this.getColorPorPosicion(benchmark.posicion)}; margin-bottom: 6px;">
                             ${this.getMensajePorPosicion(benchmark.posicion)}
@@ -162,7 +175,7 @@ const DashboardEngine = {
             <div class="section-no-break" style="background: white; padding: 30px; margin: 25px 0; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08);">
                 <h2 style="color: #1a237e; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">📊 INDICADORES CLAVE DE DESEMPEÑO</h2>
                 <p style="color: #888; margin: 0 0 25px 0; font-size: 12px;">Métricas para toma de decisiones</p>
-                
+            
                 <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
                     <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 25px 20px; border-radius: 10px; text-align: center; border: 1px solid #e0e0e0;">
                         <div style="font-size: 32px; margin-bottom: 8px;">🔒</div>
@@ -191,7 +204,7 @@ const DashboardEngine = {
             <div class="risk-section section-no-break" style="background: white; padding: 30px; margin: 25px 0; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.08);">
                 <h2 style="color: #1a237e; margin: 0 0 8px 0; font-size: 18px; font-weight: 600;">⚠️ ANÁLISIS DE RIESGO PREDICTIVO</h2>
                 <p style="color: #888; margin: 0 0 25px 0; font-size: 12px;">Proyección basada en patrones</p>
-                
+            
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 25px;">
                     <div style="background: linear-gradient(135deg, ${riesgo.color} 0%, ${this.ajustarColor(riesgo.color, -20)} 100%); color: white; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0 5px 20px ${riesgo.color}40;">
                         <div style="font-size: 48px; margin-bottom: 8px;">${this.getIconoRiesgo(riesgo.nivel)}</div>
@@ -209,7 +222,7 @@ const DashboardEngine = {
                         <div style="font-size: 11px; color: #999;">Capacitación preventiva</div>
                     </div>
                 </div>
-                
+            
                 ${riesgo.factoresRiesgo.length > 0 ? `
                 <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); border: 2px solid #ffb74d; padding: 20px; border-radius: 10px; margin-bottom: 15px;">
                     <h3 style="color: #e65100; margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">🔍 FACTORES DE RIESGO</h3>
@@ -218,7 +231,7 @@ const DashboardEngine = {
                     </ul>
                 </div>
                 ` : ''}
-                
+            
                 <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border: 2px solid #4caf50; padding: 20px; border-radius: 10px;">
                     <h3 style="color: #2e7d32; margin: 0 0 12px 0; font-size: 14px; font-weight: 600;">💡 RECOMENDACIONES</h3>
                     <ul style="margin: 0; padding-left: 20px; color: #555;">
@@ -239,7 +252,7 @@ const DashboardEngine = {
                     ↩️ VOLVER
                 </button>
             </div>
-            
+        
             <!-- FOOTER -->
             <div style="text-align: center; padding: 25px; border-top: 2px solid #e0e0e0; background: white; border-radius: 0 0 12px 12px; margin: 0 0 30px 0;">
                 <p style="margin: 0 0 8px 0; color: #1a237e; font-size: 12px; font-weight: 600;">${this.config.empresa} INTELLIGENCE ENGINE v4.1</p>
@@ -252,13 +265,13 @@ const DashboardEngine = {
         `;
     },
 
-    generarResumenEjecutivo: function(perfil, riesgo, dimensiones) {
+    generarResumenEjecutivo: function(scoreBase, scoreCompetencias, perfil, riesgo, dimensiones) {
         var nivel = perfil.nivelGeneral;
-        var puntaje = perfil.puntajeGeneral;
+        var puntaje = scoreCompetencias;
         var brechas = this.contarBrechas(dimensiones);
-        
-        var resumen = 'El profesional evaluado demuestra un nivel <strong style="color: ' + this.getColorPorNivel(nivel) + ';">' + nivel + '</strong> con un puntaje de <strong>' + puntaje + '/100</strong>. ';
-        
+    
+        var resumen = 'El profesional evaluado demuestra un nivel <strong style="color: ' + this.getColorPorNivel(nivel) + ';">' + nivel + '</strong> con Score Base de <strong>' + scoreBase + '%</strong> y Score Competencias de <strong>' + puntaje + '/100</strong>. ';
+    
         if (puntaje >= 90) {
             resumen += 'Se identifica capacidad comprobada para liderar iniciativas estratégicas de seguridad a nivel corporativo. ';
         } else if (puntaje >= 75) {
@@ -266,15 +279,15 @@ const DashboardEngine = {
         } else {
             resumen += 'Se recomienda plan de desarrollo enfocado en ' + brechas + ' competencias críticas identificadas antes de asumir roles de mayor responsabilidad. ';
         }
-        
+    
         resumen += 'El riesgo operacional proyectado es <strong style="color: ' + riesgo.color + ';">' + riesgo.nivel + '</strong> con ' + riesgo.probabilidadIncidente + '% de probabilidad de incidente en los próximos 6 meses. ';
-        
+    
         if (brechas > 0) {
             resumen += 'Se han identificado ' + brechas + ' brechas críticas que requieren atención prioritaria mediante capacitación específica y seguimiento.';
         } else {
             resumen += 'No se identificaron brechas críticas. Se recomienda mantener programa de educación continua.';
         }
-        
+    
         return resumen;
     },
 
@@ -434,3 +447,4 @@ if (typeof window !== 'undefined') {
     DashboardEngine.cargarConfig();
     console.log('✅ Executive Dashboard Engine v4.1 cargado');
 }
+
