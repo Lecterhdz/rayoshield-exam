@@ -700,13 +700,19 @@ const app = {
         else nivelCertificado = 'COMPLETADO';
     
         // ✅ GENERAR CERTIFICADO CON EL NIVEL CORRECTO
+        if (typeof generarCertificadoCaso !== 'function') {
+            alert('❌ Error: Función de certificado no cargada. Recarga la página.');
+            return;
+        }
+    
         generarCertificadoCaso(this.userData, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
             var a = document.createElement('a');
             var nombreArchivo = 'RayoShield_CERTIFICADO_' + nivelCertificado + '_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.download = nombreArchivo;
             a.href = url;
             a.click();
-        }).catch(function() {
+        }).catch(function(err) {
+            console.error('Error:', err);
             alert('❌ Error generando certificado');
         });
     },
@@ -1201,40 +1207,93 @@ const app = {
         var resultadoEl = document.getElementById('caso-resultado');
         resultadoEl.style.display = 'block';
         resultadoEl.scrollIntoView({ behavior: 'smooth' });
-        
         this.detenerTimerCaso();
-        // Si tiene feature predictivo, usar Dashboard Engine
+    
+        // ✅ DETERMINAR QUÉ BOTONES MOSTRAR SEGÚN PLAN Y NIVEL DEL CASO
+        var mostrarCertificado = false;
+        var mostrarInsignia = false;
+        var conMarcaDeAgua = false;
+    
+        // DEMO: Solo certificado con marca de agua (sin insignias)
+        if (this.licencia.tipo === 'DEMO') {
+            mostrarCertificado = true;
+            mostrarInsignia = false;
+            conMarcaDeAgua = true;
+        }
+        // PROFESIONAL: Certificado sin marca de agua (sin insignias)
+        else if (this.licencia.tipo === 'PROFESIONAL') {
+            mostrarCertificado = true;
+            mostrarInsignia = false;
+            conMarcaDeAgua = false;
+        }
+        // CONSULTOR: Certificado + Insignia (solo para casos MASTER+)
+        else if (this.licencia.tipo === 'CONSULTOR') {
+            mostrarCertificado = true;
+            mostrarInsignia = resultado.aprobado && this.casoActual.nivel !== 'basico';
+            conMarcaDeAgua = false;
+        }
+        // EMPRESARIAL: Certificado + Insignia (todos los niveles)
+        else if (this.licencia.tipo === 'EMPRESARIAL') {
+            mostrarCertificado = true;
+            mostrarInsignia = resultado.aprobado;
+            conMarcaDeAgua = false;
+        }
+    
+        // ✅ DETERMINAR NIVEL DEL CERTIFICADO SEGÚN CASO
+        var nivelCertificado = '';
+        if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
+        else if (this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
+        else if (this.casoActual.nivel === 'elite') nivelCertificado = 'ELITE';
+        else if (this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
+        else nivelCertificado = 'COMPLETADO';
+    
+        // ✅ GENERAR BOTONES SEGÚN PLAN
+        var botonesHTML = '';
+        if (resultado.aprobado) {
+            botonesHTML = '<div class="button-group" style="margin-top:20px; display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">';
+        
+            // Botón Certificado (TODOS los planes)
+            if (mostrarCertificado) {
+                botonesHTML += '<button class="btn btn-primary" onclick="app.descargarCertificadoCaso(' + conMarcaDeAgua + ')" style="background:linear-gradient(135deg,#2196F3,#1976D2);color:white;font-weight:bold; padding:14px 28px;">📄 Descargar Certificado</button>';
+            }
+        
+            // Botón Insignia (solo CONSULTOR y EMPRESARIAL, casos MASTER+)
+            if (mostrarInsignia) {
+                botonesHTML += '<button class="btn btn-primary" onclick="app.descargarInsignia()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold; padding:14px 28px;">🏅 Descargar Insignia</button>';
+            }
+        
+            botonesHTML += '<button class="btn btn-secondary" onclick="app.volverAListaCasos()" style="padding:14px 28px;">🔄 Otro caso</button>';
+            botonesHTML += '<button class="btn btn-secondary" onclick="app.volverHome()" style="padding:14px 28px;">🏠 Inicio</button>';
+            botonesHTML += '</div>';
+        } else {
+            botonesHTML = '<div class="button-group" style="margin-top:20px; display:flex; gap:15px; flex-wrap:wrap; justify-content:center;">';
+            botonesHTML += '<button class="btn btn-secondary" onclick="app.volverAListaCasos()" style="padding:14px 28px;">🔄 Intentar otro caso</button>';
+            botonesHTML += '<button class="btn btn-secondary" onclick="app.volverHome()" style="padding:14px 28px;">🏠 Inicio</button>';
+            botonesHTML += '</div>';
+        }
+    
+        // ✅ RENDERIZAR RESULTADO
         if (this.licencia.features && this.licencia.features.predictivo && typeof DashboardEngine !== 'undefined') {
             resultadoEl.innerHTML = DashboardEngine.generar(resultado);
-        } 
-        // Si tiene dashboard básico (CONSULTOR)
+        }
         else if (this.licencia.features && this.licencia.features.casosElite && typeof DashboardBasico !== 'undefined') {
             resultadoEl.innerHTML = DashboardBasico.generar(resultado);
         }
-        // Vista básica (PROFESIONAL)
         else {
             var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
             var icono = resultado.aprobado ? '✅' : '📚';
-            var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel MASTER' : '📚 Requiere repaso';
-            var insignia = this.obtenerInsigniaPorPuntaje(resultado.porcentaje);
-            
-            var botonesHTML = '';
-            if (resultado.aprobado) {
-                botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
-                    '<button class="btn btn-primary" onclick="app.descargarInsignia()" style="background:linear-gradient(135deg,#D4AF37,#FFD700);color:#1a1a1a;font-weight:bold;">🏅 Descargar Insignia</button>' +
-                    '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>' +
-                    '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-                    '</div>';
-            } else {
-                botonesHTML = '<div class="button-group" style="margin-top:20px;">' +
-                    '<button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>' +
-                    '<button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>' +
-                    '</div>';
-            }
-            
-            resultadoEl.innerHTML = '<div class="resultado-investigacion ' + claseEstado + '"><h2>' + icono + ' Resultado de la Investigación</h2><div class="puntaje-master">' + resultado.porcentaje + '%</div><p><strong>Puntaje:</strong> ' + resultado.puntajeTotal + ' / ' + resultado.puntajeMaximo + '</p><p><strong>Estado:</strong> ' + estadoTexto + '</p>' + (resultado.aprobado ? '<div style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#D4AF37,#FFD700);border-radius:10px;text-align:center;"><div style="font-size:64px;margin-bottom:10px;">' + insignia.icono + '</div><div style="font-size:20px;font-weight:bold;color:#1a1a1a;">Insignia ' + insignia.nombre + '</div><div style="font-size:14px;color:#333;margin-top:5px;">' + insignia.descripcion + '</div></div>' : '') + '</div>' + (resultado.feedback.length > 0 ? '<div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;"><strong>💡 Retroalimentación:</strong><ul style="margin-top:10px;">' + resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul></div>' : '') + '<div class="leccion-master"><strong>🎓 Lección Aprendida:</strong><p style="margin-top:10px;">' + resultado.leccion + '</p></div><div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;"><strong>📋 Conclusión Oficial:</strong><p style="margin-top:10px;line-height:1.6;">' + resultado.conclusion + '</p></div>' + botonesHTML;
-        }
+            var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel ' + nivelCertificado : '📚 Requiere repaso';
         
+            // ✅ MOSTRAR INSIGNIA SOLO SI APLICA
+            var insigniaHTML = '';
+            if (mostrarInsignia && resultado.aprobado) {
+                var insignia = this.obtenerInsigniaPorPuntaje(resultado.porcentaje);
+                insigniaHTML = '<div style="margin:20px 0;padding:20px;background:linear-gradient(135deg,#D4AF37,#FFD700);border-radius:10px;text-align:center;"><div style="font-size:64px;margin-bottom:10px;">' + insignia.icono + '</div><div style="font-size:20px;font-weight:bold;color:#1a1a1a;">Insignia ' + insignia.nombre + '</div><div style="font-size:14px;color:#333;margin-top:5px;">' + insignia.descripcion + '</div></div>';
+            }
+        
+            resultadoEl.innerHTML = '<div class="resultado-investigacion ' + claseEstado + '"><h2>' + icono + ' Resultado de la Investigación</h2><div class="puntaje-master">' + resultado.porcentaje + '%</div><p><strong>Puntaje:</strong> ' + resultado.puntajeTotal + ' / ' + resultado.puntajeMaximo + '</p><p><strong>Estado:</strong> ' + estadoTexto + '</p><p><strong>Nivel del Caso:</strong> ' + nivelCertificado + '</p>' + insigniaHTML + '</div>' + (resultado.feedback.length > 0 ? '<div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;"><strong>💡 Retroalimentación:</strong><ul style="margin-top:10px;">' + resultado.feedback.map(function(f) { return '<li>' + f + '</li>'; }).join('') + '</ul></div>' : '') + '<div class="leccion-master"><strong>🎓 Lección Aprendida:</strong><p style="margin-top:10px;">' + resultado.leccion + '</p></div><div style="background:#E8F5E9;padding:20px;border-radius:10px;margin:20px 0;"><strong>📋 Conclusión Oficial:</strong><p style="margin-top:10px;line-height:1.6;">' + resultado.conclusion + '</p></div>' + botonesHTML;
+        }
+    
         document.getElementById('btn-enviar-caso').style.display = 'none';
     },
     
@@ -1370,6 +1429,7 @@ const app = {
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
+
 
 
 
