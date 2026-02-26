@@ -1,9 +1,9 @@
 // ─────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - CERTIFICADO DE CASOS (v3.0 - CORREGIDO)
+// RAYOSHIELD EXAM - CERTIFICADO DE CASOS (v3.0)
 // ─────────────────────────────────────────────────────────────────────
 
 /**
- * Genera hash único para certificado (DEBE IR PRIMERO)
+ * Genera hash único para certificado
  */
 async function generarHashCertificado(texto) {
     try {
@@ -181,7 +181,7 @@ async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarca
     ctx.textAlign = 'center';
     ctx.fillText('Fecha: ' + fecha, canvas.width / 2, 1700);
     
-    // ID DEL CERTIFICADO (USA generarHashCertificado)
+    // ID DEL CERTIFICADO
     const hash = await generarHashCertificado(
         (userData.nombre || '') + ':' + 
         (userData.curp || '') + ':' + 
@@ -225,15 +225,15 @@ async function generarCertificadoMaster(userData, caso, resultado) {
 /**
  * Descarga certificado
  */
-function descargarCertificadoMaster(imageUrl, filename = 'certificado-master.png') {
+function descargarCertificadoMaster(imageUrl, filename) {
     const link = document.createElement('a');
-    link.download = filename;
+    link.download = filename || 'certificado-master.png';
     link.href = imageUrl;
     link.click();
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// EXPORTAR FUNCIONES (AL FINAL - IMPORTANTE)
+// EXPORTAR FUNCIONES
 // ─────────────────────────────────────────────────────────────────────
 
 if (typeof window !== 'undefined') {
@@ -241,5 +241,5 @@ if (typeof window !== 'undefined') {
     window.generarCertificadoCaso = generarCertificadoCaso;
     window.generarCertificadoMaster = generarCertificadoMaster;
     window.descargarCertificadoMaster = descargarCertificadoMaster;
-    console.log('✅ certificate-master.js v3.0 cargado - Funciones exportadas');
+    console.log('✅ certificate-master.js v3.0 cargado');
 }
