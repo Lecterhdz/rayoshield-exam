@@ -239,10 +239,10 @@ async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarca
     
     // Línea de firmas
     ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 500, 1680);
-    ctx.lineTo(canvas.width / 2 - 100, 1680);
-    ctx.moveTo(canvas.width / 2 + 100, 1680);
-    ctx.lineTo(canvas.width / 2 + 500, 1680);
+    ctx.moveTo(canvas.width / 2 - 500, 1620);
+    ctx.lineTo(canvas.width / 2 - 100, 1620);
+    ctx.moveTo(canvas.width / 2 + 100, 1620);
+    ctx.lineTo(canvas.width / 2 + 500, 1620);
     ctx.strokeStyle = '#1a1a1a';
     ctx.lineWidth = 3;
     ctx.stroke();
@@ -251,24 +251,30 @@ async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarca
     ctx.font = 'italic 38px "Segoe UI", Arial';
     ctx.fillStyle = '#1a237e';
     ctx.textAlign = 'center';
-    ctx.fillText('_________________________', canvas.width / 2 - 300, 1660);
+    ctx.fillText('_________________________', canvas.width / 2 - 300, 1600);
     ctx.font = 'bold 32px "Segoe UI", Arial';
     ctx.fillStyle = '#1a1a1a';
-    ctx.fillText('Director SHE', canvas.width / 2 - 300, 1710);
+    ctx.fillText('Director SHE', canvas.width / 2 - 300, 1650);
     
     // Firma derecha
     ctx.font = 'italic 38px "Segoe UI", Arial';
     ctx.fillStyle = '#1a237e';
-    ctx.fillText('_________________________', canvas.width / 2 + 300, 1660);
+    ctx.fillText('_________________________', canvas.width / 2 + 300, 1600);
     ctx.font = 'bold 32px "Segoe UI", Arial';
     ctx.fillStyle = '#1a1a1a';
-    ctx.fillText('Instructor Certificado', canvas.width / 2 + 300, 1710);
+    ctx.fillText('Instructor Certificado', canvas.width / 2 + 300, 1650);
     
     // Fecha
     ctx.font = '30px "Segoe UI", Arial';
     ctx.fillStyle = '#999';
     ctx.textAlign = 'center';
-    ctx.fillText('Fecha de emisión: ' + fecha, canvas.width / 2, 1740);
+    ctx.fillText('Fecha de emisión: ' + fecha, canvas.width / 2, 1700);
+
+    // ✅ ID DEL CERTIFICADO
+    const hash = await generarHashCertificado(`${userData.nombre}:${userData.curp}:${caso.id}:${resultado.puntajeTotal}:${Date.now()}`);
+    ctx.font = '20px monospace';
+    ctx.fillStyle = '#999';
+    ctx.fillText('ID: ' + hash.toUpperCase().substring(0, 16), canvas.width / 2, 1730);  // ← AJUSTADO
     
     // ───────────────────────────────────────────────────────────────────────
     // MARCA DE AGUA (SOLO DEMO)
@@ -455,3 +461,4 @@ if (typeof window !== 'undefined') {
     window.descargarCertificadoMaster = descargarCertificadoMaster;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
+
