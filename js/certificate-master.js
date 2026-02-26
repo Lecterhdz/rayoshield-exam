@@ -3,9 +3,24 @@
 // Versión: 2.0 - Con sello metálico en relieve
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Genera certificado de caso con nivel correcto y marca de agua opcional
- */
+// ─────────────────────────────────────────────────────────────────────
+// GENERAR HASH ÚNICO PARA CERTIFICADO
+// ─────────────────────────────────────────────────────────────────────
+async function generarHashCertificado(texto) {
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(texto);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 32);
+    } catch (error) {
+        console.error('Error generando hash:', error);
+        return 'RS-' + Date.now().toString(36).toUpperCase();
+    }
+}
+// 
+// Genera certificado de caso con nivel correcto y marca de agua opcional
+// 
 async function generarCertificadoCaso(userData, caso, resultado, nivel, conMarcaDeAgua) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -461,4 +476,5 @@ if (typeof window !== 'undefined') {
     window.descargarCertificadoMaster = descargarCertificadoMaster;
     console.log('✅ certificate-master.js v2.0 cargado - Con sello metálico');
 }
+
 
