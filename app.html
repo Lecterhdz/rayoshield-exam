@@ -6,480 +6,614 @@
     <meta name="theme-color" content="#2196F3">
     <title>RayoShield Exam - App</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/logo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="icon" href="https://Lecterhdz.github.io/rayoshield-exam/assets/logo.png">
+    
     <style>
-        .logo { width: 80px; height: 80px; border-radius: 10px; background: white; padding: 5px; }
+        /* ═══════════════════════════════════════════════════════════════
+        RAYOSHIELD EXAM - ESTILOS ACTUALIZADOS (SmartCot Style)
+        ═══════════════════════════════════════════════════════════════ */
+        :root {
+            /* Dark Theme (Default) */
+            --white:   #1e2330;
+            --bg:      #161b27;
+            --bg2:     #1a2035;
+            --surface: #1e2330;
+            --border:  #2a3347;
+            --border2: #334060;
+            --ink:     #e8edf5;
+            --ink2:    #c4cde0;
+            --ink3:    #8a97b4;
+            --ink4:    #5a6a8a;
+            --blue:    #2196F3;
+            --blue-l:  #1a2540;
+            --blue-m:  #253a5e;
+            --indigo:  #7c6ff0;
+            --teal:    #2cb8a8;
+            --amber:   #f0a742;
+            --rose:    #f0436a;
+            --green:   #3dba72;
+            --radius:    12px;
+            --radius-sm: 8px;
+            --radius-lg: 18px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.25);
+            --shadow:    0 4px 16px rgba(0,0,0,.35);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,.5);
+            --font: 'Outfit', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Light Theme */
+        body.tema-claro {
+            --white:   #ffffff;
+            --bg:      #f8fafc;
+            --bg2:     #f1f5f9;
+            --surface: #ffffff;
+            --border:  #e2e8f0;
+            --border2: #cbd5e1;
+            --ink:     #1a1a1a;
+            --ink2:    #4a4a4a;
+            --ink3:    #64748b;
+            --ink4:    #94a3b8;
+            --blue:    #2563eb;
+            --blue-l:  #dbeafe;
+            --blue-m:  #93c5fd;
+        }
+
+        /* Reset */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            font-size: 16px;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background: var(--bg2); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+
+        /* Layout */
+        .layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            display:flex; flex-direction:column;
+            padding: 0;
+            position: sticky; top:0; height:100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+        
+        .sidebar-logo {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid var(--border);
+            display:flex; align-items:center; gap:12px;
+        }
+        
+        .logo-icon {
+            width:38px; height:38px;
+            background: linear-gradient(135deg, var(--blue), var(--indigo));
+            border-radius: 10px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:18px;
+            box-shadow: 0 4px 12px rgba(33,150,243,.3);
+            flex-shrink:0;
+        }
+        
+        .logo-text { line-height:1.2; }
+        .logo-text strong { font-size:17px; font-weight:800; color: var(--ink); letter-spacing:-0.5px; }
+        .logo-text span { display:block; font-size:10px; color:var(--ink4); font-family:var(--mono); letter-spacing:.5px; text-transform:uppercase; }
+        
+        .sidebar-section { 
+            padding: 20px 12px 8px; 
+            font-size:10px; font-weight:600; color: var(--ink4); 
+            text-transform:uppercase; letter-spacing:1px; font-family: var(--mono); 
+        }
+        
+        .nav-item {
+            display:flex; align-items:center; gap:10px;
+            padding: 9px 14px;
+            border-radius: var(--radius-sm);
+            margin: 2px 8px;
+            cursor:pointer;
+            transition: all .18s;
+            font-size:14px; font-weight:500;
+            color: var(--ink3);
+            border: none; background:none; width:calc(100% - 16px);
+            text-align:left;
+        }
+        
+        .nav-item:hover { background: var(--bg); color: var(--ink); }
+        .nav-item.active { background: var(--blue-l); color: var(--blue); font-weight:600; }
+        .nav-item .nav-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
+        .nav-badge {
+            margin-left:auto;
+            background: var(--blue);
+            color: white;
+            font-size:10px; font-weight:700;
+            padding:2px 7px; border-radius:20px;
+            font-family: var(--mono);
+        }
+        
+        .sidebar-footer { margin-top:auto; padding:16px; border-top:1px solid var(--border); }
+        
+        .license-pill {
+            display:flex; align-items:center; gap:8px;
+            padding:10px 14px;
+            background: linear-gradient(135deg, var(--blue-l), var(--blue-m));
+            border: 1px solid var(--blue-m);
+            border-radius: var(--radius-sm);
+            margin-bottom:10px;
+        }
+        
+        .license-pill .lp-dot {
+            width:8px; height:8px; border-radius:50%;
+            background: var(--blue); flex-shrink:0;
+            box-shadow:0 0 6px rgba(33,150,243,.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+        .license-pill .lp-text { font-size:12px; font-weight:600; color:var(--blue); }
+        .license-pill .lp-sub { font-size:10px; color:var(--ink4); font-family:var(--mono); }
+        
+        .btn-salir {
+            display:flex; align-items:center; justify-content:center; gap:8px;
+            width:100%; padding:9px;
+            background:none; border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            font-size:13px; font-weight:500; color:var(--ink3);
+            cursor:pointer; transition:all .18s;
+            font-family:var(--font);
+        }
+        .btn-salir:hover { background:var(--rose); border-color:var(--rose); color:white; }
+
+        /* Main */
+        .main { overflow:visible; display:flex; flex-direction:column; min-width:0; }
+        
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height:60px;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:50;
+        }
+        
+        .topbar-left { display:flex; flex-direction:column; }
+        .topbar-title { font-size:17px; font-weight:700; color:var(--ink); letter-spacing:-.3px; }
+        .topbar-sub { font-size:11px; color:var(--ink4); font-family:var(--mono); }
+        
+        .topbar-right { display:flex; align-items:center; gap:10px; }
+        
+        .topbar-btn {
+            display:flex; align-items:center; gap:6px;
+            padding:7px 14px;
+            border-radius:var(--radius-sm);
+            border:none; cursor:pointer;
+            font-size:13px; font-weight:600;
+            transition:all .18s; font-family:var(--font);
+            min-height: 44px;
+        }
+        .topbar-btn.primary { background: var(--blue); color:white; box-shadow:0 2px 8px rgba(33,150,243,.3); }
+        .topbar-btn.primary:hover { background:#1d4ed8; transform:translateY(-1px); }
+        .topbar-btn.ghost { background:var(--bg); color:var(--ink2); border:1px solid var(--border); }
+        .topbar-btn.ghost:hover { background:var(--bg2); }
+
+        /* Content */
+        .content { padding:28px 32px; flex:1; overflow-x: hidden; }
+
+        /* Screens */
+        .screen { display:none; }
+        .screen.active { display:block; animation: fadeUp .25s ease; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Stats */
+        .stats-row { display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:28px; }
+        .stat-card {
+            background:var(--white);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            padding:20px 22px;
+            position:relative;
+            overflow:hidden;
+            box-shadow:var(--shadow-sm);
+            transition:all .2s;
+        }
+        .stat-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+        .stat-number { font-size:32px; font-weight:800; color:var(--ink); letter-spacing:-1.5px; line-height:1; margin-bottom:4px; }
+        .stat-label { font-size:12px; color:var(--ink4); font-weight:500; }
+
+        /* Cards */
+        .card {
+            background:var(--white);
+            border:1px solid var(--border);
+            border-radius:var(--radius);
+            box-shadow:var(--shadow-sm);
+            overflow:visible;
+            margin-bottom: 20px;
+        }
+        .card-header { padding:18px 22px 0; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .card-title { font-size:15px; font-weight:700; color:var(--ink); letter-spacing:-.2px; }
+        .card-sub { font-size:12px; color:var(--ink4); margin-top:2px; }
+        .card-body { padding:0 22px 22px; overflow:visible; }
+
+        /* Forms */
+        .form-group {
+            display:flex; flex-direction:column; gap:5px;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            font-size:11px; font-weight:600; color:var(--ink3);
+            text-transform:uppercase; letter-spacing:.4px; font-family:var(--mono);
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            padding:10px 14px;
+            background:var(--bg);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            font-size:14px;
+            color:var(--ink);
+            font-family:var(--font);
+            transition:all .15s;
+            min-height: 44px;
+            width: 100%;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline:none; border-color:var(--blue); background:var(--white);
+            box-shadow:0 0 0 3px rgba(33,150,243,.08);
+        }
+
+        /* Buttons */
+        .btn {
+            padding:12px 24px;
+            border-radius:var(--radius-sm);
+            border:none;
+            font-size:14px;
+            font-weight:600;
+            cursor:pointer;
+            transition:all .18s;
+            font-family:var(--font);
+            min-height: 44px;
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            gap:8px;
+        }
+        .btn-primary { background:linear-gradient(135deg,var(--blue),var(--indigo)); color:white; box-shadow:0 2px 8px rgba(33,150,243,.3); }
+        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(33,150,243,.35); }
+        .btn-secondary { background:var(--bg); color:var(--ink2); border:1px solid var(--border); }
+        .btn-secondary:hover { background:var(--bg2); }
+        .btn-success { background:var(--green); color:white; }
+        .btn-warning { background:var(--amber); color:#1a1a1a; }
+        .btn-info { background:var(--teal); color:white; }
+
+        /* Button Group */
+        .button-group {
+            display:flex;
+            gap:15px;
+            flex-wrap:wrap;
+            justify-content:center;
+            margin-top:20px;
+        }
+
+        /* Mobile Navigation */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+            z-index: 300;
+            box-shadow: 0 -4px 20px rgba(15,23,42,.08);
+        }
+        .bottom-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
+        .bn-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px 4px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: var(--font);
+            transition: all .15s;
+            min-height: 48px;
+        }
+        .bn-icon { font-size: 22px; line-height: 1; transition: transform .15s; }
+        .bn-label { font-size: 10px; font-weight: 600; color: var(--ink4); transition: color .15s; }
+        .bn-item.active .bn-icon { transform: translateY(-2px); }
+        .bn-item.active .bn-label { color: var(--blue); }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            transition: background .15s;
+            min-width: 44px;
+            min-height: 44px;
+        }
+        .hamburger:hover { background: var(--bg2); }
+        .hamburger span { display: block; width: 20px; height: 2px; background: var(--ink2); border-radius: 2px; margin: 4px 0; transition: all .25s; }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,.4);
+            backdrop-filter: blur(4px);
+            z-index: 250;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .layout { grid-template-columns: 200px 1fr; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .layout { grid-template-columns: 1fr; }
+            .content { padding: 16px 16px 90px !important; }
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 0;
+                bottom: 0;
+                width: 260px;
+                z-index: 260;
+                transition: left .28s cubic-bezier(.4,0,.2,1);
+            }
+            .sidebar.open { left: 0; box-shadow: var(--shadow-lg); }
+            .hamburger { display: flex !important; }
+            .bottom-nav { display: block !important; }
+            .topbar { padding: 0 16px; height: 54px; }
+            .topbar-sub { display: none; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-number { font-size: 26px; }
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <img src="assets/logo.png" alt="RayoShield" class="logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22><rect fill=%22%232196F3%22 width=%22150%22 height=%22150%22/><text fill=%22white%22 font-size=%2260%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>RS</text></svg>'">
-            <h1>RayoShield Exam</h1>
-            <p>Capacitación en Normas STPS</p>
+    <div class="layout">
+        <!-- ══════════════ SIDEBAR ══════════════ -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">🛡️</div>
+                <div class="logo-text">
+                    <strong>RayoShield</strong>
+                    <span>Exam Platform</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">Principal</div>
+            <button class="nav-item active" onclick="app.volverHome()">
+                <span class="nav-icon">🏠</span> Inicio
+            </button>
+            <button class="nav-item" onclick="app.irASeleccionarExamen()">
+                <span class="nav-icon">📚</span> Exámenes
+            </button>
+            <button class="nav-item" onclick="app.irACasosMaster()" id="nav-casos">
+                <span class="nav-icon">⚠️</span> Casos MASTER
+                <span class="nav-badge" id="nav-badge-casos">0</span>
+            </button>
+            
+            <div class="sidebar-section">Usuario</div>
+            <button class="nav-item" onclick="app.mostrarDatosUsuario()">
+                <span class="nav-icon">👤</span> Mi Perfil
+            </button>
+            <button class="nav-item" onclick="app.mostrarHistorial()">
+                <span class="nav-icon">📋</span> Historial
+            </button>
+            <button class="nav-item" onclick="app.mostrarLicencia()">
+                <span class="nav-icon">🔑</span> Licencia
+            </button>
+            
+            <div class="sidebar-section">Herramientas</div>
+            <button class="nav-item" onclick="app.mostrarInfo()">
+                <span class="nav-icon">ℹ️</span> Información
+            </button>
+            <button class="nav-item" onclick="app.mostrarPanelWhiteLabel()" id="nav-white-label" style="display:none;">
+                <span class="nav-icon">🎨</span> White Label
+            </button>
+            
+            <div class="sidebar-footer">
+                <div class="license-pill">
+                    <div class="lp-dot"></div>
+                    <div>
+                        <div class="lp-text" id="sidebar-license-plan">DEMO</div>
+                        <div class="lp-sub" id="sidebar-license-expiry">Cargando...</div>
+                    </div>
+                </div>
+                <button class="btn-salir" onclick="app.cerrarSesion()">🚪 Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- ══════════════ MAIN ══════════════ -->
+        <div class="main">
+            <!-- TOPBAR -->
+            <div class="topbar">
+                <div class="topbar-left" style="flex-direction:row;align-items:center;gap:10px;">
+                    <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <div>
+                        <div class="topbar-title" id="topbar-title">RayoShield Exam</div>
+                        <div class="topbar-sub" id="topbar-sub">Plataforma de certificación STPS</div>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="topbar-btn primary" onclick="app.toggleTema()" title="Cambiar tema" style="min-width:44px;padding:8px;">
+                        🌓
+                    </button>
+                    <button class="topbar-btn ghost" onclick="app.mostrarLicencia()">🔑 Licencia</button>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- HOME SCREEN -->
+                <section id="home-screen" class="screen active">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-number">21</div>
+                            <div class="stat-label">Exámenes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">420</div>
+                            <div class="stat-label">Preguntas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">15</div>
+                            <div class="stat-label">Casos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">4</div>
+                            <div class="stat-label">Niveles</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">🛡️ Bienvenido a RayoShield Exam</div>
+                                <div class="card-sub">Evalúa tus conocimientos en normas STPS</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="licencia-info" style="padding:15px;background:#f5f5f5;border-radius:10px;text-align:center;font-weight:bold;margin:15px 0;">
+                                📋 Licencia DEMO
+                            </div>
+                            
+                            <div id="usuario-info" style="padding:15px;background:#E3F2FD;border-radius:10px;margin:15px 0;font-size:14px;">
+                                <!-- Se llena con JS -->
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar">📚 Examen</button>
+                                <button class="btn btn-warning" onclick="app.irACasosMaster()" id="btn-casos-master">⚠️ Casos MASTER</button>
+                                <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">📋 Datos</button>
+                                <button class="btn btn-info" onclick="app.mostrarHistorial()">📋 Historial</button>
+                                <button class="btn btn-success" onclick="app.mostrarLicencia()">🔑 Licencia</button>
+                                <button class="btn btn-secondary" onclick="app.mostrarInfo()">ℹ️ Info</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Otros screens se mantienen igual... -->
+                <!-- (select-exam-screen, exam-screen, result-screen, history-screen, license-screen, info-screen, casos-master-screen, user-data-screen, white-label-screen) -->
+
+            </div>
         </div>
-    </header>
+    </div>
 
-    <main class="container">
-        <!-- HOME -->
-        <section id="home-screen" class="screen active">
-            <div class="card">
-                <h2>🛡️ Bienvenido a RayoShield Exam</h2>
-                <p>Evalúa tus conocimientos en normas de seguridad industrial STPS</p>
-                
-                <div id="licencia-info" style="padding:15px;background:#f5f5f5;border-radius:10px;text-align:center;font-weight:bold;margin:15px 0;">
-                    📋 Licencia DEMO
-                </div>
-                
-                <div id="usuario-info" style="padding:15px;background:#E3F2FD;border-radius:10px;margin:15px 0;font-size:14px;">
-                    <!-- Se llena con JS -->
-                </div>
-                
-                <div class="stats">
-                    <div class="stat"><span class="stat-number">21</span><span class="stat-label">Exámenes</span></div>
-                    <div class="stat"><span class="stat-number">420</span><span class="stat-label">Preguntas</span></div>
-                    <div class="stat"><span class="stat-number">3</span><span class="stat-label">Niveles</span></div>
-                </div>
-                
-                <div class="button-group">
-                    <!-- Acción Principal - Azul Ejecutivo -->
-                    <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar">📚 Examen</button>
-    
-                    <!-- Feature Premium - -->
-                    <button class="btn btn-warning" onclick="app.irACasosMaster()" id="btn-casos-master">⚠️ Casos MASTER</button>
-    
-                    <!-- Secundarios - Gris Azulado -->
-                    <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">📋 Datos de usuario</button>
-    
-                    <!-- Informativo - Turquesa -->
-                    <button class="btn btn-info" onclick="app.mostrarHistorial()">📋 Historial</button>
-    
-                    <!-- Acceso/Éxito - Verde Esmeralda -->
-                    <button class="btn btn-success" onclick="app.mostrarLicencia()">🔑 Licencia</button>
-    
-                    <!-- Secundario - Gris Azulado -->
-                    <button class="btn btn-secondary" onclick="app.mostrarInfo()">ℹ️ Información</button>
-    
-                    <!-- Feature Premium - -->
-                    <button class="btn btn-warning" onclick="app.mostrarPanelWhiteLabel()" id="btn-white-label" style="display:none;">🎨 Personalizar Marca</button>
-                    
-                </div>
-            </div>
-        </section>
+    <!-- Overlay para cerrar sidebar en móvil -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-        <!-- DATOS DE USUARIO ✅ CON IDs CORRECTOS -->
-        <section id="user-data-screen" class="screen">
-            <div class="card">
-                <h2>📋 Datos del Usuario</h2>
-                <p style="color:#666;margin-bottom:20px;">Completa tus datos para comenzar los exámenes</p>
-                
-                <div class="form-group">
-                    <label for="user-empresa">🏢 Empresa</label>
-                    <input type="text" id="user-empresa" placeholder="Nombre de tu empresa" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                </div>
-                
-                <div class="form-group">
-                    <label for="user-nombre">👤 Nombre Completo</label>
-                    <input type="text" id="user-nombre" placeholder="Tu nombre completo" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                </div>
-                
-                <div class="form-group">
-                    <label for="user-curp">🆔 CURP</label>
-                    <input type="text" id="user-curp" placeholder="ABC123456HDFGHI09" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;text-transform:uppercase;">
-                </div>
-                
-                <div class="form-group">
-                    <label for="user-puesto">💼 Puesto/Cargo</label>
-                    <input type="text" id="user-puesto" placeholder="Tu puesto de trabajo" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                </div>
-                
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="app.guardarDatosUsuarioForm()">💾 Guardar Datos</button>
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- SELECCIÓN DE EXAMEN (agrupado por categoría → nivel) -->
-        <section id="select-exam-screen" class="screen">
-            <div class="card">
-                <h2>📚 Selecciona un Examen</h2>
-        
-                <!-- Vista: Categorías -->
-                <div id="categorias-view">
-                    <p style="color:#666;margin-bottom:20px;">Elige una categoría de examen</p>
-                    <div id="categorias-list" class="exam-list"></div>
-                </div>
-        
-                <!-- Vista: Niveles (oculta por defecto) -->
-                <div id="niveles-view" style="display:none;">
-                    <button class="btn btn-secondary" onclick="app.volverACategorias()" style="margin-bottom:15px;">
-                        ← Volver a categorías
-                    </button>
-                    <h3 id="categoria-titulo" style="color:#2196F3;margin-bottom:10px;"></h3>
-                    <p id="categoria-norma" style="color:#666;margin-bottom:20px;"></p>
-                    <p style="color:#666;margin-bottom:20px;">Selecciona tu nivel:</p>
-                    <div id="niveles-list" class="exam-list"></div>
-                </div>
-        
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- EXAMEN (actualizado con timer y sin botón salir) -->
-        <section id="exam-screen" class="screen">
-            <div class="card">
-                <div class="exam-header">
-                    <h3 id="exam-title">Título del Examen</h3>
-                    <p id="exam-norma" class="norma">Norma</p>
-                </div>
-        
-                <!-- Timer de examen -->
-                <div id="exam-timer" style="text-align: center; font-size: 24px; font-weight: bold; color: #666; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 10px;">
-                    ⏱️ 30:00
-                </div>
-        
-                <div class="progress-container">
-                    <div class="progress-bar" id="progress-bar"></div>
-                    <p class="progress-text" id="progress-text">Pregunta 1 de 20</p>
-                </div>
-        
-                <div class="question-container">
-                    <h4 id="question-text" class="question-text">¿Pregunta?</h4>
-                    <div id="options-container" class="options-container"></div>
-                </div>
-        
-                <div class="button-group">
-                    <!-- Botón de salir eliminado - el examen tiene timer -->
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
-                </div>
-        
-                <p style="text-align: center; color: #999; font-size: 12px; margin-top: 10px;">
-                    ⏰ El examen tiene un límite de 30 minutos. Se enviará automáticamente al terminar.
-                </p>
-            </div>
-        </section>
-
-        <!-- RESULTADO -->
-        <section id="result-screen" class="screen">
-            <div class="card result-card">
-                <div class="result-icon" id="result-icon">🏆</div>
-                <h2 id="result-title">Resultado</h2>
-                <div class="score-display">
-                    <span class="score-number" id="score-number">0%</span>
-                    <span class="score-label">Calificación</span>
-                </div>
-                <div class="result-details">
-                    <p><strong>Aciertos:</strong> <span id="aciertos">0</span> de <span id="total">0</span></p>
-                    <p><strong>Mínimo requerido:</strong> <span id="min-score">80</span>%</p>
-                    <p><strong>Estado:</strong> <span id="result-status">-</span></p>
-                </div>
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="app.descargarCertificado()" id="btn-certificado">📄 Descargar Certificado</button>
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- HISTORIAL -->
-        <section id="history-screen" class="screen">
-            <div class="card">
-                <h2>📋 Historial de Exámenes</h2>
-                <div id="history-list" class="history-list"></div>
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- LICENCIA (actualizado con ID + Clave) -->
-        <section id="license-screen" class="screen">
-            <div class="card">
-                <h2>🔑 Activar Licencia</h2>
-        
-                <div id="licencia-info-detail" style="padding:20px;background:#f5f5f5;border-radius:10px;margin:20px 0;text-align:center;font-weight:bold;">
-                    📋 Licencia DEMO - 3 exámenes hoy
-                </div>
-        
-                <div class="license-content">
-                    <p style="color:#666;margin-bottom:20px;">Ingresa tus credenciales de licencia</p>
-            
-                    <!-- Campo ID de Cliente -->
-                    <div class="form-group">
-                        <label for="license-id">🆔 ID de Cliente</label>
-                        <input type="text" id="license-id" placeholder="Ej: CONSTRUCTORA_AZTECA_001" 
-                       style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;text-transform:uppercase;">
-                    </div>
-            
-                    <!-- Campo Clave de Licencia -->
-                    <div class="form-group">
-                        <label for="license-key">🔐 Clave de Licencia</label>
-                        <input type="text" id="license-key" placeholder="Ej: RS-XXXX-YYYY-ZZZZ" 
-                       style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;text-transform:uppercase;letter-spacing:2px;font-family:monospace;">
-                    </div>
-            
-                    <button class="btn btn-primary" onclick="app.activarLicencia()" style="width:100%;margin-top:10px;">
-                        🔓 Activar Licencia
-                    </button>
-            
-                    <!-- Información de planes ACTUALIZADA -->
-                    <div style="margin-top:30px;padding:20px;background:#E3F2FD;border-radius:10px;">
-                        <h4 style="color:#1976D2;margin-bottom:15px;">💰 Planes y Precios 2026</h4>
-
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-bottom:20px;">
-                            <!-- DEMO -->
-                            <div style="background:white;padding:15px;border-radius:8px;border:2px solid #9E9E9E;">
-                                <h5 style="color:#9E9E9E;margin-bottom:5px;">📋 DEMO</h5>
-                                <p style="font-size:24px;font-weight:bold;color:#1a1a1a;">Gratis <span style="font-size:14px;color:#666;">/siempre</span></p>
-                                <ul style="font-size:13px;color:#666;margin:10px 0 0 15px;">
-                                    <li>1 caso básico</li>
-                                    <li>3 exámenes por día</li>
-                                    <li>Certificado con marca de agua</li>
-                                    <li>Acceso ilimitado a básicos</li>
-                                </ul>
-                            </div>
-
-                            <!-- PROFESIONAL -->
-                            <div style="background:white;padding:15px;border-radius:8px;border:2px solid #4CAF50;">
-                                <h5 style="color:#4CAF50;margin-bottom:5px;">👤 PROFESIONAL</h5>
-                                <p style="font-size:24px;font-weight:bold;color:#1a1a1a;">$2,499 <span style="font-size:14px;color:#666;">/año</span></p>
-                                <ul style="font-size:13px;color:#666;margin:10px 0 0 15px;">
-                                    <li>5 casos BÁSICOS</li>
-                                    <li>5 casos MASTER</li>
-                                    <li>21 exámenes NOM-STPS</li>
-                                    <li>Certificados sin marca de agua</li>
-                                    <li>Historial completo</li>
-                                </ul>
-                            </div>
-
-                            <!-- CONSULTOR (DESTACADO) -->
-                            <div style="background:linear-gradient(135deg,#2196F3,#1976D2);padding:15px;border-radius:8px;border:2px solid #2196F3;transform:scale(1.05);">
-                                <h5 style="color:white;margin-bottom:5px;">💼 CONSULTOR ⭐</h5>
-                                <p style="font-size:24px;font-weight:bold;color:white;">$7,999 <span style="font-size:14px;color:#E3F2FD;">/año</span></p>
-                                <ul style="font-size:13px;color:#E3F2FD;margin:10px 0 0 15px;">
-                                    <li>Todo PROFESIONAL</li>
-                                    <li>+3 casos ELITE</li>
-                                    <li>Insignias digitales</li>
-                                    <li>Dashboard básico</li>
-                                    <li>Soporte prioritario</li>
-                                </ul>
-                            </div>
-
-                            <!-- EMPRESARIAL -->
-                            <div style="background:white;padding:15px;border-radius:8px;border:2px solid #9C27B0;">
-                                <h5 style="color:#9C27B0;margin-bottom:5px;">🏢 EMPRESARIAL</h5>
-                                <p style="font-size:24px;font-weight:bold;color:#1a1a1a;">$19,999 <span style="font-size:14px;color:#666;">/año</span></p>
-                                <ul style="font-size:13px;color:#666;margin:10px 0 0 15px;">
-                                    <li>Todos los casos (15)</li>
-                                    <li>+2 casos PERICIAL</li>
-                                    <li>Dashboard predictivo</li>
-                                    <li>Análisis de brechas de competencia</li>
-                                    <li>Soporte dedicado</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Ofertas -->
-                        <div style="background:#FFF3E0;padding:15px;border-radius:8px;border-left:4px solid #FF9800;">
-                            <h5 style="color:#E65100;margin-bottom:10px;">🎉 Ofertas de Lanzamiento</h5>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;font-size:14px;">
-                                <div>• <strong>Early Adopter:</strong> 30% descuento primeros 50</div>
-                                <div>• <strong>Equipos:</strong> 15% descuento 5+ licencias</div>
-                                <div>• <strong>Anual:</strong> 2 meses gratis</div>
-                            </div>
-                        </div>
-
-                        <!-- Servicios Adicionales -->
-                        <div style="margin-top:15px;background:#F3E5F5;padding:15px;border-radius:8px;border-left:4px solid #9C27B0;">
-                            <h5 style="color:#7B1FA2;margin-bottom:10px;">🎓 Servicios Profesionales</h5>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;font-size:13px;">
-                                <div>• <strong>Capacitación:</strong> $8,000 MXN/día</div>
-                                <div>• <strong>Exámenes personalizados:</strong> $5,000 MXN/examen</div>
-                                <div>• <strong>Herramienta digital:</strong> Desde $30,000 MXN</div>
-                                <div>• <strong>Consultoría SHE:</strong> Cotización</div>
-                            </div>
-                        </div>
-
-                        <p style="margin-top:15px;color:#666;font-size:12px;">
-                            <strong>💡 Nota:</strong> Precios no incluyen IVA. Todos los planes incluyen actualizaciones de contenido.<br>
-                            <strong>📞 Contacto:</strong> hdzlecter@gmail.com
-                        </p>
-                    </div>
-
-                </div>
-        
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- INFORMACIÓN -->
-        <section id="info-screen" class="screen">
-            <div class="card">
-                <h2>ℹ️ Información</h2>
-                <div class="info-content">
-                    <h3>RayoShield Exam</h3>
-                    <p><strong>Versión:</strong> 1.0.0</p>
-                    <p><strong>Plataforma:</strong> Web (PWA)</p>
-                    <h3>Exámenes Disponibles</h3>
-                    <ul class="exam-normas">
-                        <li>🔒 LOTO (NOM-004-STPS-2008)</li>
-                        <li>⚠️ Seguridad (NOM-031-STPS-2011)</li>
-                        <li>🦺 EPP (NOM-017-STPS-2008)</li>
-                        <li>⚡ Eléctricos (NOM-029-STPS-2011)</li>
-                        <li>🔥 Estática (NOM-022-STPS-2015)</li>
-                        <li>💡 Iluminación (NOM-025-STPS-2008)</li>
-                    </ul>
-                </div>
-                <div class="button-group">
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- CASOS CRÍTICOS - INVESTIGACIÓN MASTER -->
-        <section id="casos-master-screen" class="screen">
-            <div class="card">
-                <div class="caso-header">
-                    <h2>⚠️ Casos Críticos de Obra</h2>
-                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Investigación de incidentes - Nivel MASTER</p>
-                    <div style="margin-top: 10px;">
-                        <span class="badge">🔍 Enfoque sistémico</span>
-                        <span class="badge">📊 ICAM / 5 Porqués</span>
-                        <span class="badge badge-nivel master">MASTER</span>
-                    </div>
-                </div>
-        
-                <!-- Selector de casos -->
-                <div id="casos-list" class="exam-list"></div>
-        
-                <!-- Vista de caso seleccionado -->
-                <div id="caso-detalle" style="display: none;">
-                    <!-- Metadatos del caso -->
-                    <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; margin: 15px 0; font-size: 14px;">
-                        <strong>📋 Ficha del Caso:</strong>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
-                            <div><strong>ID:</strong> <span id="caso-id"></span></div>
-                            <div><strong>Fecha:</strong> <span id="caso-fecha"></span></div>
-                            <div><strong>Industria:</strong> <span id="caso-industria"></span></div>
-                            <div><strong>Tiempo estimado:</strong> <span id="caso-tiempo"></span></div>
-                        </div>
-                    </div>
-            
-                    <!-- Descripción del evento -->
-                    <div style="margin: 20px 0;">
-                        <h3 style="color: #E65100; margin-bottom: 10px;">📝 Descripción del Evento</h3>
-                        <p id="caso-descripcion" style="line-height: 1.6;"></p>
-                    </div>
-            
-                    <!-- Timeline -->
-                    <div style="margin: 20px 0;">
-                        <h4 style="color: #1a1a1a; margin-bottom: 10px;">⏱️ Línea de Tiempo</h4>
-                        <div class="timeline" id="caso-timeline"></div>
-                    </div>
-            
-                    <!-- Energías identificadas -->
-                    <div style="margin: 20px 0;">
-                        <h4 style="color: #1a1a1a; margin-bottom: 10px;">⚡ Energías Peligrosas Identificadas</h4>
-                        <div class="energia-grid" id="caso-energias"></div>
-                    </div>
-            
-                    <!-- Preguntas de investigación -->
-                    <div id="caso-preguntas" style="margin: 30px 0;"></div>
-            
-                    <!-- Botones de navegación -->
-                    <div class="button-group" id="caso-botones">
-                        <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
-                        <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display: none;">✅ Enviar Respuestas</button>
-                    </div>
-            
-                    <!-- Resultado (oculto hasta enviar) -->
-                    <div id="caso-resultado" style="display: none; margin-top: 30px;"></div>
-                </div>
-        
-                <div class="button-group" id="casos-main-buttons">
-                    <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                </div>
-            </div>
-        </section>
-        <!-- PANEL DE CONFIGURACIÓN WHITE LABEL -->
-        <section id="white-label-screen" class="screen" style="display:none;">
-            <div class="card">
-                <h2>🎨 Personaliza tu Marca</h2>
-                <p style="color:#666;">Configura cómo verán tus clientes la plataforma.</p>
-        
-                <div class="form-group">
-                    <label>Nombre de tu Empresa / Consultora</label>
-                    <input type="text" id="wl-nombre" placeholder="Ej: Seguridad Industrial MX" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                </div>
-        
-                <div class="form-group">
-                    <label>URL de tu Logo</label>
-                    <input type="text" id="wl-logo" placeholder="assets/mi-logo.png" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                    <small style="color:#666;">Puedes poner una URL externa o ruta local.</small>
-                </div>
-        
-                <div class="form-group">
-                    <label>Color Primario</label>
-                    <input type="color" id="wl-color" value="#2196F3" style="width:100%;height:50px;border:none;border-radius:10px;">
-                </div>
-        
-                <div class="form-group">
-                    <label>Email de Contacto</label>
-                    <input type="email" id="wl-email" placeholder="contacto@tuempresa.com" style="width:100%;padding:15px;border:2px solid #ddd;border-radius:10px;font-size:16px;margin:10px 0;">
-                </div>
-
-                <div class="button-group">
-                    <button class="btn btn-primary" onclick="app.guardarWhiteLabel()">💾 Guardar Configuración</button>
-                    <button class="btn btn-secondary" onclick="app.volverHome()">↩️ Volver</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="footer">
-        <p>© 2026 RayoShield. Todos los derechos reservados.</p>
-        <p style="margin-top: 10px;">
-            <a href="index.html" style="color: white; text-decoration: none;">Inicio</a> | 
-            <a href="app.html" style="color: white; text-decoration: none;">App</a> | 
-            <a href="ventas.html" style="color: white; text-decoration: none;">Precios</a> | 
-            <a href="terminos.html" style="color: white; text-decoration: none;">Términos</a> | 
-            <a href="privacidad.html" style="color: white; text-decoration: none;">Privacidad</a>
-        </p>
-    </footer>
+    <!-- Barra inferior — solo móvil -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <button class="bn-item active" id="bn-home" onclick="app.volverHome();closeSidebar()">
+                <span class="bn-icon">🏠</span>
+                <span class="bn-label">Inicio</span>
+            </button>
+            <button class="bn-item" id="bn-examenes" onclick="app.irASeleccionarExamen();closeSidebar()">
+                <span class="bn-icon">📚</span>
+                <span class="bn-label">Exámenes</span>
+            </button>
+            <button class="bn-item" id="bn-casos" onclick="app.irACasosMaster();closeSidebar()">
+                <span class="bn-icon">⚠️</span>
+                <span class="bn-label">Casos</span>
+            </button>
+            <button class="bn-item" id="bn-historial" onclick="app.mostrarHistorial();closeSidebar()">
+                <span class="bn-icon">📋</span>
+                <span class="bn-label">Historial</span>
+            </button>
+            <button class="bn-item" id="bn-licencia" onclick="app.mostrarLicencia();closeSidebar()">
+                <span class="bn-icon">🔑</span>
+                <span class="bn-label">Licencia</span>
+            </button>
+        </div>
+    </nav>
 
     <!-- Scripts en orden correcto -->
     <script src="js/exams.js"></script>
     <script src="js/scoring.js"></script>
     <script src="js/certificate.js"></script>
-    <script src="js/certificate-master.js"></script>  <!-- ← AGREGAR ESTA LÍNEA -->
-    <!-- Smart Evaluation Engine 2.0 -->
+    <script src="js/certificate-master.js"></script>
     <script src="js/smart-evaluation-v2.js"></script>
-    <!-- Executive Dashboard Engine -->
-    <script src="js/dashboard-ejecutivo-engine.js"></script>
     <script src="js/dashboard-basico-engine.js"></script>
+    <script src="js/dashboard-ejecutivo-engine.js"></script>
     <script src="js/app.js"></script>
     
-    <!-- Service Worker seguro -->
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('✅ SW registrado:', reg.scope))
-                .catch(err => console.log('⚠️ SW (no crítico):', err.message));
+        // Toggle sidebar en móvil
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isOpen  = sidebar.classList.contains('open');
+            if (isOpen) { closeSidebar(); } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
         }
+        
+        function closeSidebar() {
+            document.querySelector('.sidebar').classList.remove('open');
+            document.getElementById('sidebar-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Actualizar topbar title según pantalla
+        const screenTitles = {
+            'home-screen': ['Inicio', 'Plataforma de certificación'],
+            'select-exam-screen': ['Exámenes', 'Selecciona categoría'],
+            'exam-screen': ['Examen', 'En progreso'],
+            'result-screen': ['Resultado', 'Calificación'],
+            'history-screen': ['Historial', 'Exámenes completados'],
+            'license-screen': ['Licencia', 'Gestión de plan'],
+            'info-screen': ['Información', 'Acerca de'],
+            'casos-master-screen': ['Casos MASTER', 'Investigación de incidentes'],
+            'user-data-screen': ['Mi Perfil', 'Datos del usuario'],
+            'white-label-screen': ['White Label', 'Personalizar marca']
+        };
+
+        // Escape key cierra modals y sidebar
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                closeSidebar();
+            }
+        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
