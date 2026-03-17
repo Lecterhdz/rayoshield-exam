@@ -177,6 +177,14 @@ const app = {
                 btnWhiteLabel.style.display = 'none';
             }
         }
+        // Actualizar Info Screen
+        var infoLicPlan = document.getElementById('info-licencia-plan');
+        var infoUsuarioNombre = document.getElementById('info-usuario-nombre');
+        var btnInstalarPWA = document.getElementById('btn-instalar-pwa');
+        
+        if (infoLicPlan) infoLicPlan.textContent = this.licencia.tipo;
+        if (infoUsuarioNombre) infoUsuarioNombre.textContent = this.userData.nombre || '—';
+        if (btnInstalarPWA && this.deferredPrompt) btnInstalarPWA.style.display = 'flex';
     },
     
     // ─────────────────────────────────────────────────────────────────────
