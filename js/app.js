@@ -2108,7 +2108,7 @@ const app = {
             var c = document.getElementById('pwa-install-container');
             if (c) c.style.display = 'none';
         });
-    }
+    },
     // ═══════════════════════════════════════════════════════════════
     // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - SIN "app."
     // ═══════════════════════════════════════════════════════════════
@@ -2613,14 +2613,9 @@ app.mostrarResultadoCaso = function(resultado) {
     }
 };
 
-// ─────────────────────────────────────────────────────────────────────
+
 // INICIAR CUANDO DOM ESTÉ LISTO
-// ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() { 
-    console.log('DOM listo'); 
-    app.init(); 
-});
-// Iniciar cuando DOM esté listo
+
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
 
