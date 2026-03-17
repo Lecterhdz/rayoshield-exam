@@ -823,6 +823,499 @@
             }
         }
 
+        /* ═══════════════════════════════════════════════════════════════
+        CASOS MASTER - ESTILOS SMARTCOT
+        ═══════════════════════════════════════════════════════════════ */
+        
+        /* GRID DE CASOS */
+        .casos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        /* ITEM DE CASO */
+        .caso-item {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid var(--border);
+        }
+        
+        .caso-item:hover {
+            border-color: var(--amber);
+            border-left-color: var(--amber);
+            transform: translateX(4px);
+            box-shadow: var(--shadow-sm);
+            background: var(--amber-l);
+        }
+        
+        .caso-item h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        
+        .caso-item p {
+            font-size: 12px;
+            color: var(--ink3);
+            margin-bottom: 4px;
+        }
+        
+        /* FICHA DEL CASO */
+        .caso-ficha {
+            background: var(--bg);
+            padding: 15px 20px;
+            border-radius: var(--radius-sm);
+            margin: 15px 0;
+            font-size: 14px;
+            border: 1px solid var(--border);
+        }
+        
+        .caso-ficha-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .caso-ficha-grid .mono {
+            font-family: var(--mono);
+            font-size: 12px;
+        }
+        
+        /* TIMER DEL CASO */
+        .caso-timer {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--ink2);
+            margin: 15px 0;
+            padding: 10px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        
+        .caso-timer.warning {
+            color: var(--amber);
+            background: var(--amber-l);
+            border-color: var(--amber);
+        }
+        
+        .caso-timer.critical {
+            color: var(--rose);
+            background: var(--rose-l);
+            border-color: var(--rose);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        /* PREGUNTAS DEL CASO */
+        .caso-preguntas {
+            margin: 30px 0;
+        }
+        
+        .pregunta-master {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .pregunta-master h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 12px;
+        }
+        
+        .pregunta-master p {
+            font-size: 14px;
+            color: var(--ink2);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        /* OPCIONES DE RESPUESTA - CASOS */
+        .opcion-sistemica {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .opcion-sistemica:hover {
+            border-color: var(--blue);
+            background: var(--blue-l);
+        }
+        
+        .opcion-sistemica.seleccionada {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+        }
+        
+        .opcion-sistemica input[type="checkbox"],
+        .opcion-sistemica input[type="radio"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .opcion-sistemica .texto-opcion {
+            font-size: 13px;
+            line-height: 1.5;
+            flex: 1;
+        }
+        
+        /* RESPUESTA ABIERTA */
+        .respuesta-abierta {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            color: var(--ink);
+            font-family: var(--font);
+            resize: vertical;
+        }
+        
+        .respuesta-abierta:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: var(--white);
+        }
+        
+        .pista-experto {
+            background: var(--blue-l);
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--blue);
+            border-left: 3px solid var(--blue);
+        }
+        
+        /* MATRIZ DE RESPONSABILIDAD */
+        .matriz-responsabilidad {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .role-row {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+        }
+        
+        .role-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 8px;
+        }
+        
+        .role-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+        }
+        
+        .role-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .role-option:hover {
+            border-color: var(--blue);
+            background: var(--blue-l);
+        }
+        
+        .role-option.seleccionada {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+        }
+        
+        .role-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .role-option span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* PLAN DE ACCIÓN */
+        .plan-accion-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .accion-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .accion-item:hover {
+            border-color: var(--blue);
+        }
+        
+        .accion-item.seleccionada {
+            border-color: var(--blue);
+            background: var(--blue-l);
+        }
+        
+        .accion-item input[type="checkbox"] {
+            margin-top: 4px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .accion-jerarquia {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: var(--mono);
+            text-transform: uppercase;
+        }
+        
+        .accion-jerarquia.ingenieria {
+            background: var(--blue-l);
+            color: var(--blue);
+        }
+        
+        .accion-jerarquia.administrativo {
+            background: var(--amber-l);
+            color: var(--amber);
+        }
+        
+        .accion-jerarquia.epp {
+            background: var(--green-l);
+            color: var(--green);
+        }
+        
+        /* ORDENAMIENTO DINÁMICO */
+        .orden-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .orden-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: move;
+            transition: all 0.15s;
+        }
+        
+        .orden-item:hover {
+            border-color: var(--blue);
+        }
+        
+        .orden-item[draggable="true"] {
+            cursor: grab;
+        }
+        
+        .orden-item:active {
+            cursor: grabbing;
+        }
+        
+        .orden-numero {
+            width: 30px;
+            height: 30px;
+            background: var(--blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: var(--mono);
+        }
+        
+        /* TIMELINE */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .timeline-item {
+            padding: 10px 14px;
+            background: var(--bg);
+            border-left: 3px solid var(--blue);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            color: var(--ink2);
+        }
+        
+        .timeline-item.evento-critico {
+            border-left-color: var(--rose);
+            background: var(--rose-l);
+            color: var(--rose);
+            font-weight: 600;
+        }
+        
+        /* ENERGÍAS */
+        .energia-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .energia-item {
+            padding: 12px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .energia-item.aislada {
+            border-color: var(--green);
+            background: var(--green-l);
+        }
+        
+        .energia-item.no-aislada {
+            border-color: var(--rose);
+            background: var(--rose-l);
+        }
+        
+        .energia-item.na {
+            border-color: var(--ink4);
+            background: var(--bg2);
+        }
+        
+        .energia-item strong {
+            display: block;
+            font-size: 12px;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        
+        .energia-item small {
+            font-size: 11px;
+            color: var(--ink3);
+            font-family: var(--mono);
+        }
+        
+        /* RESULTADO DE CASO */
+        .resultado-investigacion {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .resultado-investigacion.aprobado {
+            border-color: var(--green);
+            background: var(--green-l);
+        }
+        
+        .resultado-investigacion.no-aprobado {
+            border-color: var(--rose);
+            background: var(--rose-l);
+        }
+        
+        .puntaje-master {
+            font-size: 56px;
+            font-weight: 800;
+            font-family: var(--mono);
+            color: var(--ink);
+            margin: 20px 0;
+            letter-spacing: -2px;
+        }
+        
+        .leccion-master {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .leccion-master strong {
+            color: var(--ink);
+            font-size: 13px;
+        }
+        
+        .leccion-master p {
+            color: var(--ink2);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 680px) {
+            .caso-ficha-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .role-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .energia-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .puntaje-master {
+                font-size: 42px;
+            }
+        }
+
         
     </style>
 </head>
