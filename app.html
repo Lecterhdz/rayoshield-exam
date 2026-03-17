@@ -1721,7 +1721,7 @@
             </div>
         </div>
     </div>
-                    <!-- ══════════════ GESTIÓN TRABAJADORES ══════════════ -->
+                <!-- ══════════════ GESTIÓN TRABAJADORES ══════════════ -->
                 <section id="trabajadores-screen" class="screen">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
                         <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
@@ -1732,30 +1732,22 @@
                     <!-- Estadísticas -->
                     <div class="stats-row" style="margin-bottom:24px;">
                         <div class="stat-card c-blue">
-                            <div class="stat-top">
-                                <div class="stat-icon-wrap">👥</div>
-                            </div>
+                            <div class="stat-top"><div class="stat-icon-wrap">👥</div></div>
                             <div class="stat-number" id="stat-trabajadores-total">0</div>
                             <div class="stat-label">Trabajadores Registrados</div>
                         </div>
                         <div class="stat-card c-green">
-                            <div class="stat-top">
-                                <div class="stat-icon-wrap">✅</div>
-                            </div>
+                            <div class="stat-top"><div class="stat-icon-wrap">✅</div></div>
                             <div class="stat-number" id="stat-trabajadores-activos">0</div>
                             <div class="stat-label">Trabajadores Activos</div>
                         </div>
                         <div class="stat-card c-amber">
-                            <div class="stat-top">
-                                <div class="stat-icon-wrap">📝</div>
-                            </div>
+                            <div class="stat-top"><div class="stat-icon-wrap">📝</div></div>
                             <div class="stat-number" id="stat-examenes-total">0</div>
                             <div class="stat-label">Exámenes Realizados</div>
                         </div>
                         <div class="stat-card c-indigo">
-                            <div class="stat-top">
-                                <div class="stat-icon-wrap">📊</div>
-                            </div>
+                            <div class="stat-top"><div class="stat-icon-wrap">📊</div></div>
                             <div class="stat-number" id="stat-tasa-aprobacion">0%</div>
                             <div class="stat-label">Tasa de Aprobación</div>
                         </div>
@@ -1814,7 +1806,6 @@
                         </div>
                         <div class="modal-body">
                             <input type="hidden" id="trabajador-id">
-                            
                             <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
                                 <div class="f-group">
                                     <label class="f-label">Nombre Completo *</label>
@@ -1825,7 +1816,6 @@
                                     <input class="f-input" id="trabajador-curp" placeholder="PEPJ850101HDFRRR09" style="text-transform:uppercase;font-family:var(--mono);">
                                 </div>
                             </div>
-                            
                             <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
                                 <div class="f-group">
                                     <label class="f-label">Puesto/Cargo *</label>
@@ -1836,7 +1826,6 @@
                                     <input class="f-input" id="trabajador-area" placeholder="Ej: Mantenimiento">
                                 </div>
                             </div>
-                            
                             <div class="form-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
                                 <div class="f-group">
                                     <label class="f-label">Email</label>
@@ -1847,34 +1836,10 @@
                                     <input class="f-input" id="trabajador-telefono" placeholder="55-1234-5678">
                                 </div>
                             </div>
-                            
-                            <div class="f-group" style="margin-top:14px;">
-                                <label class="f-label">Notas (opcional)</label>
-                                <textarea class="f-input" id="trabajador-notas" placeholder="Observaciones, certificaciones, etc." style="min-height:80px;"></textarea>
-                            </div>
                         </div>
                         <div class="modal-footer">
                             <button onclick="app.cerrarModalTrabajador()" class="topbar-btn ghost">❌ Cancelar</button>
                             <button onclick="app.guardarTrabajador()" class="topbar-btn primary">💾 Guardar</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- MODAL SELECCIONAR TRABAJADOR (KIOSCO MODE) -->
-                <div id="modal-seleccionar-trabajador" class="modal">
-                    <div class="modal-content" style="max-width:500px;">
-                        <div class="modal-header">
-                            <div class="modal-title">👷 Seleccionar Trabajador</div>
-                            <button class="modal-close" onclick="app.cerrarModalSeleccionarTrabajador()">✕</button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="f-group">
-                                <label class="f-label">Buscar Trabajador</label>
-                                <input class="f-input" id="kiosco-buscar" placeholder="Escribe nombre o CURP..." onkeyup="app.filtrarKioscoTrabajadores()">
-                            </div>
-                            <div id="kiosco-lista" style="margin-top:15px;max-height:300px;overflow-y:auto;">
-                                <!-- Se llena dinámicamente -->
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1891,8 +1856,24 @@
                             <div id="progreso-historial" style="max-height:400px;overflow-y:auto;"></div>
                         </div>
                         <div class="modal-footer">
-                            <button onclick="app.exportarProgresoPDF()" class="topbar-btn ghost">📄 Exportar PDF</button>
                             <button onclick="document.getElementById('modal-progreso-trabajador').classList.remove('active')" class="topbar-btn primary">✅ Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MODAL SELECCIONAR TRABAJADOR (KIOSCO) -->
+                <div id="modal-seleccionar-trabajador" class="modal">
+                    <div class="modal-content" style="max-width:500px;">
+                        <div class="modal-header">
+                            <div class="modal-title">👷 Seleccionar Trabajador</div>
+                            <button class="modal-close" onclick="app.cerrarModalSeleccionarTrabajador()">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="f-group">
+                                <label class="f-label">Buscar Trabajador</label>
+                                <input class="f-input" id="kiosco-buscar" placeholder="Escribe nombre o CURP..." onkeyup="app.filtrarKioscoTrabajadores()">
+                            </div>
+                            <div id="kiosco-lista" style="margin-top:15px;max-height:300px;overflow-y:auto;"></div>
                         </div>
                     </div>
                 </div>
