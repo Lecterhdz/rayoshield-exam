@@ -1933,6 +1933,34 @@
     <script src="js/dashboard-basico-engine.js"></script>
     <script src="js/dashboard-ejecutivo-engine.js"></script>
     <script src="js/app.js"></script>
-    
+<!-- ✅ SOLO ESTO CONSERVAR - Funciones globales -->
+<script>
+// Toggle sidebar en móvil (función global, NO de app)
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isOpen = sidebar.classList.contains('open');
+    if (isOpen) { 
+        closeSidebar(); 
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeSidebar() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+// Escape key cierra sidebar (event listener global)
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { 
+        closeSidebar(); 
+    }
+});
+</script>
 </body>
 </html>
