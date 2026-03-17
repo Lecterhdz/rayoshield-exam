@@ -926,7 +926,7 @@ const app = {
     irACasosMaster: function() {
         this.detenerTimerCaso();
         
-        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
+        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN
         var casosList = document.getElementById('casos-list');
         var casoDetalle = document.getElementById('caso-detalle');
         var casosMainButtons = document.getElementById('casos-main-buttons');
