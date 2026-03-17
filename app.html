@@ -352,7 +352,9 @@
 
         /* Hamburger */
         .hamburger {
-            display: none;
+            display: flex;              /* ✅ AGREGAR */
+            flex-direction: column;     /* ✅ AGREGAR - Esto hace que las rayas se apilen verticalmente */
+            justify-content: center;    /* ✅ AGREGAR */
             background: none;
             border: none;
             cursor: pointer;
