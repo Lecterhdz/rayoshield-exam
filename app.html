@@ -1820,13 +1820,10 @@
                             <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
                         </div>
                         <div class="card-body">
-                            <!-- ✅ LISTA DE CASOS -->
+                            <!-- ✅ ESTOS 5 IDs SON OBLIGATORIOS -->
                             <div id="casos-list" class="casos-grid"></div>
                             
-                            <!-- ✅ DETALLE DEL CASO (CON TODOS LOS ELEMENTOS) -->
                             <div id="caso-detalle" style="display:none;">
-                                
-                                <!-- Ficha del Caso -->
                                 <div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;font-size:14px;">
                                     <strong>📋 Ficha del Caso:</strong>
                                     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">
@@ -1837,32 +1834,21 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Descripción -->
                                 <div id="caso-descripcion" style="margin:20px 0;"></div>
-                                
-                                <!-- Timeline -->
-                                <div style="margin:20px 0;">
-                                    <h4 style="color:var(--ink);margin-bottom:10px;">⏱️ Línea de Tiempo</h4>
-                                    <div class="timeline" id="caso-timeline"></div>
-                                </div>
-                                
-                                <!-- Energías -->
-                                <div style="margin:20px 0;">
-                                    <h4 style="color:var(--ink);margin-bottom:10px;">⚡ Energías Identificadas</h4>
-                                    <div class="energia-grid" id="caso-energias"></div>
-                                </div>
-                                
-                                <!-- Preguntas -->
+                                <div id="caso-timeline" style="margin:20px 0;"></div>
+                                <div id="caso-energias" style="margin:20px 0;"></div>
                                 <div id="caso-preguntas" style="margin:30px 0;"></div>
                                 
-                                <!-- Botones -->
                                 <div class="button-group" id="caso-botones">
                                     <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
                                     <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display:none;">✅ Enviar Respuestas</button>
                                 </div>
                                 
-                                <!-- Resultado -->
                                 <div id="caso-resultado" style="display:none;margin-top:30px;"></div>
+                            </div>
+                            
+                            <div id="casos-main-buttons" class="button-group">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
                             </div>
                         </div>
                     </div>
