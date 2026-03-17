@@ -49,6 +49,11 @@ const app = {
     init: function() {
         console.log('RayoShield iniciado');
         this.cargarLicencia();
+
+        // ✅ Inicializar Multi-Usuario
+        if (typeof MultiUsuario !== 'undefined') {
+            MultiUsuario.init();
+        }
         
         // ✅ Inicializar features si están vacías o no existen
         if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
