@@ -898,7 +898,52 @@ const app = {
         this.respuestaTemporal = null;
         this.mostrarPantalla('home-screen');
     },
+
+    // ✅ AGREGAR ESTA FUNCIÓN
+    mostrarPerfil: function() {
+        this.actualizarPerfil();
+        this.mostrarPantalla('perfil-screen');
+    },
     
+    // ✅ AGREGAR ESTA FUNCIÓN
+    actualizarPerfil: function() {
+        document.getElementById('perfil-nombre').textContent = this.userData.nombre || 'Usuario';
+        document.getElementById('perfil-nombre-input').value = this.userData.nombre || '';
+        document.getElementById('perfil-empresa-input').value = this.userData.empresa || '';
+        document.getElementById('perfil-puesto-input').value = this.userData.puesto || '';
+        document.getElementById('perfil-curp-input').value = this.userData.curp || '';
+        
+        document.getElementById('perfil-plan').textContent = this.licencia.tipo;
+        
+        var hist = this.obtenerHistorial();
+        var aprobados = hist.filter(h => h.estado === 'Aprobado').length;
+        var promedio = hist.length > 0 ? Math.round(hist.reduce((a,b) => a + b.score, 0) / hist.length) : 0;
+        
+        document.getElementById('perf-promedio').textContent = promedio + '%';
+        document.getElementById('perf-examenes').textContent = hist.length;
+        document.getElementById('perf-aprobados').textContent = aprobados;
+        document.getElementById('perfil-examenes').textContent = hist.length + ' Exámenes';
+        
+        var logroExamen = document.getElementById('logro-examen');
+        if (hist.length >= 1) { 
+            logroExamen.textContent = '✅'; 
+            logroExamen.parentElement.style.opacity = '1'; 
+        }
+        
+        var actividadEl = document.getElementById('perfil-actividad');
+        if (hist.length > 0) {
+            actividadEl.innerHTML = hist.slice(-5).reverse().map(function(h) {
+                var color = h.estado === 'Aprobado' ? 'g' : 'r';
+                return '<div class="act-item"><div class="act-dot ' + color + '"></div><div class="act-text"><strong>' + h.examen + '</strong> — ' + h.score + '% (' + h.estado + ')</div><div class="act-time">' + new Date(h.fecha).toLocaleDateString('es-MX') + '</div></div>';
+            }).join('');
+        }
+    },
+    
+    // ✅ AGREGAR ESTA FUNCIÓN
+    editarPerfil: function() {
+        this.mostrarDatosUsuario();
+    },
+
     mostrarDatosUsuario: function() {
         var e = document.getElementById('user-empresa'), n = document.getElementById('user-nombre');
         var c = document.getElementById('user-curp'), p = document.getElementById('user-puesto');
