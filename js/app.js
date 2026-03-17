@@ -2228,7 +2228,7 @@ const MultiUsuario = {
             tasa_aprobacion: resultados.length > 0 ? Math.round((aprobados / resultados.length) * 100) : 0
         };
     }
-};
+};  // ← ✅ CIERRA OBJETO MULTI-USUARIO
 
 // Inicializar MultiUsuario
 MultiUsuario.init();
@@ -2254,7 +2254,7 @@ app.mostrarResultado = function() {
         });
         console.log('✅ Resultado guardado para', t.nombre);
     }
-};
+};  // ← ✅ PUNTO Y COMA
 
 // Sobrescribir mostrarResultadoCaso para guardar con trabajador
 const originalMostrarResultadoCaso = app.mostrarResultadoCaso;
@@ -2273,7 +2273,7 @@ app.mostrarResultadoCaso = function(resultado) {
         });
         console.log('✅ Resultado de caso guardado para', t.nombre);
     }
-};
+};  // ← ✅ PUNTO Y COMA (NO COMA)
 
 // ─────────────────────────────────────────────────────────────────────
 // INICIAR CUANDO DOM ESTÉ LISTO
