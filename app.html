@@ -1,573 +1,959 @@
-
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
-
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  :root {
-    --bg:       #0a0c0f;
-    --surface:  #0f1318;
-    --panel:    #141820;
-    --border:   #1e2530;
-    --border2:  #2a3545;
-    --green:    #00e676;
-    --green-dim:#00e67620;
-    --green-mid:#00e67640;
-    --amber:    #ffab40;
-    --red:      #ff5252;
-    --blue:     #448aff;
-    --text:     #e8eef8;
-    --text2:    #8090aa;
-    --text3:    #4a5870;
-    --font:     'Space Grotesk', sans-serif;
-    --mono:     'Space Mono', monospace;
-  }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 14px;
-    min-height: 100vh;
-  }
-
-  /* ── LAYOUT ── */
-  .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex; flex-direction: column;
-    position: relative; overflow: hidden;
-  }
-
-  /* Scanline texture */
-  .sidebar::before {
-    content:'';
-    position:absolute; inset:0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,230,118,.015) 2px, rgba(0,230,118,.015) 4px);
-    pointer-events:none; z-index:0;
-  }
-
-  .sidebar-inner { position:relative; z-index:1; display:flex; flex-direction:column; height:100%; }
-
-  /* Logo */
-  .logo-wrap {
-    padding: 20px 18px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
-  }
-
-  .logo-badge {
-    width: 38px; height: 38px;
-    background: var(--green-dim);
-    border: 1px solid var(--green);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
-    position: relative;
-  }
-
-  .logo-badge::after {
-    content:'';
-    position:absolute; top:-1px; right:-1px;
-    width:6px; height:6px; border-radius:50%;
-    background: var(--green);
-    box-shadow: 0 0 6px var(--green);
-    animation: blink 2s infinite;
-  }
-
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-  .logo-name {
-    font-size: 15px; font-weight: 700; letter-spacing: -.3px;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .logo-sub {
-    font-size: 9px; color: var(--green);
-    font-family: var(--mono);
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-top: 3px;
-  }
-
-  /* Nav */
-  .nav-section {
-    padding: 20px 10px 6px;
-    font-size: 9px; font-weight: 700;
-    color: var(--text3);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-family: var(--mono);
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .nav-section::after {
-    content:'';
-    flex:1;
-    height:1px;
-    background: var(--border);
-  }
-
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 8px 12px;
-    margin: 1px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all .15s;
-    font-size: 13px; font-weight: 500;
-    color: var(--text2);
-    border: none; background: none; width: calc(100% - 16px);
-    text-align: left; font-family: var(--font);
-    position: relative;
-  }
-
-  .nav-item .nav-ico {
-    width: 18px; text-align: center;
-    font-size: 15px; flex-shrink: 0;
-  }
-
-  .nav-item:hover { background: var(--panel); color: var(--text); }
-
-  .nav-item.active {
-    background: var(--green-dim);
-    color: var(--green);
-    border-left: 2px solid var(--green);
-    border-radius: 0 4px 4px 0;
-    margin-left: 8px;
-    padding-left: 10px;
-  }
-
-  .nav-badge {
-    margin-left: auto;
-    font-size: 10px; font-weight: 700;
-    color: var(--amber);
-    font-family: var(--mono);
-    background: rgba(255,171,64,.12);
-    border: 1px solid rgba(255,171,64,.3);
-    padding: 1px 6px; border-radius: 3px;
-  }
-
-  /* Sidebar footer */
-  .sidebar-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
-
-  .status-pill {
-    background: var(--green-dim);
-    border: 1px solid rgba(0,230,118,.3);
-    border-radius: 4px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    display: flex; align-items: center; gap: 10px;
-  }
-
-  .status-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    flex-shrink: 0;
-    animation: blink 2s infinite;
-  }
-
-  .status-label { font-size: 12px; font-weight: 700; color: var(--green); line-height: 1; }
-  .status-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
-
-  .btn-exit {
-    width: 100%; padding: 8px;
-    background: none; border: 1px solid var(--border2);
-    border-radius: 4px;
-    font-size: 12px; font-weight: 600;
-    color: var(--text3); cursor: pointer;
-    transition: all .15s; font-family: var(--font);
-    letter-spacing: .5px;
-  }
-
-  .btn-exit:hover { border-color: var(--red); color: var(--red); background: rgba(255,82,82,.06); }
-
-  /* ── MAIN ── */
-  .main { display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
-
-  /* Topbar */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    height: 56px; padding: 0 28px;
-    display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; z-index: 50;
-  }
-
-  .topbar-left { display: flex; align-items: center; gap: 12px; }
-
-  .breadcrumb {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--text3);
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .breadcrumb span { color: var(--green); }
-  .page-title { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
-
-  .topbar-right { display: flex; align-items: center; gap: 8px; }
-
-  .tb-btn {
-    padding: 6px 14px; border-radius: 4px;
-    font-size: 12px; font-weight: 700; letter-spacing: .5px;
-    cursor: pointer; transition: all .15s;
-    font-family: var(--font);
-  }
-
-  .tb-btn.outline {
-    background: none; border: 1px solid var(--border2); color: var(--text2);
-  }
-
-  .tb-btn.outline:hover { border-color: var(--green); color: var(--green); }
-
-  .tb-btn.accent {
-    background: var(--green-dim); border: 1px solid rgba(0,230,118,.4); color: var(--green);
-  }
-
-  .tb-btn.accent:hover { background: var(--green-mid); }
-
-  /* Content */
-  .content { padding: 28px; flex: 1; }
-
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: all .2s;
-  }
-
-  .stat-card:hover { border-color: var(--border2); }
-
-  .stat-card::before {
-    content: '';
-    position: absolute; top:0; left:0;
-    width: 3px; height: 100%;
-    background: var(--green);
-  }
-
-  .stat-card.amber::before { background: var(--amber); }
-  .stat-card.blue::before { background: var(--blue); }
-  .stat-card.red::before { background: var(--red); }
-
-  .stat-icon {
-    font-size: 20px; margin-bottom: 10px;
-    display: block;
-  }
-
-  .stat-num {
-    font-size: 30px; font-weight: 700;
-    font-family: var(--mono);
-    letter-spacing: -1px;
-    line-height: 1;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .stat-lbl {
-    font-size: 11px; font-weight: 600;
-    color: var(--text3); letter-spacing: 1px;
-    text-transform: uppercase; font-family: var(--mono);
-  }
-
-  /* ── WELCOME CARD ── */
-  .welcome-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .welcome-header {
-    padding: 16px 22px;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(0,230,118,.04);
-  }
-
-  .welcome-icon {
-    width: 36px; height: 36px;
-    background: var(--green-dim);
-    border: 1px solid rgba(0,230,118,.3);
-    border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; flex-shrink: 0;
-  }
-
-  .welcome-title { font-size: 14px; font-weight: 700; color: var(--text); }
-  .welcome-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
-
-  .welcome-body { padding: 20px 22px; }
-
-  /* License info block */
-  .lic-block {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    display: flex; align-items: center; gap: 12px;
-  }
-
-  .lic-badge {
-    font-size: 10px; font-weight: 700;
-    font-family: var(--mono); letter-spacing: 1px;
-    padding: 4px 10px; border-radius: 3px;
-    background: rgba(255,171,64,.12);
-    border: 1px solid rgba(255,171,64,.3);
-    color: var(--amber);
-    flex-shrink: 0;
-  }
-
-  .lic-text { font-size: 12px; color: var(--text2); }
-
-  /* User info block */
-  .user-block {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 12px 16px;
-    margin-bottom: 20px;
-    font-size: 12px; color: var(--text2);
-  }
-
-  /* Action buttons */
-  .actions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .act-btn {
-    padding: 12px 10px;
-    border-radius: 4px;
-    border: 1px solid var(--border2);
-    background: var(--bg);
-    color: var(--text2);
-    font-size: 12px; font-weight: 700;
-    cursor: pointer; transition: all .18s;
-    font-family: var(--font);
-    letter-spacing: .4px;
-    display: flex; align-items: center; gap: 8px;
-    justify-content: center;
-  }
-
-  .act-btn:hover { background: var(--panel); color: var(--text); border-color: var(--border2); }
-
-  .act-btn.primary {
-    background: var(--green-dim);
-    border-color: rgba(0,230,118,.4);
-    color: var(--green);
-    grid-column: span 2;
-  }
-
-  .act-btn.primary:hover { background: var(--green-mid); }
-
-  .act-btn.warning {
-    background: rgba(255,171,64,.08);
-    border-color: rgba(255,171,64,.3);
-    color: var(--amber);
-  }
-
-  .act-btn.warning:hover { background: rgba(255,171,64,.14); }
-
-  /* ── BOTTOM NAV (mobile) ── */
-  .bottom-nav {
-    display: none;
-    position: fixed; bottom:0; left:0; right:0;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 6px 0;
-    z-index: 300;
-  }
-
-  .bottom-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
-
-  .bn-item {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 3px; padding: 6px 4px;
-    cursor: pointer; border: none; background: none;
-    font-family: var(--font); min-height: 48px;
-  }
-
-  .bn-ico { font-size: 20px; }
-  .bn-lbl { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-family: var(--mono); }
-  .bn-item.active .bn-lbl { color: var(--green); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .actions { grid-template-columns: 1fr 1fr; }
-    .act-btn.primary { grid-column: span 2; }
-  }
-
-  @media (max-width: 680px) {
-    .app { grid-template-columns: 1fr; }
-    .sidebar { display: none; }
-    .topbar { padding: 0 16px; }
-    .content { padding: 16px 16px 80px; }
-    .bottom-nav { display: block; }
-    .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-num { font-size: 24px; }
-    .actions { grid-template-columns: 1fr 1fr; }
-    .act-btn.primary { grid-column: span 2; }
-    .page-title { font-size: 15px; }
-  }
-</style>
-
-<div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-      <div class="logo-wrap">
-        <div class="logo-badge">🛡️</div>
-        <div>
-          <div class="logo-name">RayoShield</div>
-          <div class="logo-sub">Exam Platform</div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0c0f">
+    <title>RayoShield Exam - Plataforma de Certificación STPS</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="assets/logo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+        RAYOSHIELD EXAM - ESTILOS ACTUALIZADOS (Space Grotesk)
+        ═══════════════════════════════════════════════════════════════ */
+        :root {
+            --bg: #0a0c0f;
+            --surface: #0f1318;
+            --panel: #141820;
+            --border: #1e2530;
+            --border2: #2a3545;
+            --green: #00e676;
+            --gdim: #00e67618;
+            --gmid: #00e67635;
+            --amber: #ffab40;
+            --adim: #ffab4018;
+            --amid: #ffab4035;
+            --blue: #448aff;
+            --bdim: #448aff18;
+            --red: #ff5252;
+            --rdim: #ff525218;
+            --teal: #00bcd4;
+            --text: #e8eef8;
+            --text2: #8090aa;
+            --text3: #4a5870;
+            --font: 'Space Grotesk', sans-serif;
+            --mono: 'Space Mono', monospace;
+            --radius: 6px;
+            --radius-sm: 4px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            font-size: 14px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--panel); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+        /* Layout */
+        .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,230,118,.012) 2px, rgba(0,230,118,.012) 4px);
+            pointer-events: none;
+        }
+
+        .si { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; }
+
+        .logo-wrap {
+            padding: 20px 18px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-badge {
+            width: 38px;
+            height: 38px;
+            background: var(--gdim);
+            border: 1px solid var(--green);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .logo-badge::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 8px var(--green);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: .25 } }
+
+        .logo-name { font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+        .logo-sub { font-size: 9px; color: var(--green); font-family: var(--mono); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+
+        .nav-sec {
+            padding: 18px 10px 6px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: var(--mono);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-sec::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+        .ni {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin: 1px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text2);
+            border: none;
+            background: none;
+            width: calc(100% - 16px);
+            text-align: left;
+            font-family: var(--font);
+            transition: all .15s;
+        }
+
+        .ni:hover { background: var(--panel); color: var(--text); }
+        .ni.active { background: var(--gdim); color: var(--green); border-left: 2px solid var(--green); border-radius: 0 4px 4px 0; margin-left: 8px; padding-left: 10px; }
+        .ni .ico { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+        .nb { margin-left: auto; font-size: 10px; font-weight: 700; color: var(--amber); font-family: var(--mono); background: rgba(255,171,64,.12); border: 1px solid rgba(255,171,64,.3); padding: 1px 6px; border-radius: 3px; }
+
+        .sf { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
+
+        .sp {
+            background: var(--gdim);
+            border: 1px solid rgba(0,230,118,.3);
+            border-radius: 4px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sd { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); flex-shrink: 0; animation: blink 2s infinite; }
+        .sl { font-size: 12px; font-weight: 700; color: var(--green); }
+        .ss { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+
+        .be {
+            width: 100%;
+            padding: 8px;
+            background: none;
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text3);
+            cursor: pointer;
+            font-family: var(--font);
+            letter-spacing: .5px;
+            transition: all .15s;
+        }
+
+        .be:hover { border-color: var(--red); color: var(--red); }
+
+        /* Main */
+        .main { display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
+
+        .topbar {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            height: 56px;
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .tl { display: flex; flex-direction: column; }
+        .bc { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+        .bc span { color: var(--green); }
+        .pt { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
+
+        .tr { display: flex; align-items: center; gap: 8px; }
+
+        .tbb {
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            cursor: pointer;
+            font-family: var(--font);
+        }
+
+        .tbb.o { background: none; border: 1px solid var(--border2); color: var(--text2); }
+        .tbb.o:hover { border-color: var(--green); color: var(--green); }
+        .tbb.a { background: var(--gdim); border: 1px solid rgba(0,230,118,.4); color: var(--green); }
+
+        .content { padding: 24px 28px; flex: 1; }
+
+        /* Screens */
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeUp .25s ease; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all .2s;
+        }
+
+        .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--green); }
+        .stat-card.amber::before { background: var(--amber); }
+        .stat-card.blue::before { background: var(--blue); }
+        .stat-card.red::before { background: var(--red); }
+
+        .stat-icon { font-size: 20px; margin-bottom: 10px; display: block; }
+        .stat-num { font-size: 30px; font-weight: 700; font-family: var(--mono); letter-spacing: -1px; line-height: 1; color: var(--text); margin-bottom: 4px; }
+        .stat-lbl { font-size: 11px; font-weight: 600; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; font-family: var(--mono); }
+
+        /* Cards */
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 16px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0,230,118,.04);
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gdim);
+            border: 1px solid rgba(0,230,118,.3);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+        .card-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+        .card-body { padding: 20px 22px; }
+
+        /* Forms */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text3);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            font-family: var(--mono);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text);
+            font-family: var(--font);
+            transition: all .15s;
+            min-height: 44px;
+            width: 100%;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green);
+            background: var(--surface);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .18s;
+            font-family: var(--font);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--gdim); border: 1px solid rgba(0,230,118,.4); color: var(--green); }
+        .btn-primary:hover { background: var(--gmid); }
+        .btn-secondary { background: var(--bg); color: var(--text2); border: 1px solid var(--border2); }
+        .btn-secondary:hover { background: var(--panel); }
+        .btn-warning { background: var(--adim); border: 1px solid rgba(255,171,64,.3); color: var(--amber); }
+        .btn-warning:hover { background: var(--amid); }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 6px 0;
+            z-index: 300;
+        }
+
+        .bottom-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
+
+        .bn-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px 4px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: var(--font);
+            min-height: 48px;
+        }
+
+        .bn-ico { font-size: 20px; }
+        .bn-lbl { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-family: var(--mono); }
+        .bn-item.active .bn-lbl { color: var(--green); }
+
+        /* Responsive - CORREGIDO PARA MÓVIL */
+        @media (max-width: 900px) {
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .button-group { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 680px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+            .topbar { padding: 0 16px; }
+            .content { padding: 16px 16px 80px !important; }
+            .bottom-nav { display: block !important; }
+            .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .stat-num { font-size: 24px; }
+            .stat-card { padding: 14px; }
+            .card-header { padding: 14px 16px; }
+            .card-body { padding: 16px; }
+            .pt { font-size: 15px; }
+            .button-group { grid-template-columns: 1fr; }
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-2 { margin-top: 16px; }
+        .mb-2 { margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="si">
+                <div class="logo-wrap">
+                    <div class="logo-badge">🛡️</div>
+                    <div>
+                        <div class="logo-name">RayoShield</div>
+                        <div class="logo-sub">Exam Platform</div>
+                    </div>
+                </div>
+
+                <div class="nav-sec">Principal</div>
+                <button class="ni active" onclick="app.volverHome()">
+                    <span class="ico">⌂</span> Inicio
+                </button>
+                <button class="ni" onclick="app.irASeleccionarExamen()">
+                    <span class="ico">▤</span> Exámenes
+                </button>
+                <button class="ni" onclick="app.irACasosMaster()" id="nav-casos">
+                    <span class="ico">⚠</span> Casos MASTER
+                    <span class="nb" id="nav-badge-casos">15</span>
+                </button>
+
+                <div class="nav-sec">Usuario</div>
+                <button class="ni" onclick="app.mostrarDatosUsuario()">
+                    <span class="ico">◎</span> Mi Perfil
+                </button>
+                <button class="ni" onclick="app.mostrarHistorial()">
+                    <span class="ico">≡</span> Historial
+                </button>
+                <button class="ni" onclick="app.mostrarLicencia()">
+                    <span class="ico">◈</span> Licencia
+                </button>
+
+                <div class="nav-sec">Herramientas</div>
+                <button class="ni" onclick="app.mostrarInfo()">
+                    <span class="ico">ℹ</span> Información
+                </button>
+
+                <div class="sf">
+                    <div class="sp">
+                        <div class="sd"></div>
+                        <div>
+                            <div class="sl" id="sidebar-license-plan">DEMO</div>
+                            <div class="ss" id="sidebar-license-expiry">Sin expiración</div>
+                        </div>
+                    </div>
+                    <button class="be" onclick="app.cerrarSesion()">⏻ &nbsp;CERRAR SESIÓN</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <div class="main">
+            <!-- TOPBAR -->
+            <div class="topbar">
+                <div class="tl">
+                    <div class="bc">SYS / <span id="topbar-section">INICIO</span></div>
+                    <div class="page-title" id="topbar-title">Dashboard</div>
+                </div>
+                <div class="tr">
+                    <button class="tbb o" onclick="app.toggleTema()">🌓</button>
+                    <button class="tbb o" onclick="app.mostrarLicencia()">◈ Licencia</button>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- HOME SCREEN -->
+                <section id="home-screen" class="screen active">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <span class="stat-icon">▤</span>
+                            <div class="stat-num">21</div>
+                            <div class="stat-lbl">Exámenes</div>
+                        </div>
+                        <div class="stat-card amber">
+                            <span class="stat-icon">❓</span>
+                            <div class="stat-num">420</div>
+                            <div class="stat-lbl">Preguntas</div>
+                        </div>
+                        <div class="stat-card blue">
+                            <span class="stat-icon">⚠</span>
+                            <div class="stat-num">15</div>
+                            <div class="stat-lbl">Casos</div>
+                        </div>
+                        <div class="stat-card red">
+                            <span class="stat-icon">◈</span>
+                            <div class="stat-num">4</div>
+                            <div class="stat-lbl">Niveles</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">🛡️</div>
+                            <div>
+                                <div class="card-title">Bienvenido a RayoShield Exam</div>
+                                <div class="card-sub">CERTIF_STPS · v2.4 · PLATAFORMA ACTIVA</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="licencia-info" style="padding:15px;background:#f5f5f5;border-radius:10px;text-align:center;font-weight:bold;margin:15px 0;">
+                                📋 Licencia DEMO
+                            </div>
+                            
+                            <div id="usuario-info" style="padding:15px;background:#E3F2FD;border-radius:10px;margin:15px 0;font-size:14px;">
+                                <!-- Se llena con JS -->
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar" style="grid-column: span 2;">▶ &nbsp;INICIAR EXAMEN</button>
+                                <button class="btn btn-warning" onclick="app.irACasosMaster()" id="btn-casos-master">⚠ &nbsp;CASOS MASTER</button>
+                                <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">◎ &nbsp;Datos</button>
+                                <button class="btn btn-secondary" onclick="app.mostrarHistorial()">≡ &nbsp;Historial</button>
+                                <button class="btn btn-secondary" onclick="app.mostrarLicencia()">◈ &nbsp;Licencia</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SELECT EXAM SCREEN -->
+                <section id="select-exam-screen" class="screen">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
+                        <button onclick="app.volverHome()" class="btn btn-secondary">← Volver</button>
+                        <span style="font-size:14px;font-weight:700;">Seleccionar Examen</span>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">📚</div>
+                            <div>
+                                <div class="card-title">Catálogo de Exámenes</div>
+                                <div class="card-sub">Selecciona una categoría</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="categorias-view">
+                                <div id="categorias-list" class="exam-list"></div>
+                            </div>
+                            
+                            <div id="niveles-view" style="display:none;">
+                                <button class="btn btn-secondary" onclick="app.volverACategorias()" style="margin-bottom:15px;">← Volver a categorías</button>
+                                <h3 id="categoria-titulo" style="color:var(--green);margin-bottom:10px;"></h3>
+                                <p id="categoria-norma" style="color:var(--text3);margin-bottom:20px;"></p>
+                                <div id="niveles-list" class="exam-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- EXAM SCREEN -->
+                <section id="exam-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">📝</div>
+                            <div>
+                                <div class="card-title" id="exam-title">Título del Examen</div>
+                                <div class="card-sub" id="exam-norma">Norma</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="exam-timer" style="text-align:center;font-size:24px;font-weight:bold;color:var(--text2);margin:15px 0;padding:10px;background:var(--bg);border-radius:10px;">
+                                ⏱️ 30:00
+                            </div>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar" id="progress-bar" style="background:var(--border);height:8px;border-radius:4px;overflow:hidden;margin-bottom:10px;">
+                                    <div class="progress-bar-fill" style="background:var(--green);height:100%;width:0%;transition:width .3s;"></div>
+                                </div>
+                                <p class="progress-text" id="progress-text" style="font-size:12px;color:var(--text3);">Pregunta 1 de 20</p>
+                            </div>
+                            
+                            <div class="question-container">
+                                <h4 id="question-text" class="question-text" style="font-size:16px;margin-bottom:20px;">¿Pregunta?</h4>
+                                <div id="options-container" class="options-container"></div>
+                            </div>
+                            
+                            <div class="button-group" style="margin-top:20px;">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
+                            </div>
+                            
+                            <p style="text-align:center;color:var(--text3);font-size:12px;margin-top:10px;">
+                                ⏰ El examen tiene un límite de 30 minutos. Se enviará automáticamente al terminar.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RESULT SCREEN -->
+                <section id="result-screen" class="screen">
+                    <div class="card result-card">
+                        <div class="card-header">
+                            <div class="card-icon" id="result-icon">🏆</div>
+                            <div>
+                                <div class="card-title" id="result-title">Resultado</div>
+                                <div class="card-sub">Evaluación completada</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="score-display" style="text-align:center;margin-bottom:20px;">
+                                <span class="score-number" id="score-number" style="font-size:48px;font-weight:700;font-family:var(--mono);color:var(--green);">0%</span>
+                                <div style="font-size:12px;color:var(--text3);margin-top:5px;">Calificación</div>
+                            </div>
+                            
+                            <div class="result-details" style="background:var(--bg);padding:15px;border-radius:6px;margin-bottom:20px;">
+                                <p style="margin-bottom:8px;"><strong>Aciertos:</strong> <span id="aciertos">0</span> de <span id="total">0</span></p>
+                                <p style="margin-bottom:8px;"><strong>Mínimo requerido:</strong> <span id="min-score">80</span>%</p>
+                                <p><strong>Estado:</strong> <span id="result-status">-</span></p>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-primary" onclick="app.descargarCertificado()" id="btn-certificado" style="grid-column:span 2;">📄 Descargar Certificado</button>
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- HISTORY SCREEN -->
+                <section id="history-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">≡</div>
+                            <div>
+                                <div class="card-title">Historial de Exámenes</div>
+                                <div class="card-sub">Exámenes completados</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="history-list" class="history-list"></div>
+                            <div class="button-group" style="margin-top:20px;">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LICENSE SCREEN -->
+                <section id="license-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">◈</div>
+                            <div>
+                                <div class="card-title">Activar Licencia</div>
+                                <div class="card-sub">Gestión de plan</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="licencia-info-detail" style="padding:20px;background:var(--bg);border-radius:10px;margin:20px 0;text-align:center;font-weight:bold;">
+                                📋 Licencia DEMO - 3 exámenes hoy
+                            </div>
+                            
+                            <div class="license-content">
+                                <p style="color:var(--text3);margin-bottom:20px;">Ingresa tus credenciales de licencia</p>
+                                
+                                <div class="form-group">
+                                    <label>🆔 ID de Cliente</label>
+                                    <input type="text" id="license-id" placeholder="Ej: CONSTRUCTORA_AZTECA_001" style="text-transform:uppercase;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>🔐 Clave de Licencia</label>
+                                    <input type="text" id="license-key" placeholder="Ej: RS-XXXX-YYYY-ZZZZ" style="text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);">
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="app.activarLicencia()" style="width:100%;margin-top:10px;">🔓 Activar Licencia</button>
+                            </div>
+                            
+                            <div class="button-group" style="margin-top:20px;">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- INFO SCREEN -->
+                <section id="info-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">ℹ</div>
+                            <div>
+                                <div class="card-title">Información</div>
+                                <div class="card-sub">Acerca de RayoShield</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-content">
+                                <h3 style="margin-bottom:15px;">RayoShield Exam</h3>
+                                <p style="margin-bottom:10px;"><strong>Versión:</strong> 2.4.1</p>
+                                <p style="margin-bottom:10px;"><strong>Plataforma:</strong> Web (PWA)</p>
+                                <h3 style="margin:20px 0 15px 0;">Exámenes Disponibles</h3>
+                                <ul class="exam-normas" style="list-style:none;padding-left:0;">
+                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🔒 LOTO (NOM-004-STPS-2008)</li>
+                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">⚠️ Seguridad (NOM-031-STPS-2011)</li>
+                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🦺 EPP (NOM-017-STPS-2008)</li>
+                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">⚡ Eléctricos (NOM-029-STPS-2011)</li>
+                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🔥 Estática (NOM-022-STPS-2015)</li>
+                                    <li style="padding:8px 0;">💡 Iluminación (NOM-025-STPS-2008)</li>
+                                </ul>
+                            </div>
+                            <div class="button-group" style="margin-top:20px;">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- USER DATA SCREEN -->
+                <section id="user-data-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">◎</div>
+                            <div>
+                                <div class="card-title">Datos del Usuario</div>
+                                <div class="card-sub">Completa tu perfil</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p style="color:var(--text3);margin-bottom:20px;">Completa tus datos para comenzar los exámenes</p>
+                            
+                            <div class="form-group">
+                                <label>🏢 Empresa</label>
+                                <input type="text" id="user-empresa" placeholder="Nombre de tu empresa">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>👤 Nombre Completo</label>
+                                <input type="text" id="user-nombre" placeholder="Tu nombre completo">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>🆔 CURP</label>
+                                <input type="text" id="user-curp" placeholder="ABC123456HDFGHI09" style="text-transform:uppercase;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>💼 Puesto/Cargo</label>
+                                <input type="text" id="user-puesto" placeholder="Tu puesto de trabajo">
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-primary" onclick="app.guardarDatosUsuarioForm()" style="grid-column:span 2;">💾 Guardar Datos</button>
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CASOS MASTER SCREEN -->
+                <section id="casos-master-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon">⚠</div>
+                            <div>
+                                <div class="card-title">Casos Críticos de Obra</div>
+                                <div class="card-sub">Investigación de incidentes - Nivel MASTER</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="casos-list" class="exam-list"></div>
+                            
+                            <div id="caso-detalle" style="display:none;">
+                                <div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;font-size:14px;">
+                                    <strong>📋 Ficha del Caso:</strong>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">
+                                        <div><strong>ID:</strong> <span id="caso-id"></span></div>
+                                        <div><strong>Fecha:</strong> <span id="caso-fecha"></span></div>
+                                        <div><strong>Industria:</strong> <span id="caso-industria"></span></div>
+                                        <div><strong>Tiempo:</strong> <span id="caso-tiempo"></span></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin:20px 0;">
+                                    <h3 style="color:var(--amber);margin-bottom:10px;">📝 Descripción del Evento</h3>
+                                    <p id="caso-descripcion" style="line-height:1.6;"></p>
+                                </div>
+                                
+                                <div style="margin:20px 0;">
+                                    <h4 style="margin-bottom:10px;">⏱️ Línea de Tiempo</h4>
+                                    <div class="timeline" id="caso-timeline"></div>
+                                </div>
+                                
+                                <div style="margin:20px 0;">
+                                    <h4 style="margin-bottom:10px;">⚡ Energías Identificadas</h4>
+                                    <div class="energia-grid" id="caso-energias"></div>
+                                </div>
+                                
+                                <div id="caso-preguntas" style="margin:30px 0;"></div>
+                                
+                                <div class="button-group" id="caso-botones">
+                                    <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
+                                    <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display:none;grid-column:span 2;">✅ Enviar Respuestas</button>
+                                </div>
+                                
+                                <div id="caso-resultado" style="display:none;margin-top:30px;"></div>
+                            </div>
+                            
+                            <div class="button-group" id="casos-main-buttons" style="margin-top:20px;">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
-      </div>
-
-      <div class="nav-section">Principal</div>
-      <button class="nav-item active">
-        <span class="nav-ico">⌂</span> Inicio
-      </button>
-      <button class="nav-item">
-        <span class="nav-ico">▤</span> Exámenes
-      </button>
-      <button class="nav-item">
-        <span class="nav-ico">⚠</span> Casos MASTER
-        <span class="nav-badge">15</span>
-      </button>
-
-      <div class="nav-section">Usuario</div>
-      <button class="nav-item">
-        <span class="nav-ico">◎</span> Mi Perfil
-      </button>
-      <button class="nav-item">
-        <span class="nav-ico">≡</span> Historial
-      </button>
-      <button class="nav-item">
-        <span class="nav-ico">◈</span> Licencia
-      </button>
-
-      <div class="nav-section">Herramientas</div>
-      <button class="nav-item">
-        <span class="nav-ico">ℹ</span> Información
-      </button>
-
-      <div class="sidebar-footer">
-        <div class="status-pill">
-          <div class="status-dot"></div>
-          <div>
-            <div class="status-label">DEMO</div>
-            <div class="status-sub">Sin expiración</div>
-          </div>
-        </div>
-        <button class="btn-exit">⏻ &nbsp;CERRAR SESIÓN</button>
-      </div>
     </div>
-  </aside>
 
-  <!-- MAIN -->
-  <div class="main">
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div class="topbar-left">
-        <div>
-          <div class="breadcrumb">SYS / <span>INICIO</span></div>
-          <div class="page-title">Dashboard</div>
+    <!-- Bottom Nav (Mobile) -->
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <button class="bn-item active" id="bn-home" onclick="app.volverHome()">
+                <span class="bn-ico">⌂</span>
+                <span class="bn-lbl">Inicio</span>
+            </button>
+            <button class="bn-item" id="bn-examenes" onclick="app.irASeleccionarExamen()">
+                <span class="bn-ico">▤</span>
+                <span class="bn-lbl">Exámenes</span>
+            </button>
+            <button class="bn-item" id="bn-casos" onclick="app.irACasosMaster()">
+                <span class="bn-ico">⚠</span>
+                <span class="bn-lbl">Casos</span>
+            </button>
+            <button class="bn-item" id="bn-historial" onclick="app.mostrarHistorial()">
+                <span class="bn-ico">≡</span>
+                <span class="bn-lbl">Historial</span>
+            </button>
+            <button class="bn-item" id="bn-licencia" onclick="app.mostrarLicencia()">
+                <span class="bn-ico">◈</span>
+                <span class="bn-lbl">Licencia</span>
+            </button>
         </div>
-      </div>
-      <div class="topbar-right">
-        <button class="tb-btn outline">🌓</button>
-        <button class="tb-btn outline">◈ Licencia</button>
-        <button class="tb-btn accent">▤ Iniciar Examen</button>
-      </div>
-    </div>
+    </nav>
 
-    <!-- CONTENT -->
-    <div class="content">
-
-      <!-- Stats row -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <span class="stat-ico">▤</span>
-          <div class="stat-num">21</div>
-          <div class="stat-lbl">Exámenes</div>
-        </div>
-        <div class="stat-card amber">
-          <span class="stat-ico">❓</span>
-          <div class="stat-num">420</div>
-          <div class="stat-lbl">Preguntas</div>
-        </div>
-        <div class="stat-card blue">
-          <span class="stat-ico">⚠</span>
-          <div class="stat-num">15</div>
-          <div class="stat-lbl">Casos</div>
-        </div>
-        <div class="stat-card red">
-          <span class="stat-ico">◈</span>
-          <div class="stat-num">4</div>
-          <div class="stat-lbl">Niveles</div>
-        </div>
-      </div>
-
-      <!-- Welcome card -->
-      <div class="welcome-card">
-        <div class="welcome-header">
-          <div class="welcome-icon">🛡️</div>
-          <div>
-            <div class="welcome-title">Bienvenido a RayoShield Exam</div>
-            <div class="welcome-sub">CERTIF_STPS · v2.4.1 · PLATAFORMA ACTIVA</div>
-          </div>
-        </div>
-        <div class="welcome-body">
-          <div class="lic-block">
-            <span class="lic-badge">DEMO</span>
-            <span class="lic-text">Licencia activa · Funcionalidades básicas habilitadas</span>
-          </div>
-          <div class="user-block">
-            📋 &nbsp;Información del usuario cargada · ID: — · Plan: DEMO
-          </div>
-          <div class="actions">
-            <button class="act-btn primary">▶ &nbsp;INICIAR EXAMEN</button>
-            <button class="act-btn warning">⚠ &nbsp;CASOS MASTER</button>
-            <button class="act-btn">◎ &nbsp;Datos</button>
-            <button class="act-btn">≡ &nbsp;Historial</button>
-            <button class="act-btn">◈ &nbsp;Licencia</button>
-            <button class="act-btn">ℹ &nbsp;Info</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Bottom nav (mobile) -->
-<nav class="bottom-nav">
-  <div class="bottom-nav-inner">
-    <button class="bn-item active"><span class="bn-ico">⌂</span><span class="bn-lbl">Inicio</span></button>
-    <button class="bn-item"><span class="bn-ico">▤</span><span class="bn-lbl">Exámenes</span></button>
-    <button class="bn-item"><span class="bn-ico">⚠</span><span class="bn-lbl">Casos</span></button>
-    <button class="bn-item"><span class="bn-ico">≡</span><span class="bn-lbl">Historial</span></button>
-    <button class="bn-item"><span class="bn-ico">◈</span><span class="bn-lbl">Licencia</span></button>
-  </div>
-</nav>
+    <!-- Scripts -->
+    <script src="js/exams.js"></script>
+    <script src="js/scoring.js"></script>
+    <script src="js/certificate.js"></script>
+    <script src="js/certificate-master.js"></script>
+    <script src="js/smart-evaluation-v2.js"></script>
+    <script src="js/dashboard-basico-engine.js"></script>
+    <script src="js/dashboard-ejecutivo-engine.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Toggle tema
+        app.toggleTema = function() {
+            console.log('Toggle tema - pendiente de implementar');
+        };
+        
+        // Cerrar sesión
+        app.cerrarSesion = function() {
+            if (confirm('¿Cerrar sesión?')) {
+                localStorage.removeItem('rayoshield_licencia');
+                localStorage.removeItem('rayoshield_usuario');
+                location.reload();
+            }
+        };
+        
+        // Actualizar topbar según pantalla
+        const originalMostrarPantalla = app.mostrarPantalla;
+        app.mostrarPantalla = function(id) {
+            originalMostrarPantalla.call(this, id);
+            
+            const titles = {
+                'home-screen': ['INICIO', 'Dashboard'],
+                'select-exam-screen': ['EXÁMENES', 'Seleccionar examen'],
+                'exam-screen': ['EXAMEN', 'En progreso'],
+                'result-screen': ['RESULTADO', 'Calificación'],
+                'history-screen': ['HISTORIAL', 'Exámenes completados'],
+                'license-screen': ['LICENCIA', 'Gestión de plan'],
+                'info-screen': ['INFO', 'Acerca de'],
+                'casos-master-screen': ['CASOS', 'Investigación'],
+                'user-data-screen': ['PERFIL', 'Datos del usuario']
+            };
+            
+            const titleData = titles[id] || ['INICIO', 'Dashboard'];
+            document.getElementById('topbar-section').textContent = titleData[0];
+            document.getElementById('topbar-title').textContent = titleData[1];
+            
+            // Update nav active
+            document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+            
+            if (id === 'home-screen') {
+                document.querySelectorAll('.ni')[0].classList.add('active');
+                document.getElementById('bn-home')?.classList.add('active');
+            } else if (id === 'select-exam-screen' || id === 'exam-screen' || id === 'result-screen') {
+                document.querySelectorAll('.ni')[1].classList.add('active');
+                document.getElementById('bn-examenes')?.classList.add('active');
+            } else if (id === 'casos-master-screen') {
+                document.querySelectorAll('.ni')[2].classList.add('active');
+                document.getElementById('bn-casos')?.classList.add('active');
+            } else if (id === 'user-data-screen') {
+                document.querySelectorAll('.ni')[3].classList.add('active');
+            } else if (id === 'history-screen') {
+                document.querySelectorAll('.ni')[4].classList.add('active');
+                document.getElementById('bn-historial')?.classList.add('active');
+            } else if (id === 'license-screen') {
+                document.querySelectorAll('.ni')[5].classList.add('active');
+                document.getElementById('bn-licencia')?.classList.add('active');
+            } else if (id === 'info-screen') {
+                document.querySelectorAll('.ni')[6].classList.add('active');
+            }
+        };
+        
+        // Actualizar sidebar license
+        app.actualizarSidebarLicense = function() {
+            document.getElementById('sidebar-license-plan').textContent = app.licencia.tipo;
+            if (app.licencia.expiracion) {
+                document.getElementById('sidebar-license-expiry').textContent = new Date(app.licencia.expiracion).toLocaleDateString('es-MX');
+            } else {
+                document.getElementById('sidebar-license-expiry').textContent = 'Sin expiración';
+            }
+        };
+        
+        // Hook into actualizarUI
+        const originalActualizarUI = app.actualizarUI;
+        app.actualizarUI = function() {
+            originalActualizarUI.call(this);
+            app.actualizarSidebarLicense();
+        };
+    </script>
+</body>
+</html>
