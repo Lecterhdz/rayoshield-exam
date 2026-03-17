@@ -585,96 +585,13 @@
         .text-center { text-align: center; }
         .mt-2 { margin-top: 16px; }
         .mb-2 { margin-bottom: 16px; }
+   
         /* ═══════════════════════════════════════════════════════════════
-        MEJORAS DE VISIBILIDAD - EXÁMENES Y RESPUESTAS
+        VISIBILIDAD - EXÁMENES, CASOS Y RESPUESTAS
         ═══════════════════════════════════════════════════════════════ */
         
-        /* CATEGORÍAS DE EXÁMENES */
-        .categoria-item {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-left: 4px solid var(--border);
-        }
-        
-        .categoria-item:hover {
-            border-color: var(--blue);
-            border-left-color: var(--blue);
-            transform: translateX(4px);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .categoria-item h4 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--ink);
-            margin-bottom: 6px;
-        }
-        
-        .categoria-item p {
-            font-size: 12px;
-            color: var(--ink3);
-            margin-bottom: 4px;
-        }
-        
-        .categoria-item small {
-            font-size: 11px;
-            color: var(--ink4);
-            font-family: var(--mono);
-        }
-        
-        /* NIVELES DE EXÁMENES */
-        .nivel-item {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px 20px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .nivel-item:hover {
-            border-color: var(--blue);
-            background: var(--blue-l);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-sm);
-        }
-        
-        .nivel-item h4 {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--ink);
-            margin: 0;
-        }
-        
-        .nivel-item p {
-            font-size: 11px;
-            color: var(--ink4);
-            margin: 4px 0 0 0;
-            font-family: var(--mono);
-        }
-        
-        .nivel-item::after {
-            content: '→';
-            font-size: 18px;
-            color: var(--ink3);
-            transition: all 0.2s;
-        }
-        
-        .nivel-item:hover::after {
-            color: var(--blue);
-            transform: translateX(4px);
-        }
-        
-        /* CASOS MASTER */
+        /* ITEMS DE EXÁMENES Y CASOS */
+        .exam-item,
         .caso-item {
             background: var(--white);
             border: 1px solid var(--border);
@@ -686,13 +603,16 @@
             border-left: 4px solid var(--border);
         }
         
+        .exam-item:hover,
         .caso-item:hover {
-            border-color: var(--amber);
-            border-left-color: var(--amber);
+            border-color: var(--blue);
+            border-left-color: var(--blue);
             transform: translateX(4px);
             box-shadow: var(--shadow-sm);
+            background: var(--blue-l);
         }
         
+        .exam-item h4,
         .caso-item h4 {
             font-size: 14px;
             font-weight: 700;
@@ -700,10 +620,18 @@
             margin-bottom: 8px;
         }
         
+        .exam-item p,
         .caso-item p {
             font-size: 12px;
             color: var(--ink3);
             margin-bottom: 4px;
+        }
+        
+        .exam-item small,
+        .caso-item small {
+            font-size: 11px;
+            color: var(--ink4);
+            font-family: var(--mono);
         }
         
         /* BADGES DE NIVEL */
@@ -777,6 +705,7 @@
         .option-btn.selected::before {
             content: '✓ ';
             font-weight: 700;
+            margin-right: 8px;
         }
         
         /* BOTÓN CONTINUAR */
@@ -827,15 +756,62 @@
             border-radius: var(--radius-sm);
         }
         
+        /* NIVELES DE EXÁMENES */
+        .nivel-item {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .nivel-item:hover {
+            border-color: var(--blue);
+            background: var(--blue-l);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .nivel-item h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--ink);
+            margin: 0;
+        }
+        
+        .nivel-item p {
+            font-size: 11px;
+            color: var(--ink4);
+            margin: 4px 0 0 0;
+            font-family: var(--mono);
+        }
+        
+        .nivel-item::after {
+            content: '→';
+            font-size: 18px;
+            color: var(--ink3);
+            transition: all 0.2s;
+        }
+        
+        .nivel-item:hover::after {
+            color: var(--blue);
+            transform: translateX(4px);
+        }
+        
         /* RESPONSIVE */
         @media (max-width: 680px) {
-            .categoria-item,
+            .exam-item,
             .nivel-item,
             .caso-item {
                 padding: 16px;
             }
             
-            .categoria-item h4,
+            .exam-item h4,
             .nivel-item h4,
             .caso-item h4 {
                 font-size: 14px;
