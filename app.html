@@ -1985,30 +1985,257 @@
                     </div>
                 </section>
 
-                <!-- INFO SCREEN -->
+                <!-- ══════════════ INFO SCREEN ══════════════ -->
                 <section id="info-screen" class="screen">
-                    <div class="card">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+                        <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
+                        <span style="font-size:14px;font-weight:700;color:var(--ink);">ℹ️ Información</span>
+                    </div>
+                
+                    <div class="card" style="margin-bottom:20px;">
                         <div class="card-header">
                             <div>
-                                <div class="card-title">ℹ️ Información</div>
-                                <div class="card-sub">Acerca de RayoShield</div>
+                                <div class="card-title">🛡️ RayoShield Exam</div>
+                                <div class="card-sub">Plataforma de certificación STPS</div>
                             </div>
-                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
                         </div>
                         <div class="card-body">
-                            <div class="info-content">
-                                <h3 style="margin-bottom:15px;">RayoShield Exam</h3>
-                                <p style="margin-bottom:10px;"><strong>Versión:</strong> 2.4.1</p>
-                                <p style="margin-bottom:10px;"><strong>Plataforma:</strong> Web (PWA)</p>
-                                <h3 style="margin:20px 0 15px 0;">Exámenes Disponibles</h3>
-                                <ul class="exam-normas" style="list-style:none;padding-left:0;">
-                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🔒 LOTO (NOM-004-STPS-2008)</li>
-                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">⚠️ Seguridad (NOM-031-STPS-2011)</li>
-                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🦺 EPP (NOM-017-STPS-2008)</li>
-                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">⚡ Eléctricos (NOM-029-STPS-2011)</li>
-                                    <li style="padding:8px 0;border-bottom:1px solid var(--border);">🔥 Estática (NOM-022-STPS-2015)</li>
-                                    <li style="padding:8px 0;">💡 Iluminación (NOM-025-STPS-2008)</li>
-                                </ul>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px;">
+                                <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);">
+                                    <div style="font-size:10px;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;margin-bottom:6px;">Versión</div>
+                                    <div style="font-size:18px;font-weight:700;color:var(--ink);">v2.4.1</div>
+                                </div>
+                                <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);">
+                                    <div style="font-size:10px;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;margin-bottom:6px;">Plataforma</div>
+                                    <div style="font-size:18px;font-weight:700;color:var(--ink);">Web (PWA)</div>
+                                </div>
+                                <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);">
+                                    <div style="font-size:10px;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;margin-bottom:6px;">Licencia</div>
+                                    <div style="font-size:18px;font-weight:700;color:var(--blue);" id="info-licencia-plan">DEMO</div>
+                                </div>
+                                <div style="background:var(--bg);padding:16px;border-radius:var(--radius-sm);">
+                                    <div style="font-size:10px;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;margin-bottom:6px;">Usuario</div>
+                                    <div style="font-size:18px;font-weight:700;color:var(--ink);" id="info-usuario-nombre">—</div>
+                                </div>
+                            </div>
+                
+                            <!-- Acciones Rápidas -->
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px;">
+                                <button onclick="app.toggleTema()" style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;">
+                                    🌓 Tema
+                                </button>
+                                <button onclick="app.instalarPWA()" id="btn-instalar-pwa" style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;display:none;">
+                                    📲 Instalar App
+                                </button>
+                                <button onclick="app.mostrarLicencia()" style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;">
+                                    🔑 Licencia
+                                </button>
+                                <button onclick="app.cerrarSesion()" style="padding:12px;background:var(--rose-l);border:1px solid var(--rose);border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--rose);cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;">
+                                    🚪 Cerrar Sesión
+                                </button>
+                            </div>
+                
+                            <h3 style="color:var(--ink);margin:20px 0 15px 0;font-size:14px;font-weight:700;">📚 Exámenes Disponibles</h3>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">🔒</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">LOTO</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-004-STPS-2008</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">⚠️</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">Seguridad</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-031-STPS-2011</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">🦺</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">EPP</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-017-STPS-2008</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">⚡</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">Eléctricos</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-029-STPS-2011</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">🔥</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">Estática</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-022-STPS-2015</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">💡</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--ink);">Iluminación</div>
+                                        <div style="font-size:11px;color:var(--ink4);">NOM-025-STPS-2008</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <h3 style="color:var(--ink);margin:20px 0 15px 0;font-size:14px;font-weight:700;">⚠️ Casos de Investigación</h3>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;">
+                                <div style="padding:12px 16px;background:var(--green-l);border:1px solid rgba(0,230,118,0.3);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">📋</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--green);">5 Casos BÁSICOS</div>
+                                        <div style="font-size:11px;color:var(--ink4);">Incidentes simples • 15 min</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--blue-l);border:1px solid rgba(68,138,255,0.3);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">⚠️</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--blue);">5 Casos MASTER</div>
+                                        <div style="font-size:11px;color:var(--ink4);">Casi accidentes • 25-30 min</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--indigo);border:1px solid rgba(124,111,240,0.3);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">🎯</span>
+                                    <div>
+                                        <div style="font-weight:600;color:white;">3 Casos ELITE</div>
+                                        <div style="font-size:11px;color:var(--ink4);">Testimonios contradictorios • 40 min</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--amber-l);border:1px solid rgba(255,171,64,0.3);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">⚖️</span>
+                                    <div>
+                                        <div style="font-weight:600;color:var(--amber);">2 Casos PERICIAL</div>
+                                        <div style="font-size:11px;color:var(--ink4);">Implicaciones legales • 60 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <h3 style="color:var(--ink);margin:20px 0 15px 0;font-size:14px;font-weight:700;">📋 Características por Plan</h3>
+                            <div style="overflow-x:auto;">
+                                <table style="width:100%;border-collapse:collapse;min-width:600px;">
+                                    <thead>
+                                        <tr style="background:var(--bg);">
+                                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;">Característica</th>
+                                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);font-family:var(--mono);text-transform:uppercase;">DEMO</th>
+                                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--blue);font-family:var(--mono);text-transform:uppercase;">PROFESIONAL</th>
+                                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--indigo);font-family:var(--mono);text-transform:uppercase;">CONSULTOR</th>
+                                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--amber);font-family:var(--mono);text-transform:uppercase;">EMPRESARIAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Exámenes NOM-STPS</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink3);">3/día</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ Ilimitados</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ Ilimitados</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ Ilimitados</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Casos BÁSICOS</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 1</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Casos MASTER</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 5</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Casos ELITE</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 3</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 3</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Casos PERICIAL</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 2</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Insignias PNG</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Dashboard</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--blue);">✓ Básico</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--amber);">✓ Predictivo</td>
+                                        </tr>
+                                        <tr style="border-bottom:1px solid var(--border);">
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">Multi-Usuario</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓ 50</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:12px 16px;font-size:12px;color:var(--ink2);">White Label</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--ink4);">✗</td>
+                                            <td style="padding:12px 16px;text-align:center;font-size:12px;color:var(--green);">✓</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                
+                            <h3 style="color:var(--ink);margin:20px 0 15px 0;font-size:14px;font-weight:700;">📞 Contacto y Soporte</h3>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:20px;">
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">📧</span>
+                                    <div>
+                                        <div style="font-size:10px;color:var(--ink4);">Email</div>
+                                        <div style="font-weight:600;color:var(--ink);">lecterhdz@gmail.com</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">🌐</span>
+                                    <div>
+                                        <div style="font-size:10px;color:var(--ink4);">Web</div>
+                                        <div style="font-weight:600;color:var(--ink);">rayoshield.com</div>
+                                    </div>
+                                </div>
+                                <div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px;">
+                                    <span style="font-size:18px;">💬</span>
+                                    <div>
+                                        <div style="font-size:10px;color:var(--ink4);">WhatsApp</div>
+                                        <div style="font-weight:600;color:var(--ink);">55-XXXX-XXXX</div>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <div style="padding:16px;background:var(--blue-l);border:1px solid var(--blue-m);border-radius:var(--radius-sm);margin-bottom:20px;">
+                                <div style="font-size:13px;color:var(--blue);line-height:1.6;">
+                                    <strong>💡 ¿Necesitas ayuda?</strong><br>
+                                    • Revisa la documentación en línea<br>
+                                    • Contacta a soporte técnico por email<br>
+                                    • Únete a nuestra comunidad de profesionales SHE
+                                </div>
+                            </div>
+                
+                            <div style="text-align:center;padding-top:20px;border-top:1px solid var(--border);">
+                                <div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">
+                                    © 2026 RayoShield Exam — Todos los derechos reservados
+                                </div>
+                                <div style="margin-top:10px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+                                    <a href="#" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">📄 Términos</a>
+                                    <a href="#" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">🔒 Privacidad</a>
+                                    <a href="mailto:lecterhdz@gmail.com" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">📧 Contacto</a>
+                                </div>
                             </div>
                         </div>
                     </div>
