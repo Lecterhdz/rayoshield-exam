@@ -585,7 +585,140 @@
         .text-center { text-align: center; }
         .mt-2 { margin-top: 16px; }
         .mb-2 { margin-bottom: 16px; }
-   
+
+        /* ═══════════════════════════════════════════════════════════════
+        MULTI-USUARIO - TABLA Y MODALES
+        ═══════════════════════════════════════════════════════════════ */
+        
+        .status-ok {
+            background: var(--green-l);
+            color: var(--green);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .status-pend {
+            background: var(--amber-l);
+            color: var(--amber);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .tbl-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: var(--font);
+            min-height: 36px;
+        }
+        
+        .tbl-btn.view {
+            background: var(--blue-l);
+            color: var(--blue);
+        }
+        
+        .tbl-btn.view:hover {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .td-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: var(--bg);
+            color: var(--ink3);
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        
+        .modal-close:hover {
+            background: var(--rose-l);
+            color: var(--rose);
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        
         /* ═══════════════════════════════════════════════════════════════
         VISIBILIDAD - EXÁMENES, CASOS Y RESPUESTAS
         ═══════════════════════════════════════════════════════════════ */
