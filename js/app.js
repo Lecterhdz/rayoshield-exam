@@ -1620,9 +1620,9 @@ const app = {
         console.log('✅ Volviendo a lista de casos');
     },
 
-    // ─────────────────────────────────────────────────────────────────────
-    // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - CORREGIDO
-    // ─────────────────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - DENTRO DE APP
+    // ═══════════════════════════════════════════════════════════════
     mostrarTrabajadores: function() {
         this.renderTrabajadores();
         this.mostrarPantalla('trabajadores-screen');
@@ -1921,6 +1921,12 @@ const app = {
         alert('👋 Sesión de trabajador cerrada');
     },
     
+    toggleTema: function() {
+        document.body.classList.toggle('tema-claro');
+        var esClaro = document.body.classList.contains('tema-claro');
+        localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
+    },
+    
     // ─────────────────────────────────────────────────────────────────────
     // INTEGRAR CON ENVÍO DE EXÁMENES Y CASOS
     // ─────────────────────────────────────────────────────────────────────
@@ -2115,6 +2121,7 @@ const app = {
             if (c) c.style.display = 'none';
         });
     },
+
     // ═══════════════════════════════════════════════════════════════
     // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - SIN "app."
     // ═══════════════════════════════════════════════════════════════
@@ -2620,10 +2627,16 @@ app.mostrarResultadoCaso = function(resultado) {
 };
 
 
+// ─────────────────────────────────────────────────────────────────────
 // INICIAR CUANDO DOM ESTÉ LISTO
+// ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() { 
+    console.log('DOM listo'); 
+    app.init(); 
+});
 
-document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
-window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
-
-
+window.addEventListener('beforeunload', function() { 
+    if (app.timerExamen) clearInterval(app.timerExamen); 
+    if (app.timerCaso) clearInterval(app.timerCaso); 
+});
 
