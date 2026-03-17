@@ -410,19 +410,30 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN EXÁMENES
+    // NAVEGACIÓN EXÁMENES (MEJORADA)
     // ─────────────────────────────────────────────────────────────────────
     irASeleccionarExamen: function() {
         var self = this;
         var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
-        if (!datosOk) { alert('Completa tus datos primero'); this.mostrarDatosUsuario(); return; }
+        if (!datosOk) { 
+            alert('Completa tus datos primero'); 
+            this.mostrarDatosUsuario(); 
+            return; 
+        }
         if (!this.verificarLicenciaExamen()) return;
         
-        document.getElementById('categorias-view').style.display = 'block';
-        document.getElementById('niveles-view').style.display = 'none';
-        
+        var categoriasView = document.getElementById('categorias-view');
+        var nivelesView = document.getElementById('niveles-view');
         var list = document.getElementById('categorias-list');
-        if (!list) return;
+        
+        if (categoriasView) categoriasView.style.display = 'block';
+        if (nivelesView) nivelesView.style.display = 'none';
+        
+        if (!list) {
+            console.error('❌ Elemento categorias-list no encontrado');
+            return;
+        }
+        
         list.innerHTML = '';
         
         CATEGORIAS.forEach(function(cat) {
@@ -438,22 +449,34 @@ const app = {
     
     mostrarNiveles: function(categoria) {
         var self = this;
-        document.getElementById('categorias-view').style.display = 'none';
-        document.getElementById('niveles-view').style.display = 'block';
-        document.getElementById('categoria-titulo').textContent = categoria.icono + ' ' + categoria.nombre;
-        document.getElementById('categoria-norma').textContent = categoria.norma;
-        
+        var categoriasView = document.getElementById('categorias-view');
+        var nivelesView = document.getElementById('niveles-view');
+        var tituloEl = document.getElementById('categoria-titulo');
+        var normaEl = document.getElementById('categoria-norma');
         var list = document.getElementById('niveles-list');
+        
+        if (categoriasView) categoriasView.style.display = 'none';
+        if (nivelesView) nivelesView.style.display = 'block';
+        
+        if (tituloEl) tituloEl.textContent = categoria.icono + ' ' + categoria.nombre;
+        if (normaEl) normaEl.textContent = categoria.norma;
+        
+        if (!list) {
+            console.error('❌ Elemento niveles-list no encontrado');
+            return;
+        }
+        
         list.innerHTML = '';
         
         categoria.niveles.forEach(function(nivel) {
             var item = document.createElement('div');
-            item.className = 'exam-item';
-            item.innerHTML = '<h4>👤 ' + nivel.nombre + '</h4><p>Examen de ' + categoria.nombre.toLowerCase() + '</p>';
+            item.className = 'nivel-item';
+            item.innerHTML = '<div><h4>👤 ' + nivel.nombre + '</h4><p>Examen de ' + categoria.nombre.toLowerCase() + ' • ' + nivel.preguntas + ' preguntas</p></div>';
             item.onclick = function() { self.iniciarExamen(nivel.examId); };
             list.appendChild(item);
         });
     },
+
     
     volverACategorias: function() {
         document.getElementById('categorias-view').style.display = 'block';
@@ -481,14 +504,20 @@ const app = {
         }).catch(function() { alert('Error cargando examen'); });
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // MOSTRAR PREGUNTA (MEJORADA)
+    // ─────────────────────────────────────────────────────────────────────
     mostrarPregunta: function() {
         if (!this.examenActual) return;
         
-        var p = this.examenActual.preguntas[this.preguntaActual], total = this.examenActual.preguntas.length;
+        var p = this.examenActual.preguntas[this.preguntaActual];
+        var total = this.examenActual.preguntas.length;
         var progreso = ((this.preguntaActual + 1) / total) * 100;
         
-        var bar = document.getElementById('progress-bar'), txt = document.getElementById('progress-text');
-        var q = document.getElementById('question-text'), cont = document.getElementById('options-container');
+        var bar = document.getElementById('progress-bar');
+        var txt = document.getElementById('progress-text');
+        var q = document.getElementById('question-text');
+        var cont = document.getElementById('options-container');
         
         if (bar) bar.innerHTML = '<div class="progress-bar-fill" style="width:' + progreso + '%"></div>';
         if (txt) txt.textContent = 'Pregunta ' + (this.preguntaActual + 1) + ' de ' + total;
@@ -501,15 +530,15 @@ const app = {
         p.opciones.forEach(function(opt, idx) {
             var btn = document.createElement('button');
             btn.className = 'option-btn' + (self.respuestaTemporal === idx ? ' selected' : '');
-            btn.textContent = String.fromCharCode(65 + idx) + ') ' + opt;
+            btn.innerHTML = '<strong style="margin-right:10px;">' + String.fromCharCode(65 + idx) + ')</strong> ' + opt;
             btn.onclick = function() { self.seleccionarRespuesta(idx); };
             cont.appendChild(btn);
         });
         
         if (this.respuestaTemporal !== null) {
             var btnC = document.createElement('button');
-            btnC.className = 'btn btn-primary btn-continuar';
-            btnC.textContent = 'Continuar';
+            btnC.className = 'btn-continuar';
+            btnC.textContent = '➜ Continuar';
             btnC.onclick = function() { self.confirmarRespuesta(); };
             cont.appendChild(btnC);
         }
@@ -892,30 +921,39 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // CASOS CRÍTICOS - INVESTIGACIÓN MASTER
+    // CASOS CRÍTICOS - INVESTIGACIÓN MASTER (CORREGIDO)
     // ─────────────────────────────────────────────────────────────────────
     irACasosMaster: function() {
         this.detenerTimerCaso();
-        document.getElementById('casos-list').style.display = 'block';
-        document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('casos-main-buttons').style.display = 'block';
         
-        var list = document.getElementById('casos-list');
-        if (!list) return;
-        list.innerHTML = '';
+        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
+        var casosList = document.getElementById('casos-list');
+        var casoDetalle = document.getElementById('caso-detalle');
+        var casosMainButtons = document.getElementById('casos-main-buttons');
+        
+        if (casosList) casosList.style.display = 'block';
+        if (casoDetalle) casoDetalle.style.display = 'none';
+        if (casosMainButtons) casosMainButtons.style.display = 'block';
+        
+        if (!casosList) {
+            console.error('❌ Elemento casos-list no encontrado');
+            alert('Error: La pantalla de casos no está disponible. Recarga la página.');
+            return;
+        }
+        
+        casosList.innerHTML = '';
         
         if (typeof CASOS_INVESTIGACION === 'undefined' || CASOS_INVESTIGACION.length === 0) {
-            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos de investigación disponibles aún.</p>';
+            casosList.innerHTML = '<p style="text-align:center;color:var(--ink4);padding:40px 20px;">No hay casos de investigación disponibles aún.</p>';
+            this.mostrarPantalla('casos-master-screen');
             return;
         }
         
         var self = this;
         var casosMostrados = 0;
-        var maxCasosDemo = 1; // ✅ DEMO solo ve 1 caso
+        var maxCasosDemo = 1;
         
-        // ✅ FILTRAR CASOS SEGÚN PLAN
         CASOS_INVESTIGACION.forEach(function(caso) {
-            // ✅ Verificar si el usuario tiene acceso a este nivel
             var tieneAcceso = false;
             
             if (caso.nivel === 'basico' && self.licencia.features.casosBasicos) tieneAcceso = true;
@@ -924,23 +962,21 @@ const app = {
             else if (caso.nivel === 'pericial' && self.licencia.features.casosPericial) tieneAcceso = true;
             
             if (tieneAcceso) {
-                // ✅ Limitar DEMO a solo 1 caso
                 if (self.licencia.tipo === 'DEMO' && casosMostrados >= maxCasosDemo) {
                     return;
                 }
                 
                 var item = document.createElement('div');
-                item.className = 'exam-item';
-                item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:#666;font-size:14px;margin-top:5px;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:#FF9800;font-size:12px;margin-top:5px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
+                item.className = 'caso-item';
+                item.innerHTML = '<h4>' + caso.icono + ' ' + caso.titulo + '</h4><p><span class="badge-nivel ' + caso.nivel + '">' + caso.nivel.toUpperCase() + '</span> • ' + caso.tiempo_estimado + '</p><p style="color:var(--ink3);font-size:13px;margin-top:8px;line-height:1.5;">' + caso.descripcion + '</p>' + (caso.requisito ? '<p style="color:var(--amber);font-size:12px;margin-top:8px;">📋 Requisito: ' + caso.requisito + '</p>' : '');
                 item.onclick = function() { self.cargarCasoMaster(caso.id); };
-                list.appendChild(item);
+                casosList.appendChild(item);
                 casosMostrados++;
             }
         });
         
-        // ✅ Mensaje si no hay casos disponibles para este plan
-        if (list.children.length === 0) {
-            list.innerHTML = '<p style="text-align:center;color:#666">No hay casos disponibles para tu plan actual.<br><strong>Actualiza tu plan para acceder a más casos.</strong></p>';
+        if (casosList.children.length === 0) {
+            casosList.innerHTML = '<p style="text-align:center;color:var(--ink4);padding:40px 20px;">No hay casos disponibles para tu plan actual.<br><strong style="color:var(--ink);">Actualiza tu plan para acceder a más casos.</strong></p>';
         }
         
         this.mostrarPantalla('casos-master-screen');
