@@ -982,101 +982,142 @@ const app = {
         this.mostrarPantalla('casos-master-screen');
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // CARGAR CASO MASTER (CORREGIDO CON VALIDACIONES)
+    // ─────────────────────────────────────────────────────────────────────
     cargarCasoMaster: async function(casoId) {
-        var self = this;
-        this.casoActual = await cargarCasoInvestigacion(casoId);
+        console.log('📋 Cargando caso:', casoId);
         
-        if (!this.casoActual) {
-            alert('❌ Error cargando el caso');
+        // ✅ VALIDAR QUE CASOS_INVESTIGACION EXISTA
+        if (typeof CASOS_INVESTIGACION === 'undefined') {
+            alert('❌ Error: No hay casos disponibles. Recarga la página.');
             return;
         }
         
-        document.getElementById('casos-list').style.display = 'none';
-        document.getElementById('caso-detalle').style.display = 'block';
-        document.getElementById('casos-main-buttons').style.display = 'none';
-        document.getElementById('caso-resultado').style.display = 'none';
+        // ✅ BUSCAR EL CASO
+        var caso = CASOS_INVESTIGACION.find(function(c) { return c.id === casoId; });
+        if (!caso) {
+            console.error('❌ Caso no encontrado:', casoId);
+            alert('❌ Error: Caso no encontrado');
+            return;
+        }
         
-        document.getElementById('caso-id').textContent = this.casoActual.id;
-        document.getElementById('caso-fecha').textContent = this.casoActual.fecha_evento;
-        document.getElementById('caso-industria').textContent = this.casoActual.industria;
-        document.getElementById('caso-tiempo').textContent = (this.casoActual.metadatos_evaluacion && this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos ? this.casoActual.metadatos_evaluacion.tiempo_estimado_minutos : 25) + ' min';
-        
-        var desc = this.casoActual.descripcion_evento || {};
-        document.getElementById('caso-descripcion').innerHTML =
-            '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
-            '<strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '<br>' +
-            '<strong>Evento:</strong> ' + (desc.evento || 'N/A') + '<br>' +
-            '<strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '<br>' +
-            '<strong style="color:#f44336;">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');
-        
-        // Timeline
-        var timelineEl = document.getElementById('caso-timeline');
-        timelineEl.innerHTML = '';
-        this.casoActual.linea_tiempo.forEach(function(evento) {
-            var item = document.createElement('div');
-            item.className = 'timeline-item' + (evento.includes('Liberación') ? ' evento-critico' : '');
-            item.textContent = evento;
-            timelineEl.appendChild(item);
-        });
-        
-        // Energías
-        var energiasEl = document.getElementById('caso-energias');
-        energiasEl.innerHTML = '';
-        var energias = this.casoActual.energias_identificadas;
-        Object.keys(energias).forEach(function(tipo) {
-            var estado = energias[tipo];
-            var clase = estado === 'Aisladas' ? 'aislada' : (estado === 'No aplican' ? 'na' : 'no-aislada');
-            var item = document.createElement('div');
-            item.className = 'energia-item ' + clase;
-            item.innerHTML = '<strong>' + tipo + '</strong><br><small>' + estado + '</small>';
-            energiasEl.appendChild(item);
-        });
-        
-        // Preguntas
-        var preguntasEl = document.getElementById('caso-preguntas');
-        preguntasEl.innerHTML = '';
+        this.casoActual = caso;
         this.respuestasCaso = {};
         
-        this.casoActual.preguntas.forEach(function(pregunta, idx) {
-            var preguntaDiv = document.createElement('div');
-            preguntaDiv.className = 'pregunta-master';
-            preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' (' + pregunta.tipo.replace('_', ' ') + ') - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
-            
-            switch(pregunta.tipo) {
-                case 'analisis_multiple':
-                case 'deteccion_omisiones':
-                case 'identificacion_sesgos':
-                case 'analisis_normativo':
-                case 'deteccion_inconsistencias':
-                case 'diagnostico_sistema':
-                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
-                    break;
-                case 'respuesta_abierta_guiada':
-                case 'redaccion_tecnica':
-                    preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
-                    break;
-                case 'analisis_responsabilidad':
-                    preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
-                    break;
-                case 'plan_accion':
-                case 'evaluacion_correctivas':
-                    preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
-                    break;
-                case 'ordenamiento_dinamico':
-                case 'matriz_priorizacion':
-                    preguntaDiv.appendChild(self.renderOrdenamientoDinamico(pregunta));
-                    break;
-                case 'calculo_tecnico':
-                    preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
-                    break;
-                default:
-                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
-            }
-            preguntasEl.appendChild(preguntaDiv);
-        });
+        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
+        var casosList = document.getElementById('casos-list');
+        var casoDetalle = document.getElementById('caso-detalle');
+        var casoBotones = document.getElementById('caso-botones');
+        var casoResultado = document.getElementById('caso-resultado');
         
-        document.getElementById('btn-enviar-caso').style.display = 'inline-block';
+        if (casosList) casosList.style.display = 'none';
+        if (casoDetalle) casoDetalle.style.display = 'block';
+        if (casoBotones) casoBotones.style.display = 'flex';
+        if (casoResultado) casoResultado.style.display = 'none';
+        
+        // ✅ LLENAR FICHA DEL CASO (CON VALIDACIÓN DE CADA ELEMENTO)
+        var elId = document.getElementById('caso-id');
+        var elFecha = document.getElementById('caso-fecha');
+        var elIndustria = document.getElementById('caso-industria');
+        var elTiempo = document.getElementById('caso-tiempo');
+        var elDescripcion = document.getElementById('caso-descripcion');
+        var elTimeline = document.getElementById('caso-timeline');
+        var elEnergias = document.getElementById('caso-energias');
+        var elPreguntas = document.getElementById('caso-preguntas');
+        var btnEnviar = document.getElementById('btn-enviar-caso');
+        
+        if (elId) elId.textContent = caso.id || 'N/A';
+        if (elFecha) elFecha.textContent = caso.fecha_evento || 'N/A';
+        if (elIndustria) elIndustria.textContent = caso.industria || 'N/A';
+        if (elTiempo) elTiempo.textContent = (caso.tiempo_estimado || '25 min') + ' min';
+        
+        // ✅ DESCRIPCIÓN DEL EVENTO
+        if (elDescripcion && caso.descripcion_evento) {
+            var desc = caso.descripcion_evento;
+            elDescripcion.innerHTML = '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
+                                      '<strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '<br>' +
+                                      '<strong>Evento:</strong> ' + (desc.evento || 'N/A') + '<br>' +
+                                      '<strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '<br>' +
+                                      '<strong style="color:var(--rose);">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');
+        }
+        
+        // ✅ TIMELINE
+        if (elTimeline && caso.linea_tiempo && Array.isArray(caso.linea_tiempo)) {
+            elTimeline.innerHTML = '';
+            caso.linea_tiempo.forEach(function(evento) {
+                var item = document.createElement('div');
+                item.className = 'timeline-item' + (evento.toLowerCase().includes('liberación') || evento.toLowerCase().includes('fatal') ? ' evento-critico' : '');
+                item.textContent = evento;
+                elTimeline.appendChild(item);
+            });
+        }
+        
+        // ✅ ENERGÍAS
+        if (elEnergias && caso.energias_identificadas) {
+            elEnergias.innerHTML = '';
+            var energias = caso.energias_identificadas;
+            Object.keys(energias).forEach(function(tipo) {
+                var estado = energias[tipo];
+                var clase = estado === 'Aisladas' ? 'aislada' : (estado === 'No aplican' ? 'na' : 'no-aislada');
+                var item = document.createElement('div');
+                item.className = 'energia-item ' + clase;
+                item.innerHTML = '<strong>' + tipo + '</strong><br><small>' + estado + '</small>';
+                elEnergias.appendChild(item);
+            });
+        }
+        
+        // ✅ PREGUNTAS
+        if (elPreguntas && caso.preguntas && Array.isArray(caso.preguntas)) {
+            elPreguntas.innerHTML = '';
+            var self = this;
+            
+            caso.preguntas.forEach(function(pregunta, idx) {
+                var preguntaDiv = document.createElement('div');
+                preguntaDiv.className = 'pregunta-master';
+                preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' (' + pregunta.tipo.replace('_', ' ') + ') - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
+                
+                switch(pregunta.tipo) {
+                    case 'analisis_multiple':
+                    case 'deteccion_omisiones':
+                    case 'identificacion_sesgos':
+                    case 'analisis_normativo':
+                    case 'deteccion_inconsistencias':
+                    case 'diagnostico_sistema':
+                        preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
+                        break;
+                    case 'respuesta_abierta_guiada':
+                    case 'redaccion_tecnica':
+                        preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
+                        break;
+                    case 'analisis_responsabilidad':
+                        preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
+                        break;
+                    case 'plan_accion':
+                    case 'evaluacion_correctivas':
+                        preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
+                        break;
+                    case 'ordenamiento_dinamico':
+                    case 'matriz_priorizacion':
+                        preguntaDiv.appendChild(self.renderOrdenamientoDinamico(pregunta));
+                        break;
+                    case 'calculo_tecnico':
+                        preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
+                        break;
+                    default:
+                        preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
+                }
+                elPreguntas.appendChild(preguntaDiv);
+            });
+        }
+        
+        // ✅ MOSTRAR BOTÓN ENVIAR
+        if (btnEnviar) btnEnviar.style.display = 'inline-block';
+        
+        // ✅ INICIAR TIMER
         this.iniciarTimerCaso();
+        
+        console.log('✅ Caso cargado correctamente:', casoId);
     },
     
     renderAnalisisMultiple: function(pregunta) {
