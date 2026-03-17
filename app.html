@@ -1498,7 +1498,95 @@
                     </div>
                 </section>
 
-                <!-- ══════════════ GESTIÓN TRABAJADORES ══════════════ -->
+                
+                <!-- USER DATA SCREEN -->
+                <section id="user-data-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">📋 Datos del Usuario</div>
+                                <div class="card-sub">Completa tu perfil</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
+                        </div>
+                        <div class="card-body">
+                            <p style="color:var(--ink4);margin-bottom:20px;">Completa tus datos para comenzar los exámenes</p>
+                            
+                            <div class="form-group">
+                                <label>🏢 Empresa</label>
+                                <input type="text" id="user-empresa" placeholder="Nombre de tu empresa">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>👤 Nombre Completo</label>
+                                <input type="text" id="user-nombre" placeholder="Tu nombre completo">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>🆔 CURP</label>
+                                <input type="text" id="user-curp" placeholder="ABC123456HDFGHI09" style="text-transform:uppercase;">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>💼 Puesto/Cargo</label>
+                                <input type="text" id="user-puesto" placeholder="Tu puesto de trabajo">
+                            </div>
+                            
+                            <div class="button-group">
+                                <button class="btn btn-primary" onclick="app.guardarDatosUsuarioForm()" style="grid-column:span 2;">💾 Guardar Datos</button>
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="casos-master-screen" class="screen">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <div class="card-title">⚠️ Casos Críticos de Obra</div>
+                                <div class="card-sub">Investigación de incidentes - Nivel MASTER</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
+                        </div>
+                        <div class="card-body">
+                            <!-- ✅ ESTOS 5 IDs SON OBLIGATORIOS -->
+                            <div id="casos-list" class="casos-grid"></div>
+                            
+                            <div id="caso-detalle" style="display:none;">
+                                <div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;font-size:14px;">
+                                    <strong>📋 Ficha del Caso:</strong>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">
+                                        <div><strong>ID:</strong> <span id="caso-id"></span></div>
+                                        <div><strong>Fecha:</strong> <span id="caso-fecha"></span></div>
+                                        <div><strong>Industria:</strong> <span id="caso-industria"></span></div>
+                                        <div><strong>Tiempo:</strong> <span id="caso-tiempo"></span></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="caso-descripcion" style="margin:20px 0;"></div>
+                                <div id="caso-timeline" style="margin:20px 0;"></div>
+                                <div id="caso-energias" style="margin:20px 0;"></div>
+                                <div id="caso-preguntas" style="margin:30px 0;"></div>
+                                
+                                <div class="button-group" id="caso-botones">
+                                    <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
+                                    <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display:none;">✅ Enviar Respuestas</button>
+                                </div>
+                                
+                                <div id="caso-resultado" style="display:none;margin-top:30px;"></div>
+                            </div>
+                            
+                            <div id="casos-main-buttons" class="button-group">
+                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+                    <!-- ══════════════ GESTIÓN TRABAJADORES ══════════════ -->
                 <section id="trabajadores-screen" class="screen">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
                         <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
@@ -1673,94 +1761,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <!-- USER DATA SCREEN -->
-                <section id="user-data-screen" class="screen">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">📋 Datos del Usuario</div>
-                                <div class="card-sub">Completa tu perfil</div>
-                            </div>
-                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
-                        </div>
-                        <div class="card-body">
-                            <p style="color:var(--ink4);margin-bottom:20px;">Completa tus datos para comenzar los exámenes</p>
-                            
-                            <div class="form-group">
-                                <label>🏢 Empresa</label>
-                                <input type="text" id="user-empresa" placeholder="Nombre de tu empresa">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>👤 Nombre Completo</label>
-                                <input type="text" id="user-nombre" placeholder="Tu nombre completo">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>🆔 CURP</label>
-                                <input type="text" id="user-curp" placeholder="ABC123456HDFGHI09" style="text-transform:uppercase;">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>💼 Puesto/Cargo</label>
-                                <input type="text" id="user-puesto" placeholder="Tu puesto de trabajo">
-                            </div>
-                            
-                            <div class="button-group">
-                                <button class="btn btn-primary" onclick="app.guardarDatosUsuarioForm()" style="grid-column:span 2;">💾 Guardar Datos</button>
-                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section id="casos-master-screen" class="screen">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">⚠️ Casos Críticos de Obra</div>
-                                <div class="card-sub">Investigación de incidentes - Nivel MASTER</div>
-                            </div>
-                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
-                        </div>
-                        <div class="card-body">
-                            <!-- ✅ ESTOS 5 IDs SON OBLIGATORIOS -->
-                            <div id="casos-list" class="casos-grid"></div>
-                            
-                            <div id="caso-detalle" style="display:none;">
-                                <div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;font-size:14px;">
-                                    <strong>📋 Ficha del Caso:</strong>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">
-                                        <div><strong>ID:</strong> <span id="caso-id"></span></div>
-                                        <div><strong>Fecha:</strong> <span id="caso-fecha"></span></div>
-                                        <div><strong>Industria:</strong> <span id="caso-industria"></span></div>
-                                        <div><strong>Tiempo:</strong> <span id="caso-tiempo"></span></div>
-                                    </div>
-                                </div>
-                                
-                                <div id="caso-descripcion" style="margin:20px 0;"></div>
-                                <div id="caso-timeline" style="margin:20px 0;"></div>
-                                <div id="caso-energias" style="margin:20px 0;"></div>
-                                <div id="caso-preguntas" style="margin:30px 0;"></div>
-                                
-                                <div class="button-group" id="caso-botones">
-                                    <button class="btn btn-secondary" onclick="app.volverAListaCasos()">← Otro caso</button>
-                                    <button class="btn btn-primary" id="btn-enviar-caso" onclick="app.enviarRespuestasCaso()" style="display:none;">✅ Enviar Respuestas</button>
-                                </div>
-                                
-                                <div id="caso-resultado" style="display:none;margin-top:30px;"></div>
-                            </div>
-                            
-                            <div id="casos-main-buttons" class="button-group">
-                                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Volver al Inicio</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </div>
-    </div>
 
     <!-- Overlay para cerrar sidebar en móvil -->
     <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
