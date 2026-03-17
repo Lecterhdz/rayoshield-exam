@@ -2120,8 +2120,8 @@ const app = {
             var c = document.getElementById('pwa-install-container');
             if (c) c.style.display = 'none';
         });
-    },
-
+    }
+};
     // ═══════════════════════════════════════════════════════════════
     // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - SIN "app."
     // ═══════════════════════════════════════════════════════════════
