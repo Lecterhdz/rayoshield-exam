@@ -16,6 +16,9 @@ const app = {
     
     // Licencia
     licencia: { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} },
+
+    // SISTEMA MULTI-USUARIO - AGREGAR AQUÍ
+    trabajadorActual: null,   
     
     // Timer Examen
     timerExamen: null,
@@ -396,177 +399,6 @@ const app = {
         this.volverHome();
     },
 
-    // ─────────────────────────────────────────────────────────────────────
-    // SISTEMA MULTI-USUARIO - ESTRUCTURA DE DATOS
-    // ─────────────────────────────────────────────────────────────────────
-    
-    const MultiUsuario = {
-        // Inicializar base de datos
-        init: function() {
-            if (!localStorage.getItem('rayoshield_empresa')) {
-                localStorage.setItem('rayoshield_empresa', JSON.stringify({
-                    nombre: '',
-                    rfc: '',
-                    email: '',
-                    telefono: '',
-                    direccion: '',
-                    fecha_registro: new Date().toISOString()
-                }));
-            }
-            
-            if (!localStorage.getItem('rayoshield_trabajadores')) {
-                localStorage.setItem('rayoshield_trabajadores', JSON.stringify([]));
-            }
-            
-            if (!localStorage.getItem('rayoshield_resultados')) {
-                localStorage.setItem('rayoshield_resultados', JSON.stringify([]));
-            }
-            
-            if (!localStorage.getItem('rayoshield_trabajador_actual')) {
-                localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
-            }
-            
-            console.log('✅ Sistema Multi-Usuario inicializado');
-        },
-        
-        // ═══════════════════════════════════════════════════════════════
-        // EMPRESA
-        // ═══════════════════════════════════════════════════════════════
-        getEmpresa: function() {
-            return JSON.parse(localStorage.getItem('rayoshield_empresa'));
-        },
-        
-        setEmpresa: function(data) {
-            localStorage.setItem('rayoshield_empresa', JSON.stringify(data));
-        },
-        
-        // ═══════════════════════════════════════════════════════════════
-        // TRABAJADORES
-        // ═══════════════════════════════════════════════════════════════
-        getTrabajadores: function() {
-            return JSON.parse(localStorage.getItem('rayoshield_trabajadores'));
-        },
-        
-        addTrabajador: function(trabajador) {
-            var trabajadores = this.getTrabajadores();
-            trabajador.id = 'TRAB-' + Date.now().toString(36).toUpperCase();
-            trabajador.fecha_registro = new Date().toISOString();
-            trabajador.estado = 'activo';
-            trabajadores.push(trabajador);
-            localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
-            return trabajador;
-        },
-        
-        updateTrabajador: function(id, data) {
-            var trabajadores = this.getTrabajadores();
-            var index = trabajadores.findIndex(t => t.id === id);
-            if (index !== -1) {
-                trabajadores[index] = { ...trabajadores[index], ...data };
-                localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
-                return true;
-            }
-            return false;
-        },
-        
-        deleteTrabajador: function(id) {
-            var trabajadores = this.getTrabajadores();
-            trabajadores = trabajadores.filter(t => t.id !== id);
-            localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
-            
-            // También eliminar sus resultados
-            var resultados = this.getResultados();
-            resultados = resultados.filter(r => r.trabajador_id !== id);
-            localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
-            
-            return true;
-        },
-        
-        getTrabajadorById: function(id) {
-            var trabajadores = this.getTrabajadores();
-            return trabajadores.find(t => t.id === id);
-        },
-        
-        // ═══════════════════════════════════════════════════════════════
-        // TRABAJADOR ACTUAL (KIOSCO MODE)
-        // ═══════════════════════════════════════════════════════════════
-        setTrabajadorActual: function(id) {
-            localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(id));
-        },
-        
-        getTrabajadorActual: function() {
-            var id = JSON.parse(localStorage.getItem('rayoshield_trabajador_actual'));
-            if (id) {
-                return this.getTrabajadorById(id);
-            }
-            return null;
-        },
-        
-        clearTrabajadorActual: function() {
-            localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
-        },
-        
-        // ═══════════════════════════════════════════════════════════════
-        // RESULTADOS
-        // ═══════════════════════════════════════════════════════════════
-        getResultados: function() {
-            return JSON.parse(localStorage.getItem('rayoshield_resultados'));
-        },
-        
-        addResultado: function(resultado) {
-            var resultados = this.getResultados();
-            resultado.id = 'RES-' + Date.now().toString(36).toUpperCase();
-            resultado.fecha = new Date().toISOString();
-            resultados.push(resultado);
-            localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
-            return resultado;
-        },
-        
-        getResultadosByTrabajador: function(trabajadorId) {
-            var resultados = this.getResultados();
-            return resultados.filter(r => r.trabajador_id === trabajadorId);
-        },
-        
-        getProgresoByTrabajador: function(trabajadorId) {
-            var resultados = this.getResultadosByTrabajador(trabajadorId);
-            var examenes = resultados.filter(r => r.tipo === 'examen');
-            var casos = resultados.filter(r => r.tipo === 'caso');
-            
-            var aprobados = examenes.filter(r => r.aprobado).length;
-            var casosCompletados = casos.filter(r => r.aprobado).length;
-            
-            return {
-                total_examenes: examenes.length,
-                examenes_aprobados: aprobados,
-                total_casos: casos.length,
-                casos_completados: casosCompletados,
-                promedio: examenes.length > 0 ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0
-            };
-        },
-        
-        // ═══════════════════════════════════════════════════════════════
-        // ESTADÍSTICAS GENERALES
-        // ═══════════════════════════════════════════════════════════════
-        getEstadisticas: function() {
-            var trabajadores = this.getTrabajadores();
-            var resultados = this.getResultados();
-            
-            var activos = trabajadores.filter(t => t.estado === 'activo').length;
-            var examenesTotales = resultados.filter(r => r.tipo === 'examen').length;
-            var casosTotales = resultados.filter(r => r.tipo === 'caso').length;
-            var aprobados = resultados.filter(r => r.aprobado).length;
-            
-            return {
-                trabajadores_totales: trabajadores.length,
-                trabajadores_activos: activos,
-                examenes_totales: examenesTotales,
-                casos_totales: casosTotales,
-                tasa_aprobacion: resultados.length > 0 ? Math.round((aprobados / resultados.length) * 100) : 0
-            };
-        }
-    };
-    
-    // Inicializar al cargar la app
-    MultiUsuario.init();
     
     // ─────────────────────────────────────────────────────────────────────
     // EXÁMENES
@@ -2273,7 +2105,186 @@ const app = {
         });
     }
 };
+};  // ← Cierra const app (línea ~1950)
 
+// ═══════════════════════════════════════════════════════════════
+// SISTEMA MULTI-USUARIO - AGREGAR AQUÍ
+// ═══════════════════════════════════════════════════════════════
+const MultiUsuario = {
+    // Inicializar base de datos
+    init: function() {
+        if (!localStorage.getItem('rayoshield_empresa')) {
+            localStorage.setItem('rayoshield_empresa', JSON.stringify({
+                nombre: '',
+                rfc: '',
+                email: '',
+                telefono: '',
+                direccion: '',
+                fecha_registro: new Date().toISOString()
+            }));
+        }
+        
+        if (!localStorage.getItem('rayoshield_trabajadores')) {
+            localStorage.setItem('rayoshield_trabajadores', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('rayoshield_resultados')) {
+            localStorage.setItem('rayoshield_resultados', JSON.stringify([]));
+        }
+        
+        if (!localStorage.getItem('rayoshield_trabajador_actual')) {
+            localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
+        }
+        
+        console.log('✅ Sistema Multi-Usuario inicializado');
+    },
+    
+    // ═══════════════════════════════════════════════════════════════
+    // EMPRESA
+    // ═══════════════════════════════════════════════════════════════
+    getEmpresa: function() {
+        return JSON.parse(localStorage.getItem('rayoshield_empresa'));
+    },
+    
+    setEmpresa: function(data) {
+        localStorage.setItem('rayoshield_empresa', JSON.stringify(data));
+    },
+    
+    // ═══════════════════════════════════════════════════════════════
+    // TRABAJADORES
+    // ═══════════════════════════════════════════════════════════════
+    getTrabajadores: function() {
+        return JSON.parse(localStorage.getItem('rayoshield_trabajadores'));
+    },
+    
+    addTrabajador: function(trabajador) {
+        var trabajadores = this.getTrabajadores();
+        trabajador.id = 'TRAB-' + Date.now().toString(36).toUpperCase();
+        trabajador.fecha_registro = new Date().toISOString();
+        trabajador.estado = 'activo';
+        trabajadores.push(trabajador);
+        localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
+        return trabajador;
+    },
+    
+    updateTrabajador: function(id, data) {
+        var trabajadores = this.getTrabajadores();
+        var index = trabajadores.findIndex(t => t.id === id);
+        if (index !== -1) {
+            trabajadores[index] = { ...trabajadores[index], ...data };
+            localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
+            return true;
+        }
+        return false;
+    },
+    
+    deleteTrabajador: function(id) {
+        var trabajadores = this.getTrabajadores();
+        trabajadores = trabajadores.filter(t => t.id !== id);
+        localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
+        
+        // También eliminar sus resultados
+        var resultados = this.getResultados();
+        resultados = resultados.filter(r => r.trabajador_id !== id);
+        localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
+        
+        return true;
+    },
+    
+    getTrabajadorById: function(id) {
+        var trabajadores = this.getTrabajadores();
+        return trabajadores.find(t => t.id === id);
+    },
+    
+    // ═══════════════════════════════════════════════════════════════
+    // TRABAJADOR ACTUAL (KIOSCO MODE)
+    // ═══════════════════════════════════════════════════════════════
+    setTrabajadorActual: function(id) {
+        localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(id));
+    },
+    
+    getTrabajadorActual: function() {
+        var id = JSON.parse(localStorage.getItem('rayoshield_trabajador_actual'));
+        if (id) {
+            return this.getTrabajadorById(id);
+        }
+        return null;
+    },
+    
+    clearTrabajadorActual: function() {
+        localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
+    },
+    
+    // ═══════════════════════════════════════════════════════════════
+    // RESULTADOS
+    // ═══════════════════════════════════════════════════════════════
+    getResultados: function() {
+        return JSON.parse(localStorage.getItem('rayoshield_resultados'));
+    },
+    
+    addResultado: function(resultado) {
+        var resultados = this.getResultados();
+        resultado.id = 'RES-' + Date.now().toString(36).toUpperCase();
+        resultado.fecha = new Date().toISOString();
+        resultados.push(resultado);
+        localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
+        return resultado;
+    },
+    
+    getResultadosByTrabajador: function(trabajadorId) {
+        var resultados = this.getResultados();
+        return resultados.filter(r => r.trabajador_id === trabajadorId);
+    },
+    
+    getProgresoByTrabajador: function(trabajadorId) {
+        var resultados = this.getResultadosByTrabajador(trabajadorId);
+        var examenes = resultados.filter(r => r.tipo === 'examen');
+        var casos = resultados.filter(r => r.tipo === 'caso');
+        
+        var aprobados = examenes.filter(r => r.aprobado).length;
+        var casosCompletados = casos.filter(r => r.aprobado).length;
+        
+        return {
+            total_examenes: examenes.length,
+            examenes_aprobados: aprobados,
+            total_casos: casos.length,
+            casos_completados: casosCompletados,
+            promedio: examenes.length > 0 ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0
+        };
+    },
+    
+    // ═══════════════════════════════════════════════════════════════
+    // ESTADÍSTICAS GENERALES
+    // ═══════════════════════════════════════════════════════════════
+    getEstadisticas: function() {
+        var trabajadores = this.getTrabajadores();
+        var resultados = this.getResultados();
+        
+        var activos = trabajadores.filter(t => t.estado === 'activo').length;
+        var examenesTotales = resultados.filter(r => r.tipo === 'examen').length;
+        var casosTotales = resultados.filter(r => r.tipo === 'caso').length;
+        var aprobados = resultados.filter(r => r.aprobado).length;
+        
+        return {
+            trabajadores_totales: trabajadores.length,
+            trabajadores_activos: activos,
+            examenes_totales: examenesTotales,
+            casos_totales: casosTotales,
+            tasa_aprobacion: resultados.length > 0 ? Math.round((aprobados / resultados.length) * 100) : 0
+        };
+    }
+};
+
+// Inicializar MultiUsuario
+MultiUsuario.init();
+
+// ─────────────────────────────────────────────────────────────────────
+// INICIAR CUANDO DOM ESTÉ LISTO
+// ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() { 
+    console.log('DOM listo'); 
+    app.init(); 
+});
 // Iniciar cuando DOM esté listo
 document.addEventListener('DOMContentLoaded', function() { console.log('DOM listo'); app.init(); });
 window.addEventListener('beforeunload', function() { if (app.timerExamen) clearInterval(app.timerExamen); if (app.timerCaso) clearInterval(app.timerCaso); });
