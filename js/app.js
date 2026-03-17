@@ -237,10 +237,10 @@ const app = {
                 }
             },
             // PLAN PROFESIONAL
-            'RS-PROF-2026-A1B2': {
+            'RS-PKDF-9826-A1B2': {
                 clienteId: 'PROFESIONAL_001',
                 tipo: 'PROFESIONAL',
-                duracion: 30,
+                duracion: 15,
                 features: {
                     whiteLabel: false,
                     predictivo: false,
@@ -254,10 +254,10 @@ const app = {
                 }
             },
             // PLAN CONSULTOR
-            'RS-CONS-2026-C3D4': {
+            'RS-COZS-2XT6-C3D4': {
                 clienteId: 'CONSULTOR_001',
                 tipo: 'CONSULTOR',
-                duracion: 30,
+                duracion: 15,
                 features: {
                     whiteLabel: false,
                     predictivo: false,
@@ -271,10 +271,10 @@ const app = {
                 }
             },
             // PLAN EMPRESARIAL
-            'RS-EMPR-2026-E5F6': {
+            'RS-EVP4-Y02I-E5F6': {
                 clienteId: 'EMPRESARIAL_001',
                 tipo: 'EMPRESARIAL',
-                duracion: 30,
+                duracion: 15,
                 features: {
                     whiteLabel: true,
                     predictivo: true,
