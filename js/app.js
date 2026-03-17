@@ -1620,14 +1620,31 @@ const app = {
         }
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // VOLVER A LISTA DE CASOS (CORREGIDO CON VALIDACIONES)
+    // ─────────────────────────────────────────────────────────────────────
     volverAListaCasos: function() {
         this.detenerTimerCaso();
-        document.getElementById('casos-list').style.display = 'block';
-        document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('casos-main-buttons').style.display = 'block';
-        document.getElementById('caso-resultado').style.display = 'none';
+        
+        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
+        var casosList = document.getElementById('casos-list');
+        var casoDetalle = document.getElementById('caso-detalle');
+        var casosMainButtons = document.getElementById('casos-main-buttons');
+        var casoResultado = document.getElementById('caso-resultado');
+        var btnEnviar = document.getElementById('btn-enviar-caso');
+        
+        if (casosList) casosList.style.display = 'block';
+        if (casoDetalle) casoDetalle.style.display = 'none';
+        if (casosMainButtons) casosMainButtons.style.display = 'block';
+        if (casoResultado) casoResultado.style.display = 'none';
+        if (btnEnviar) btnEnviar.style.display = 'none';
+        
+        // ✅ LIMPIAR ESTADO
         this.casoActual = null;
         this.respuestasCaso = {};
+        this.resultadoCaso = null;
+        
+        console.log('✅ Volviendo a lista de casos');
     },
     
     // ─────────────────────────────────────────────────────────────────────
