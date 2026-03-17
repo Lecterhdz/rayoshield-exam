@@ -1621,28 +1621,29 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────────
-    // GESTIÓN DE TRABAJADORES (MULTI-USUARIO)
+    // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - CORREGIDO
     // ─────────────────────────────────────────────────────────────────────
-    
-    // Mostrar pantalla de trabajadores
-    app.mostrarTrabajadores = function() {
+    mostrarTrabajadores: function() {
         this.renderTrabajadores();
         this.mostrarPantalla('trabajadores-screen');
-    };
+    },
     
-    // Renderizar tabla de trabajadores
-    app.renderTrabajadores = function() {
+    renderTrabajadores: function() {
+        if (typeof MultiUsuario === 'undefined') {
+            console.error('❌ MultiUsuario no está definido');
+            return;
+        }
+        
         var trabajadores = MultiUsuario.getTrabajadores();
         var filtro = document.getElementById('filtro-estado') ? document.getElementById('filtro-estado').value : 'todos';
         var busqueda = document.getElementById('buscar-trabajador') ? document.getElementById('buscar-trabajador').value.toLowerCase() : '';
         
-        // Filtrar
         if (filtro !== 'todos') {
             trabajadores = trabajadores.filter(t => t.estado === filtro);
         }
         if (busqueda) {
-            trabajadores = trabajadores.filter(t => 
-                t.nombre.toLowerCase().includes(busqueda) || 
+            trabajadores = trabajadores.filter(t =>
+                t.nombre.toLowerCase().includes(busqueda) ||
                 t.curp.toLowerCase().includes(busqueda) ||
                 (t.puesto && t.puesto.toLowerCase().includes(busqueda))
             );
@@ -1695,14 +1696,13 @@ const app = {
             '</tr>';
         }).join('');
         
-        // Actualizar estadísticas
         this.actualizarEstadisticasTrabajadores();
-    };
+    },
     
-    // Actualizar estadísticas
-    app.actualizarEstadisticasTrabajadores = function() {
-        var stats = MultiUsuario.getEstadisticas();
+    actualizarEstadisticasTrabajadores: function() {
+        if (typeof MultiUsuario === 'undefined') return;
         
+        var stats = MultiUsuario.getEstadisticas();
         var el1 = document.getElementById('stat-trabajadores-total');
         var el2 = document.getElementById('stat-trabajadores-activos');
         var el3 = document.getElementById('stat-examenes-total');
@@ -1712,10 +1712,9 @@ const app = {
         if (el2) el2.textContent = stats.trabajadores_activos;
         if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
         if (el4) el4.textContent = stats.tasa_aprobacion + '%';
-    };
+    },
     
-    // Mostrar modal nuevo trabajador
-    app.mostrarModalTrabajador = function() {
+    mostrarModalTrabajador: function() {
         document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
         document.getElementById('trabajador-id').value = '';
         document.getElementById('trabajador-nombre').value = '';
@@ -1725,17 +1724,19 @@ const app = {
         document.getElementById('trabajador-email').value = '';
         document.getElementById('trabajador-telefono').value = '';
         document.getElementById('trabajador-notas').value = '';
-        
         document.getElementById('modal-trabajador').classList.add('active');
-    };
+    },
     
-    // Cerrar modal trabajador
-    app.cerrarModalTrabajador = function() {
+    cerrarModalTrabajador: function() {
         document.getElementById('modal-trabajador').classList.remove('active');
-    };
+    },
     
-    // Guardar trabajador
-    app.guardarTrabajador = function() {
+    guardarTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') {
+            alert('❌ Error: Sistema Multi-Usuario no cargado');
+            return;
+        }
+        
         var id = document.getElementById('trabajador-id').value;
         var nombre = document.getElementById('trabajador-nombre').value.trim();
         var curp = document.getElementById('trabajador-curp').value.trim().toUpperCase();
@@ -1762,10 +1763,11 @@ const app = {
         
         this.cerrarModalTrabajador();
         this.renderTrabajadores();
-    };
+    },
     
-    // Editar trabajador
-    app.editarTrabajador = function(id) {
+    editarTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         var t = MultiUsuario.getTrabajadorById(id);
         if (!t) return;
         
@@ -1780,10 +1782,11 @@ const app = {
         document.getElementById('trabajador-notas').value = t.notas || '';
         
         document.getElementById('modal-trabajador').classList.add('active');
-    };
+    },
     
-    // Eliminar trabajador
-    app.eliminarTrabajador = function(id) {
+    eliminarTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         if (!confirm('⚠️ ¿Estás seguro de eliminar este trabajador?\n\nSe eliminarán también todos sus resultados de exámenes y casos.')) {
             return;
         }
@@ -1791,10 +1794,11 @@ const app = {
         MultiUsuario.deleteTrabajador(id);
         alert('✅ Trabajador eliminado correctamente');
         this.renderTrabajadores();
-    };
+    },
     
-    // Ver progreso de trabajador
-    app.verProgresoTrabajador = function(id) {
+    verProgresoTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         var t = MultiUsuario.getTrabajadorById(id);
         var progreso = MultiUsuario.getProgresoByTrabajador(id);
         var resultados = MultiUsuario.getResultadosByTrabajador(id);
@@ -1848,13 +1852,11 @@ const app = {
         }
         
         document.getElementById('modal-progreso-trabajador').classList.add('active');
-    };
+    },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // KIOSCO MODE - SELECCIONAR TRABAJADOR
-    // ─────────────────────────────────────────────────────────────────────
-    
-    app.mostrarSeleccionarTrabajador = function() {
+    mostrarSeleccionarTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         var trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
         var lista = document.getElementById('kiosco-lista');
         
@@ -1868,34 +1870,36 @@ const app = {
         }).join('');
         
         document.getElementById('modal-seleccionar-trabajador').classList.add('active');
-    };
+    },
     
-    app.cerrarModalSeleccionarTrabajador = function() {
+    cerrarModalSeleccionarTrabajador: function() {
         document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
-    };
+    },
     
-    app.filtrarKioscoTrabajadores = function() {
+    filtrarKioscoTrabajadores: function() {
         var busqueda = document.getElementById('kiosco-buscar').value.toLowerCase();
         var items = document.querySelectorAll('#kiosco-lista > div');
-        
         items.forEach(function(item) {
             var texto = item.textContent.toLowerCase();
             item.style.display = texto.includes(busqueda) ? 'block' : 'none';
         });
-    };
+    },
     
-    app.seleccionarTrabajadorKiosco = function(id) {
+    seleccionarTrabajadorKiosco: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         MultiUsuario.setTrabajadorActual(id);
         this.cerrarModalSeleccionarTrabajador();
         
         var t = MultiUsuario.getTrabajadorById(id);
         alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
         
-        // Actualizar UI para mostrar trabajador actual
         this.actualizarTrabajadorActualUI();
-    };
+    },
     
-    app.actualizarTrabajadorActualUI = function() {
+    actualizarTrabajadorActualUI: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         var t = MultiUsuario.getTrabajadorActual();
         var topbarSub = document.getElementById('topbar-sub');
         
@@ -1903,9 +1907,11 @@ const app = {
             topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
             topbarSub.style.color = 'var(--green)';
         }
-    };
+    },
     
-    app.cerrarSesionTrabajador = function() {
+    cerrarSesionTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        
         MultiUsuario.clearTrabajadorActual();
         var topbarSub = document.getElementById('topbar-sub');
         if (topbarSub) {
@@ -1913,7 +1919,7 @@ const app = {
             topbarSub.style.color = 'var(--ink4)';
         }
         alert('👋 Sesión de trabajador cerrada');
-    };
+    },
     
     // ─────────────────────────────────────────────────────────────────────
     // INTEGRAR CON ENVÍO DE EXÁMENES Y CASOS
