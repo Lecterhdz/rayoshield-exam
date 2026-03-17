@@ -1,619 +1,573 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#2196F3">
-    <title>RayoShield Exam - App</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="assets/logo.png">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="css/styles.css">
-    
-    <style>
-        /* ═══════════════════════════════════════════════════════════════
-        RAYOSHIELD EXAM - ESTILOS ACTUALIZADOS (SmartCot Style)
-        ═══════════════════════════════════════════════════════════════ */
-        :root {
-            /* Dark Theme (Default) */
-            --white:   #1e2330;
-            --bg:      #161b27;
-            --bg2:     #1a2035;
-            --surface: #1e2330;
-            --border:  #2a3347;
-            --border2: #334060;
-            --ink:     #e8edf5;
-            --ink2:    #c4cde0;
-            --ink3:    #8a97b4;
-            --ink4:    #5a6a8a;
-            --blue:    #2196F3;
-            --blue-l:  #1a2540;
-            --blue-m:  #253a5e;
-            --indigo:  #7c6ff0;
-            --teal:    #2cb8a8;
-            --amber:   #f0a742;
-            --rose:    #f0436a;
-            --green:   #3dba72;
-            --radius:    12px;
-            --radius-sm: 8px;
-            --radius-lg: 18px;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,.25);
-            --shadow:    0 4px 16px rgba(0,0,0,.35);
-            --shadow-lg: 0 12px 40px rgba(0,0,0,.5);
-            --font: 'Outfit', sans-serif;
-            --mono: 'JetBrains Mono', monospace;
-        }
 
-        /* Light Theme */
-        body.tema-claro {
-            --white:   #ffffff;
-            --bg:      #f8fafc;
-            --bg2:     #f1f5f9;
-            --surface: #ffffff;
-            --border:  #e2e8f0;
-            --border2: #cbd5e1;
-            --ink:     #1a1a1a;
-            --ink2:    #4a4a4a;
-            --ink3:    #64748b;
-            --ink4:    #94a3b8;
-            --blue:    #2563eb;
-            --blue-l:  #dbeafe;
-            --blue-m:  #93c5fd;
-        }
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
-        /* Reset */
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        html { scroll-behavior:smooth; }
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--ink);
-            min-height: 100vh;
-            font-size: 16px;
-            overflow-x: hidden;
-        }
+  * { margin:0; padding:0; box-sizing:border-box; }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width:5px; height:5px; }
-        ::-webkit-scrollbar-track { background: var(--bg2); }
-        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius:3px; }
+  :root {
+    --bg:       #0a0c0f;
+    --surface:  #0f1318;
+    --panel:    #141820;
+    --border:   #1e2530;
+    --border2:  #2a3545;
+    --green:    #00e676;
+    --green-dim:#00e67620;
+    --green-mid:#00e67640;
+    --amber:    #ffab40;
+    --red:      #ff5252;
+    --blue:     #448aff;
+    --text:     #e8eef8;
+    --text2:    #8090aa;
+    --text3:    #4a5870;
+    --font:     'Space Grotesk', sans-serif;
+    --mono:     'Space Mono', monospace;
+  }
 
-        /* Layout */
-        .layout { display:grid; grid-template-columns:240px 1fr; min-height:100vh; }
-        
-        /* Sidebar */
-        .sidebar {
-            background: var(--white);
-            border-right: 1px solid var(--border);
-            display:flex; flex-direction:column;
-            padding: 0;
-            position: sticky; top:0; height:100vh;
-            overflow-y: auto;
-            z-index: 100;
-        }
-        
-        .sidebar-logo {
-            padding: 24px 20px 20px;
-            border-bottom: 1px solid var(--border);
-            display:flex; align-items:center; gap:12px;
-        }
-        
-        .logo-icon {
-            width:38px; height:38px;
-            background: linear-gradient(135deg, var(--blue), var(--indigo));
-            border-radius: 10px;
-            display:flex; align-items:center; justify-content:center;
-            font-size:18px;
-            box-shadow: 0 4px 12px rgba(33,150,243,.3);
-            flex-shrink:0;
-        }
-        
-        .logo-text { line-height:1.2; }
-        .logo-text strong { font-size:17px; font-weight:800; color: var(--ink); letter-spacing:-0.5px; }
-        .logo-text span { display:block; font-size:10px; color:var(--ink4); font-family:var(--mono); letter-spacing:.5px; text-transform:uppercase; }
-        
-        .sidebar-section { 
-            padding: 20px 12px 8px; 
-            font-size:10px; font-weight:600; color: var(--ink4); 
-            text-transform:uppercase; letter-spacing:1px; font-family: var(--mono); 
-        }
-        
-        .nav-item {
-            display:flex; align-items:center; gap:10px;
-            padding: 9px 14px;
-            border-radius: var(--radius-sm);
-            margin: 2px 8px;
-            cursor:pointer;
-            transition: all .18s;
-            font-size:14px; font-weight:500;
-            color: var(--ink3);
-            border: none; background:none; width:calc(100% - 16px);
-            text-align:left;
-        }
-        
-        .nav-item:hover { background: var(--bg); color: var(--ink); }
-        .nav-item.active { background: var(--blue-l); color: var(--blue); font-weight:600; }
-        .nav-item .nav-icon { font-size:16px; width:20px; text-align:center; flex-shrink:0; }
-        .nav-badge {
-            margin-left:auto;
-            background: var(--blue);
-            color: white;
-            font-size:10px; font-weight:700;
-            padding:2px 7px; border-radius:20px;
-            font-family: var(--mono);
-        }
-        
-        .sidebar-footer { margin-top:auto; padding:16px; border-top:1px solid var(--border); }
-        
-        .license-pill {
-            display:flex; align-items:center; gap:8px;
-            padding:10px 14px;
-            background: linear-gradient(135deg, var(--blue-l), var(--blue-m));
-            border: 1px solid var(--blue-m);
-            border-radius: var(--radius-sm);
-            margin-bottom:10px;
-        }
-        
-        .license-pill .lp-dot {
-            width:8px; height:8px; border-radius:50%;
-            background: var(--blue); flex-shrink:0;
-            box-shadow:0 0 6px rgba(33,150,243,.5);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
-        .license-pill .lp-text { font-size:12px; font-weight:600; color:var(--blue); }
-        .license-pill .lp-sub { font-size:10px; color:var(--ink4); font-family:var(--mono); }
-        
-        .btn-salir {
-            display:flex; align-items:center; justify-content:center; gap:8px;
-            width:100%; padding:9px;
-            background:none; border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            font-size:13px; font-weight:500; color:var(--ink3);
-            cursor:pointer; transition:all .18s;
-            font-family:var(--font);
-        }
-        .btn-salir:hover { background:var(--rose); border-color:var(--rose); color:white; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    min-height: 100vh;
+  }
 
-        /* Main */
-        .main { overflow:visible; display:flex; flex-direction:column; min-width:0; }
-        
-        .topbar {
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            padding: 0 32px;
-            height:60px;
-            display:flex; align-items:center; justify-content:space-between;
-            position:sticky; top:0; z-index:50;
-        }
-        
-        .topbar-left { display:flex; flex-direction:column; }
-        .topbar-title { font-size:17px; font-weight:700; color:var(--ink); letter-spacing:-.3px; }
-        .topbar-sub { font-size:11px; color:var(--ink4); font-family:var(--mono); }
-        
-        .topbar-right { display:flex; align-items:center; gap:10px; }
-        
-        .topbar-btn {
-            display:flex; align-items:center; gap:6px;
-            padding:7px 14px;
-            border-radius:var(--radius-sm);
-            border:none; cursor:pointer;
-            font-size:13px; font-weight:600;
-            transition:all .18s; font-family:var(--font);
-            min-height: 44px;
-        }
-        .topbar-btn.primary { background: var(--blue); color:white; box-shadow:0 2px 8px rgba(33,150,243,.3); }
-        .topbar-btn.primary:hover { background:#1d4ed8; transform:translateY(-1px); }
-        .topbar-btn.ghost { background:var(--bg); color:var(--ink2); border:1px solid var(--border); }
-        .topbar-btn.ghost:hover { background:var(--bg2); }
+  /* ── LAYOUT ── */
+  .app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
 
-        /* Content */
-        .content { padding:28px 32px; flex:1; overflow-x: hidden; }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
 
-        /* Screens */
-        .screen { display:none; }
-        .screen.active { display:block; animation: fadeUp .25s ease; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  /* Scanline texture */
+  .sidebar::before {
+    content:'';
+    position:absolute; inset:0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,230,118,.015) 2px, rgba(0,230,118,.015) 4px);
+    pointer-events:none; z-index:0;
+  }
 
-        /* Stats */
-        .stats-row { display:grid; grid-template-columns: repeat(4,1fr); gap:16px; margin-bottom:28px; }
-        .stat-card {
-            background:var(--white);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            padding:20px 22px;
-            position:relative;
-            overflow:hidden;
-            box-shadow:var(--shadow-sm);
-            transition:all .2s;
-        }
-        .stat-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
-        .stat-number { font-size:32px; font-weight:800; color:var(--ink); letter-spacing:-1.5px; line-height:1; margin-bottom:4px; }
-        .stat-label { font-size:12px; color:var(--ink4); font-weight:500; }
+  .sidebar-inner { position:relative; z-index:1; display:flex; flex-direction:column; height:100%; }
 
-        /* Cards */
-        .card {
-            background:var(--white);
-            border:1px solid var(--border);
-            border-radius:var(--radius);
-            box-shadow:var(--shadow-sm);
-            overflow:visible;
-            margin-bottom: 20px;
-        }
-        .card-header { padding:18px 22px 0; display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-        .card-title { font-size:15px; font-weight:700; color:var(--ink); letter-spacing:-.2px; }
-        .card-sub { font-size:12px; color:var(--ink4); margin-top:2px; }
-        .card-body { padding:0 22px 22px; overflow:visible; }
+  /* Logo */
+  .logo-wrap {
+    padding: 20px 18px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
 
-        /* Forms */
-        .form-group {
-            display:flex; flex-direction:column; gap:5px;
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            font-size:11px; font-weight:600; color:var(--ink3);
-            text-transform:uppercase; letter-spacing:.4px; font-family:var(--mono);
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            padding:10px 14px;
-            background:var(--bg);
-            border:1px solid var(--border);
-            border-radius:var(--radius-sm);
-            font-size:14px;
-            color:var(--ink);
-            font-family:var(--font);
-            transition:all .15s;
-            min-height: 44px;
-            width: 100%;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline:none; border-color:var(--blue); background:var(--white);
-            box-shadow:0 0 0 3px rgba(33,150,243,.08);
-        }
+  .logo-badge {
+    width: 38px; height: 38px;
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    position: relative;
+  }
 
-        /* Buttons */
-        .btn {
-            padding:12px 24px;
-            border-radius:var(--radius-sm);
-            border:none;
-            font-size:14px;
-            font-weight:600;
-            cursor:pointer;
-            transition:all .18s;
-            font-family:var(--font);
-            min-height: 44px;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            gap:8px;
-        }
-        .btn-primary { background:linear-gradient(135deg,var(--blue),var(--indigo)); color:white; box-shadow:0 2px 8px rgba(33,150,243,.3); }
-        .btn-primary:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(33,150,243,.35); }
-        .btn-secondary { background:var(--bg); color:var(--ink2); border:1px solid var(--border); }
-        .btn-secondary:hover { background:var(--bg2); }
-        .btn-success { background:var(--green); color:white; }
-        .btn-warning { background:var(--amber); color:#1a1a1a; }
-        .btn-info { background:var(--teal); color:white; }
+  .logo-badge::after {
+    content:'';
+    position:absolute; top:-1px; right:-1px;
+    width:6px; height:6px; border-radius:50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: blink 2s infinite;
+  }
 
-        /* Button Group */
-        .button-group {
-            display:flex;
-            gap:15px;
-            flex-wrap:wrap;
-            justify-content:center;
-            margin-top:20px;
-        }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        /* Mobile Navigation */
-        .bottom-nav {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-top: 1px solid var(--border);
-            padding: 6px 0 max(6px, env(safe-area-inset-bottom));
-            z-index: 300;
-            box-shadow: 0 -4px 20px rgba(15,23,42,.08);
-        }
-        .bottom-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
-        .bn-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            padding: 6px 4px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-family: var(--font);
-            transition: all .15s;
-            min-height: 48px;
-        }
-        .bn-icon { font-size: 22px; line-height: 1; transition: transform .15s; }
-        .bn-label { font-size: 10px; font-weight: 600; color: var(--ink4); transition: color .15s; }
-        .bn-item.active .bn-icon { transform: translateY(-2px); }
-        .bn-item.active .bn-label { color: var(--blue); }
+  .logo-name {
+    font-size: 15px; font-weight: 700; letter-spacing: -.3px;
+    color: var(--text);
+    line-height: 1;
+  }
 
-        /* Hamburger Menu */
-        .hamburger {
-            display: none;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            transition: background .15s;
-            min-width: 44px;
-            min-height: 44px;
-        }
-        .hamburger:hover { background: var(--bg2); }
-        .hamburger span { display: block; width: 20px; height: 2px; background: var(--ink2); border-radius: 2px; margin: 4px 0; transition: all .25s; }
+  .logo-sub {
+    font-size: 9px; color: var(--green);
+    font-family: var(--mono);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
 
-        /* Sidebar Overlay */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(15,23,42,.4);
-            backdrop-filter: blur(4px);
-            z-index: 250;
-        }
-        .sidebar-overlay.open { display: block; }
+  /* Nav */
+  .nav-section {
+    padding: 20px 10px 6px;
+    font-size: 9px; font-weight: 700;
+    color: var(--text3);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: var(--mono);
+    display: flex; align-items: center; gap: 6px;
+  }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .layout { grid-template-columns: 200px 1fr; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-        }
+  .nav-section::after {
+    content:'';
+    flex:1;
+    height:1px;
+    background: var(--border);
+  }
 
-        @media (max-width: 768px) {
-            .layout { grid-template-columns: 1fr; }
-            .content { padding: 16px 16px 90px !important; }
-            .sidebar {
-                position: fixed;
-                left: -260px;
-                top: 0;
-                bottom: 0;
-                width: 260px;
-                z-index: 260;
-                transition: left .28s cubic-bezier(.4,0,.2,1);
-            }
-            .sidebar.open { left: 0; box-shadow: var(--shadow-lg); }
-            .hamburger { display: flex !important; }
-            .bottom-nav { display: block !important; }
-            .topbar { padding: 0 16px; height: 54px; }
-            .topbar-sub { display: none; }
-            .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .stat-number { font-size: 26px; }
-        }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px;
+    margin: 1px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .15s;
+    font-size: 13px; font-weight: 500;
+    color: var(--text2);
+    border: none; background: none; width: calc(100% - 16px);
+    text-align: left; font-family: var(--font);
+    position: relative;
+  }
 
-        /* Utilities */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-2 { margin-top: 16px; }
-        .mb-2 { margin-bottom: 16px; }
-    </style>
-</head>
-<body>
-    <div class="layout">
-        <!-- ══════════════ SIDEBAR ══════════════ -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <div class="logo-icon">🛡️</div>
-                <div class="logo-text">
-                    <strong>RayoShield</strong>
-                    <span>Exam Platform</span>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">Principal</div>
-            <button class="nav-item active" onclick="app.volverHome()">
-                <span class="nav-icon">🏠</span> Inicio
-            </button>
-            <button class="nav-item" onclick="app.irASeleccionarExamen()">
-                <span class="nav-icon">📚</span> Exámenes
-            </button>
-            <button class="nav-item" onclick="app.irACasosMaster()" id="nav-casos">
-                <span class="nav-icon">⚠️</span> Casos MASTER
-                <span class="nav-badge" id="nav-badge-casos">0</span>
-            </button>
-            
-            <div class="sidebar-section">Usuario</div>
-            <button class="nav-item" onclick="app.mostrarDatosUsuario()">
-                <span class="nav-icon">👤</span> Mi Perfil
-            </button>
-            <button class="nav-item" onclick="app.mostrarHistorial()">
-                <span class="nav-icon">📋</span> Historial
-            </button>
-            <button class="nav-item" onclick="app.mostrarLicencia()">
-                <span class="nav-icon">🔑</span> Licencia
-            </button>
-            
-            <div class="sidebar-section">Herramientas</div>
-            <button class="nav-item" onclick="app.mostrarInfo()">
-                <span class="nav-icon">ℹ️</span> Información
-            </button>
-            <button class="nav-item" onclick="app.mostrarPanelWhiteLabel()" id="nav-white-label" style="display:none;">
-                <span class="nav-icon">🎨</span> White Label
-            </button>
-            
-            <div class="sidebar-footer">
-                <div class="license-pill">
-                    <div class="lp-dot"></div>
-                    <div>
-                        <div class="lp-text" id="sidebar-license-plan">DEMO</div>
-                        <div class="lp-sub" id="sidebar-license-expiry">Cargando...</div>
-                    </div>
-                </div>
-                <button class="btn-salir" onclick="app.cerrarSesion()">🚪 Cerrar Sesión</button>
-            </div>
-        </aside>
+  .nav-item .nav-ico {
+    width: 18px; text-align: center;
+    font-size: 15px; flex-shrink: 0;
+  }
 
-        <!-- ══════════════ MAIN ══════════════ -->
-        <div class="main">
-            <!-- TOPBAR -->
-            <div class="topbar">
-                <div class="topbar-left" style="flex-direction:row;align-items:center;gap:10px;">
-                    <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()" aria-label="Menú">
-                        <span></span><span></span><span></span>
-                    </button>
-                    <div>
-                        <div class="topbar-title" id="topbar-title">RayoShield Exam</div>
-                        <div class="topbar-sub" id="topbar-sub">Plataforma de certificación STPS</div>
-                    </div>
-                </div>
-                <div class="topbar-right">
-                    <button class="topbar-btn primary" onclick="app.toggleTema()" title="Cambiar tema" style="min-width:44px;padding:8px;">
-                        🌓
-                    </button>
-                    <button class="topbar-btn ghost" onclick="app.mostrarLicencia()">🔑 Licencia</button>
-                </div>
-            </div>
+  .nav-item:hover { background: var(--panel); color: var(--text); }
 
-            <!-- CONTENT -->
-            <div class="content">
-                <!-- HOME SCREEN -->
-                <section id="home-screen" class="screen active">
-                    <div class="stats-row">
-                        <div class="stat-card">
-                            <div class="stat-number">21</div>
-                            <div class="stat-label">Exámenes</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">420</div>
-                            <div class="stat-label">Preguntas</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">15</div>
-                            <div class="stat-label">Casos</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-number">4</div>
-                            <div class="stat-label">Niveles</div>
-                        </div>
-                    </div>
+  .nav-item.active {
+    background: var(--green-dim);
+    color: var(--green);
+    border-left: 2px solid var(--green);
+    border-radius: 0 4px 4px 0;
+    margin-left: 8px;
+    padding-left: 10px;
+  }
 
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">🛡️ Bienvenido a RayoShield Exam</div>
-                                <div class="card-sub">Evalúa tus conocimientos en normas STPS</div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div id="licencia-info" style="padding:15px;background:#f5f5f5;border-radius:10px;text-align:center;font-weight:bold;margin:15px 0;">
-                                📋 Licencia DEMO
-                            </div>
-                            
-                            <div id="usuario-info" style="padding:15px;background:#E3F2FD;border-radius:10px;margin:15px 0;font-size:14px;">
-                                <!-- Se llena con JS -->
-                            </div>
-                            
-                            <div class="button-group">
-                                <button class="btn btn-primary" onclick="app.irASeleccionarExamen()" id="btn-comenzar">📚 Examen</button>
-                                <button class="btn btn-warning" onclick="app.irACasosMaster()" id="btn-casos-master">⚠️ Casos MASTER</button>
-                                <button class="btn btn-secondary" onclick="app.mostrarDatosUsuario()">📋 Datos</button>
-                                <button class="btn btn-info" onclick="app.mostrarHistorial()">📋 Historial</button>
-                                <button class="btn btn-success" onclick="app.mostrarLicencia()">🔑 Licencia</button>
-                                <button class="btn btn-secondary" onclick="app.mostrarInfo()">ℹ️ Info</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px; font-weight: 700;
+    color: var(--amber);
+    font-family: var(--mono);
+    background: rgba(255,171,64,.12);
+    border: 1px solid rgba(255,171,64,.3);
+    padding: 1px 6px; border-radius: 3px;
+  }
 
-                <!-- Otros screens se mantienen igual... -->
-                <!-- (select-exam-screen, exam-screen, result-screen, history-screen, license-screen, info-screen, casos-master-screen, user-data-screen, white-label-screen) -->
+  /* Sidebar footer */
+  .sidebar-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
 
-            </div>
+  .status-pill {
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,.3);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    flex-shrink: 0;
+    animation: blink 2s infinite;
+  }
+
+  .status-label { font-size: 12px; font-weight: 700; color: var(--green); line-height: 1; }
+  .status-sub { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-top: 2px; }
+
+  .btn-exit {
+    width: 100%; padding: 8px;
+    background: none; border: 1px solid var(--border2);
+    border-radius: 4px;
+    font-size: 12px; font-weight: 600;
+    color: var(--text3); cursor: pointer;
+    transition: all .15s; font-family: var(--font);
+    letter-spacing: .5px;
+  }
+
+  .btn-exit:hover { border-color: var(--red); color: var(--red); background: rgba(255,82,82,.06); }
+
+  /* ── MAIN ── */
+  .main { display: flex; flex-direction: column; background: var(--bg); min-width: 0; }
+
+  /* Topbar */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    height: 56px; padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+
+  .breadcrumb {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .breadcrumb span { color: var(--green); }
+  .page-title { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+  .tb-btn {
+    padding: 6px 14px; border-radius: 4px;
+    font-size: 12px; font-weight: 700; letter-spacing: .5px;
+    cursor: pointer; transition: all .15s;
+    font-family: var(--font);
+  }
+
+  .tb-btn.outline {
+    background: none; border: 1px solid var(--border2); color: var(--text2);
+  }
+
+  .tb-btn.outline:hover { border-color: var(--green); color: var(--green); }
+
+  .tb-btn.accent {
+    background: var(--green-dim); border: 1px solid rgba(0,230,118,.4); color: var(--green);
+  }
+
+  .tb-btn.accent:hover { background: var(--green-mid); }
+
+  /* Content */
+  .content { padding: 28px; flex: 1; }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all .2s;
+  }
+
+  .stat-card:hover { border-color: var(--border2); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute; top:0; left:0;
+    width: 3px; height: 100%;
+    background: var(--green);
+  }
+
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.blue::before { background: var(--blue); }
+  .stat-card.red::before { background: var(--red); }
+
+  .stat-icon {
+    font-size: 20px; margin-bottom: 10px;
+    display: block;
+  }
+
+  .stat-num {
+    font-size: 30px; font-weight: 700;
+    font-family: var(--mono);
+    letter-spacing: -1px;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .stat-lbl {
+    font-size: 11px; font-weight: 600;
+    color: var(--text3); letter-spacing: 1px;
+    text-transform: uppercase; font-family: var(--mono);
+  }
+
+  /* ── WELCOME CARD ── */
+  .welcome-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .welcome-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(0,230,118,.04);
+  }
+
+  .welcome-icon {
+    width: 36px; height: 36px;
+    background: var(--green-dim);
+    border: 1px solid rgba(0,230,118,.3);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+
+  .welcome-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .welcome-sub { font-size: 11px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+
+  .welcome-body { padding: 20px 22px; }
+
+  /* License info block */
+  .lic-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .lic-badge {
+    font-size: 10px; font-weight: 700;
+    font-family: var(--mono); letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 3px;
+    background: rgba(255,171,64,.12);
+    border: 1px solid rgba(255,171,64,.3);
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+
+  .lic-text { font-size: 12px; color: var(--text2); }
+
+  /* User info block */
+  .user-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 12px; color: var(--text2);
+  }
+
+  /* Action buttons */
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .act-btn {
+    padding: 12px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    background: var(--bg);
+    color: var(--text2);
+    font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all .18s;
+    font-family: var(--font);
+    letter-spacing: .4px;
+    display: flex; align-items: center; gap: 8px;
+    justify-content: center;
+  }
+
+  .act-btn:hover { background: var(--panel); color: var(--text); border-color: var(--border2); }
+
+  .act-btn.primary {
+    background: var(--green-dim);
+    border-color: rgba(0,230,118,.4);
+    color: var(--green);
+    grid-column: span 2;
+  }
+
+  .act-btn.primary:hover { background: var(--green-mid); }
+
+  .act-btn.warning {
+    background: rgba(255,171,64,.08);
+    border-color: rgba(255,171,64,.3);
+    color: var(--amber);
+  }
+
+  .act-btn.warning:hover { background: rgba(255,171,64,.14); }
+
+  /* ── BOTTOM NAV (mobile) ── */
+  .bottom-nav {
+    display: none;
+    position: fixed; bottom:0; left:0; right:0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 6px 0;
+    z-index: 300;
+  }
+
+  .bottom-nav-inner { display: grid; grid-template-columns: repeat(5, 1fr); }
+
+  .bn-item {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 3px; padding: 6px 4px;
+    cursor: pointer; border: none; background: none;
+    font-family: var(--font); min-height: 48px;
+  }
+
+  .bn-ico { font-size: 20px; }
+  .bn-lbl { font-size: 9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-family: var(--mono); }
+  .bn-item.active .bn-lbl { color: var(--green); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .actions { grid-template-columns: 1fr 1fr; }
+    .act-btn.primary { grid-column: span 2; }
+  }
+
+  @media (max-width: 680px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 16px 16px 80px; }
+    .bottom-nav { display: block; }
+    .stats-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-num { font-size: 24px; }
+    .actions { grid-template-columns: 1fr 1fr; }
+    .act-btn.primary { grid-column: span 2; }
+    .page-title { font-size: 15px; }
+  }
+</style>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+      <div class="logo-wrap">
+        <div class="logo-badge">🛡️</div>
+        <div>
+          <div class="logo-name">RayoShield</div>
+          <div class="logo-sub">Exam Platform</div>
         </div>
+      </div>
+
+      <div class="nav-section">Principal</div>
+      <button class="nav-item active">
+        <span class="nav-ico">⌂</span> Inicio
+      </button>
+      <button class="nav-item">
+        <span class="nav-ico">▤</span> Exámenes
+      </button>
+      <button class="nav-item">
+        <span class="nav-ico">⚠</span> Casos MASTER
+        <span class="nav-badge">15</span>
+      </button>
+
+      <div class="nav-section">Usuario</div>
+      <button class="nav-item">
+        <span class="nav-ico">◎</span> Mi Perfil
+      </button>
+      <button class="nav-item">
+        <span class="nav-ico">≡</span> Historial
+      </button>
+      <button class="nav-item">
+        <span class="nav-ico">◈</span> Licencia
+      </button>
+
+      <div class="nav-section">Herramientas</div>
+      <button class="nav-item">
+        <span class="nav-ico">ℹ</span> Información
+      </button>
+
+      <div class="sidebar-footer">
+        <div class="status-pill">
+          <div class="status-dot"></div>
+          <div>
+            <div class="status-label">DEMO</div>
+            <div class="status-sub">Sin expiración</div>
+          </div>
+        </div>
+        <button class="btn-exit">⏻ &nbsp;CERRAR SESIÓN</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="breadcrumb">SYS / <span>INICIO</span></div>
+          <div class="page-title">Dashboard</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="tb-btn outline">🌓</button>
+        <button class="tb-btn outline">◈ Licencia</button>
+        <button class="tb-btn accent">▤ Iniciar Examen</button>
+      </div>
     </div>
 
-    <!-- Overlay para cerrar sidebar en móvil -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+    <!-- CONTENT -->
+    <div class="content">
 
-    <!-- Barra inferior — solo móvil -->
-    <nav class="bottom-nav">
-        <div class="bottom-nav-inner">
-            <button class="bn-item active" id="bn-home" onclick="app.volverHome();closeSidebar()">
-                <span class="bn-icon">🏠</span>
-                <span class="bn-label">Inicio</span>
-            </button>
-            <button class="bn-item" id="bn-examenes" onclick="app.irASeleccionarExamen();closeSidebar()">
-                <span class="bn-icon">📚</span>
-                <span class="bn-label">Exámenes</span>
-            </button>
-            <button class="bn-item" id="bn-casos" onclick="app.irACasosMaster();closeSidebar()">
-                <span class="bn-icon">⚠️</span>
-                <span class="bn-label">Casos</span>
-            </button>
-            <button class="bn-item" id="bn-historial" onclick="app.mostrarHistorial();closeSidebar()">
-                <span class="bn-icon">📋</span>
-                <span class="bn-label">Historial</span>
-            </button>
-            <button class="bn-item" id="bn-licencia" onclick="app.mostrarLicencia();closeSidebar()">
-                <span class="bn-icon">🔑</span>
-                <span class="bn-label">Licencia</span>
-            </button>
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="stat-ico">▤</span>
+          <div class="stat-num">21</div>
+          <div class="stat-lbl">Exámenes</div>
         </div>
-    </nav>
+        <div class="stat-card amber">
+          <span class="stat-ico">❓</span>
+          <div class="stat-num">420</div>
+          <div class="stat-lbl">Preguntas</div>
+        </div>
+        <div class="stat-card blue">
+          <span class="stat-ico">⚠</span>
+          <div class="stat-num">15</div>
+          <div class="stat-lbl">Casos</div>
+        </div>
+        <div class="stat-card red">
+          <span class="stat-ico">◈</span>
+          <div class="stat-num">4</div>
+          <div class="stat-lbl">Niveles</div>
+        </div>
+      </div>
 
-    <!-- Scripts en orden correcto -->
-    <script src="js/exams.js"></script>
-    <script src="js/scoring.js"></script>
-    <script src="js/certificate.js"></script>
-    <script src="js/certificate-master.js"></script>
-    <script src="js/smart-evaluation-v2.js"></script>
-    <script src="js/dashboard-basico-engine.js"></script>
-    <script src="js/dashboard-ejecutivo-engine.js"></script>
-    <script src="js/app.js"></script>
-    
-    <script>
-        // Toggle sidebar en móvil
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            const isOpen  = sidebar.classList.contains('open');
-            if (isOpen) { closeSidebar(); } else {
-                sidebar.classList.add('open');
-                overlay.classList.add('open');
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        
-        function closeSidebar() {
-            document.querySelector('.sidebar').classList.remove('open');
-            document.getElementById('sidebar-overlay').classList.remove('open');
-            document.body.style.overflow = '';
-        }
+      <!-- Welcome card -->
+      <div class="welcome-card">
+        <div class="welcome-header">
+          <div class="welcome-icon">🛡️</div>
+          <div>
+            <div class="welcome-title">Bienvenido a RayoShield Exam</div>
+            <div class="welcome-sub">CERTIF_STPS · v2.4.1 · PLATAFORMA ACTIVA</div>
+          </div>
+        </div>
+        <div class="welcome-body">
+          <div class="lic-block">
+            <span class="lic-badge">DEMO</span>
+            <span class="lic-text">Licencia activa · Funcionalidades básicas habilitadas</span>
+          </div>
+          <div class="user-block">
+            📋 &nbsp;Información del usuario cargada · ID: — · Plan: DEMO
+          </div>
+          <div class="actions">
+            <button class="act-btn primary">▶ &nbsp;INICIAR EXAMEN</button>
+            <button class="act-btn warning">⚠ &nbsp;CASOS MASTER</button>
+            <button class="act-btn">◎ &nbsp;Datos</button>
+            <button class="act-btn">≡ &nbsp;Historial</button>
+            <button class="act-btn">◈ &nbsp;Licencia</button>
+            <button class="act-btn">ℹ &nbsp;Info</button>
+          </div>
+        </div>
+      </div>
 
-        // Actualizar topbar title según pantalla
-        const screenTitles = {
-            'home-screen': ['Inicio', 'Plataforma de certificación'],
-            'select-exam-screen': ['Exámenes', 'Selecciona categoría'],
-            'exam-screen': ['Examen', 'En progreso'],
-            'result-screen': ['Resultado', 'Calificación'],
-            'history-screen': ['Historial', 'Exámenes completados'],
-            'license-screen': ['Licencia', 'Gestión de plan'],
-            'info-screen': ['Información', 'Acerca de'],
-            'casos-master-screen': ['Casos MASTER', 'Investigación de incidentes'],
-            'user-data-screen': ['Mi Perfil', 'Datos del usuario'],
-            'white-label-screen': ['White Label', 'Personalizar marca']
-        };
+    </div>
+  </div>
+</div>
 
-        // Escape key cierra modals y sidebar
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                closeSidebar();
-            }
-        });
-    </script>
-</body>
-</html>
+<!-- Bottom nav (mobile) -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bn-item active"><span class="bn-ico">⌂</span><span class="bn-lbl">Inicio</span></button>
+    <button class="bn-item"><span class="bn-ico">▤</span><span class="bn-lbl">Exámenes</span></button>
+    <button class="bn-item"><span class="bn-ico">⚠</span><span class="bn-lbl">Casos</span></button>
+    <button class="bn-item"><span class="bn-ico">≡</span><span class="bn-lbl">Historial</span></button>
+    <button class="bn-item"><span class="bn-ico">◈</span><span class="bn-lbl">Licencia</span></button>
+  </div>
+</nav>
