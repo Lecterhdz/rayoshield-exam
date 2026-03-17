@@ -1831,32 +1831,156 @@
                     </div>
                 </section>
 
-                <!-- LICENSE SCREEN -->
+            <!-- ══════════════ LICENCIA SCREEN ══════════════ -->
                 <section id="license-screen" class="screen">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">🔑 Activar Licencia</div>
-                                <div class="card-sub">Gestión de plan</div>
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+                        <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
+                        <span style="font-size:14px;font-weight:700;color:var(--ink);">🔑 Licencia y Planes</span>
+                    </div>
+                
+                    <!-- PLAN ACTUAL -->
+                    <div class="card" style="margin-bottom:24px;">
+                        <div class="card-body" style="padding:24px;">
+                            <div style="background:linear-gradient(135deg,var(--blue),var(--indigo));border-radius:var(--radius-lg);padding:24px 28px;color:white;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;box-shadow:0 8px 32px rgba(37,99,235,.35);">
+                                <div>
+                                    <div style="font-size:12px;opacity:.75;font-family:var(--mono);text-transform:uppercase;margin-bottom:6px;">Plan actual</div>
+                                    <div style="font-size:28px;font-weight:800;margin-bottom:4px;" id="licencia-screen-plan">DEMO</div>
+                                    <div style="font-size:13px;opacity:.85;">Cliente: <strong id="licencia-screen-cliente">DEMO_USER</strong></div>
+                                    <div style="font-size:13px;opacity:.85;">Válido hasta: <strong id="licencia-screen-expiry">--</strong></div>
+                                    <div style="font-size:11px;opacity:.75;margin-top:8px;font-family:var(--mono);" id="licencia-screen-days">7 días restantes</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div style="font-size:12px;opacity:.7;margin-bottom:8px;font-family:var(--mono);">📧 lecterhdz@gmail.com</div>
+                                    <button onclick="document.getElementById('activar-licencia-section').scrollIntoView({behavior:'smooth'})" style="padding:10px 22px;background:white;color:var(--blue);border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 2px 8px rgba(0,0,0,.15);">🔄 Renovar / Activar</button>
+                                </div>
                             </div>
-                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
+                
+                            <!-- CARACTERÍSTICAS DEL PLAN -->
+                            <div style="background:var(--bg);padding:20px;border-radius:var(--radius-sm);">
+                                <h4 style="color:var(--ink);margin:0 0 15px 0;font-size:14px;font-weight:700;">✨ Características de tu plan</h4>
+                                <div id="licencia-features" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+                                    <!-- Se llena dinámicamente -->
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div id="licencia-info-detail" style="padding:20px;background:var(--bg);border-radius:10px;margin:20px 0;text-align:center;font-weight:bold;">
-                                📋 Licencia DEMO - 3 exámenes hoy
+                    </div>
+                
+                    <!-- PLANES DISPONIBLES -->
+                    <h3 style="color:var(--ink);margin-bottom:16px;font-size:16px;font-weight:700;">📦 Planes Disponibles</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:28px;">
+                        
+                        <!-- DEMO -->
+                        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);">
+                            <div style="font-size:13px;font-weight:700;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Demo</div>
+                            <div style="font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-1.5px;margin-bottom:4px;">$0</div>
+                            <div style="font-size:12px;color:var(--ink4);margin-bottom:20px;">Para explorar · 3 exámenes/día</div>
+                            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;">
+                                <div style="font-size:13px;color:var(--ink3);display:flex;gap:8px;align-items:center;"><span style="color:var(--green);font-weight:700;">✓</span> 21 exámenes NOM-STPS</div>
+                                <div style="font-size:13px;color:var(--ink3);display:flex;gap:8px;align-items:center;"><span style="color:var(--green);font-weight:700;">✓</span> 1 caso BÁSICO</div>
+                                <div style="font-size:13px;color:var(--ink3);display:flex;gap:8px;align-items:center;"><span style="color:var(--green);font-weight:700;">✓</span> Certificado con marca de agua</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin casos MASTER/ELITE</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin insignias</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin dashboard</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin multi-usuario</div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label>🆔 ID de Cliente</label>
-                                <input type="text" id="license-id" placeholder="Ej: CONSTRUCTORA_AZTECA_001" style="text-transform:uppercase;">
+                            <button style="width:100%;padding:10px;background:var(--bg2);color:var(--ink4);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:default;font-family:var(--font);">Plan gratuito</button>
+                        </div>
+                
+                        <!-- PROFESIONAL — destacado -->
+                        <div style="background:linear-gradient(160deg,#f0f7ff,var(--white));border:2px solid var(--blue);border-radius:var(--radius-lg);padding:24px;box-shadow:0 8px 24px rgba(37,99,235,.15);position:relative;">
+                            <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--blue);color:white;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;white-space:nowrap;font-family:var(--mono);">⭐ RECOMENDADO</div>
+                            <div style="font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Profesional</div>
+                            <div style="font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-1.5px;margin-bottom:4px;">$2,499<span style="font-size:16px;font-weight:500;color:var(--ink4);">/año</span></div>
+                            <div style="font-size:12px;color:var(--ink4);margin-bottom:20px;">Para profesionales · Ahorra $1,000</div>
+                            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;">
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--blue);font-weight:700;">✓</span> <strong>Exámenes ilimitados</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--blue);font-weight:700;">✓</span> <strong>5 casos BÁSICOS</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--blue);font-weight:700;">✓</span> <strong>5 casos MASTER</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--blue);font-weight:700;">✓</span> Certificado sin marca de agua</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--blue);font-weight:700;">✓</span> Historial completo</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin casos ELITE/PERICIAL</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin insignias</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin dashboard</div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label>🔐 Clave de Licencia</label>
-                                <input type="text" id="license-key" placeholder="Ej: RS-XXXX-YYYY-ZZZZ" style="text-transform:uppercase;letter-spacing:2px;font-family:var(--mono);">
+                            <button onclick="app.activarLicenciaConPlan('PROFESIONAL')" style="width:100%;padding:10px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 2px 8px rgba(37,99,235,.3);">🔄 Activar — $2,499/año</button>
+                        </div>
+                
+                        <!-- CONSULTOR -->
+                        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);">
+                            <div style="font-size:13px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Consultor</div>
+                            <div style="font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-1.5px;margin-bottom:4px;">$7,999<span style="font-size:16px;font-weight:500;color:var(--ink4);">/año</span></div>
+                            <div style="font-size:12px;color:var(--ink4);margin-bottom:20px;">Para consultores · Ahorra $2,000</div>
+                            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;">
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--indigo);font-weight:700;">✓</span> Todo lo de PROFESIONAL</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--indigo);font-weight:700;">✓</span> <strong>3 casos ELITE</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--indigo);font-weight:700;">✓</span> <strong>Insignias PNG</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--indigo);font-weight:700;">✓</span> Dashboard Básico</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--indigo);font-weight:700;">✓</span> 5 dimensiones SHE</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin casos PERICIAL</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin dashboard predictivo</div>
+                                <div style="font-size:13px;color:#cbd5e1;display:flex;gap:8px;align-items:center;"><span style="color:#64748b;">✗</span> Sin multi-usuario</div>
                             </div>
-                            
-                            <button class="btn btn-primary" onclick="app.activarLicencia()" style="width:100%;margin-top:10px;">🔓 Activar Licencia</button>
+                            <button onclick="app.activarLicenciaConPlan('CONSULTOR')" style="width:100%;padding:10px;background:var(--indigo);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">📩 Activar — $7,999/año</button>
+                        </div>
+                
+                        <!-- EMPRESARIAL -->
+                        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow-sm);">
+                            <div style="font-size:13px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Empresarial</div>
+                            <div style="font-size:34px;font-weight:800;color:var(--ink);letter-spacing:-1.5px;margin-bottom:4px;">$19,999<span style="font-size:16px;font-weight:500;color:var(--ink4);">/año</span></div>
+                            <div style="font-size:12px;color:var(--ink4);margin-bottom:20px;">Para empresas · Ahorra $5,000</div>
+                            <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;">
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> <strong>Todo ilimitado</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> <strong>2 casos PERICIAL</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> Dashboard Predictivo</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> Riesgo organizacional</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> <strong>50 trabajadores</strong></div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> White Label</div>
+                                <div style="font-size:13px;color:var(--ink2);display:flex;gap:8px;align-items:center;"><span style="color:var(--amber);font-weight:700;">✓</span> Soporte prioritario</div>
+                            </div>
+                            <button onclick="app.activarLicenciaConPlan('EMPRESARIAL')" style="width:100%;padding:10px;background:var(--amber);color:#1a1a1a;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);">📩 Activar — $19,999/año</button>
+                        </div>
+                    </div>
+                
+                    <!-- ACTIVAR LICENCIA -->
+                    <div id="activar-licencia-section" style="margin-top:28px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);">
+                        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:15px;display:flex;align-items:center;gap:8px;">
+                            🔑 Activar con clave de licencia
+                        </div>
+                        <div style="display:grid;gap:15px;max-width:500px;">
+                            <div>
+                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;font-family:var(--mono);text-transform:uppercase;">ID de Cliente</label>
+                                <input type="text" id="license-id" placeholder="Ej: PROFESIONAL_001" style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);font-family:var(--font);text-transform:uppercase;">
+                            </div>
+                            <div>
+                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;font-family:var(--mono);text-transform:uppercase;">Clave de Licencia</label>
+                                <input type="text" id="license-key" placeholder="RS-XXXX-YYYY-ZZZZ" style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);font-family:var(--mono);letter-spacing:2px;text-transform:uppercase;">
+                            </div>
+                            <button onclick="app.activarLicencia()" style="padding:12px 24px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 2px 8px rgba(37,99,235,.3);">🔓 Activar Licencia</button>
+                        </div>
+                        <div style="font-size:12px;color:var(--ink4);margin-top:12px;">
+                            ¿Compraste una licencia? Ingresa tu ID y clave para activarla. Contacto: <strong style="color:var(--blue);">lecterhdz@gmail.com</strong>
+                        </div>
+                
+                        <!-- CLAVES DE PRUEBA -->
+                        <div style="margin-top:20px;padding:15px;background:var(--blue-l);border-radius:var(--radius-sm);border-left:4px solid var(--blue);">
+                            <h4 style="color:var(--blue);margin:0 0 10px 0;font-size:13px;font-weight:700;">🧪 Claves de Prueba</h4>
+                            <div style="font-size:12px;color:var(--ink3);line-height:1.8;">
+                                <div><strong>PROFESIONAL:</strong> ID: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">PROFESIONAL_001</code> | Clave: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">RS-PROF-2026-A1B2</code></div>
+                                <div><strong>CONSULTOR:</strong> ID: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">CONSULTOR_001</code> | Clave: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">RS-CONS-2026-C3D4</code></div>
+                                <div><strong>EMPRESARIAL:</strong> ID: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">EMPRESARIAL_001</code> | Clave: <code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:var(--mono);">RS-EMPR-2026-E5F6</code></div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- FOOTER -->
+                    <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border);text-align:center;">
+                        <div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">
+                            © 2026 RayoShield Exam — Todos los derechos reservados
+                        </div>
+                        <div style="margin-top:10px;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+                            <a href="mailto:hdzlecter@gmail.com" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">📧 Contacto</a>
+                            <a href="#" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">📄 Términos</a>
+                            <a href="#" style="color:var(--ink3);text-decoration:none;font-size:12px;font-weight:500;font-family:var(--font);transition:color .15s;" onmouseover="this.style.color='var(--blue)'" onmouseout="this.style.color='var(--ink3)'">🔒 Privacidad</a>
                         </div>
                     </div>
                 </section>
