@@ -1953,12 +1953,6 @@
             document.body.style.overflow = '';
         }
 
-        // Toggle tema
-        app.toggleTema = function() {
-            document.body.classList.toggle('tema-claro');
-            var esClaro = document.body.classList.contains('tema-claro');
-            localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
-        };
 
         // Cerrar sesión
         app.cerrarSesion = function() {
