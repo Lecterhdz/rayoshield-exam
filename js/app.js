@@ -1737,39 +1737,7 @@ const app = {
     },
     
     cargarHistorial: function() { console.log('Historial:', this.obtenerHistorial().length, 'exámenes'); },
-    
-    // ─────────────────────────────────────────────────────────────────────
-    // PWA INSTALL
-    // ─────────────────────────────────────────────────────────────────────
-    initPWAInstall: function() {
-        var self = this;
-        window.addEventListener('beforeinstallprompt', function(e) {
-            console.log('PWA instalable');
-            e.preventDefault();
-            self.deferredPrompt = e;
-            var c = document.getElementById('pwa-install-container');
-            if (c) c.style.display = 'block';
-        });
-        window.addEventListener('appinstalled', function() {
-            console.log('PWA instalada');
-            self.deferredPrompt = null;
-            var c = document.getElementById('pwa-install-container');
-            if (c) c.style.display = 'none';
-        });
-    },
-    
-    instalarPWA: function() {
-        var self = this;
-        if (!this.deferredPrompt) { alert('Menú navegador → "Agregar a pantalla principal"'); return; }
-        this.deferredPrompt.prompt();
-        this.deferredPrompt.userChoice.then(function(r) {
-            console.log('Instalación:', r.outcome);
-            self.deferredPrompt = null;
-            var c = document.getElementById('pwa-install-container');
-            if (c) c.style.display = 'none';
-        });
-    }
-};
+
 // ─────────────────────────────────────────────────────────────────────
 // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - DENTRO DE APP
 // ─────────────────────────────────────────────────────────────────────
@@ -2038,9 +2006,43 @@ toggleTema: function() {
     document.body.classList.toggle('tema-claro');
     var esClaro = document.body.classList.contains('tema-claro');
     localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
-}
+},
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // PWA INSTALL
+    // ─────────────────────────────────────────────────────────────────────
+    initPWAInstall: function() {
+        var self = this;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            console.log('PWA instalable');
+            e.preventDefault();
+            self.deferredPrompt = e;
+            var c = document.getElementById('pwa-install-container');
+            if (c) c.style.display = 'block';
+        });
+        window.addEventListener('appinstalled', function() {
+            console.log('PWA instalada');
+            self.deferredPrompt = null;
+            var c = document.getElementById('pwa-install-container');
+            if (c) c.style.display = 'none';
+        });
+    },
+    
+    instalarPWA: function() {
+        var self = this;
+        if (!this.deferredPrompt) { alert('Menú navegador → "Agregar a pantalla principal"'); return; }
+        this.deferredPrompt.prompt();
+        this.deferredPrompt.userChoice.then(function(r) {
+            console.log('Instalación:', r.outcome);
+            self.deferredPrompt = null;
+            var c = document.getElementById('pwa-install-container');
+            if (c) c.style.display = 'none';
+        });
+    }
+};
 
-};  // ←══════════════════ CIERRA EL OBJETO APP AQUÍ
+
+
 
 // ═══════════════════════════════════════════════════════════════
 // OBJETO MULTI-USUARIO (FUERA DEL OBJETO APP)
