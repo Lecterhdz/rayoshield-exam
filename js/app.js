@@ -1120,6 +1120,10 @@ const app = {
         console.log('✅ Caso cargado correctamente:', casoId);
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // RENDERIZAR PREGUNTAS DE CASO (ACTUALIZADO CON TEMA SMARTCOT)
+    // ─────────────────────────────────────────────────────────────────────
+    
     renderAnalisisMultiple: function(pregunta) {
         var container = document.createElement('div');
         var self = this;
@@ -1127,18 +1131,20 @@ const app = {
         pregunta.opciones.forEach(function(opt, idx) {
             var label = document.createElement('label');
             label.className = 'opcion-sistemica';
-            label.style.display = 'flex';
-            label.style.alignItems = 'flex-start';
-            label.style.gap = '12px';
+            label.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;transition:all 0.15s;';
             
             var checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.name = 'pregunta-' + pregunta.id;
             checkbox.value = idx;
             checkbox.style.marginTop = '4px';
+            checkbox.style.width = '18px';
+            checkbox.style.height = '18px';
+            checkbox.style.cursor = 'pointer';
             
             var textoSpan = document.createElement('span');
             textoSpan.className = 'texto-opcion';
+            textoSpan.style.cssText = 'font-size:13px;line-height:1.5;color:var(--ink2);flex:1;';
             textoSpan.textContent = opt.texto || opt;
             
             label.appendChild(checkbox);
@@ -1147,6 +1153,13 @@ const app = {
             label.onclick = function(e) {
                 if (e.target === checkbox) {
                     label.classList.toggle('seleccionada');
+                    if (label.classList.contains('seleccionada')) {
+                        label.style.borderColor = 'var(--blue)';
+                        label.style.background = 'var(--blue-l)';
+                    } else {
+                        label.style.borderColor = 'var(--border)';
+                        label.style.background = 'var(--bg)';
+                    }
                 }
             };
             container.appendChild(label);
@@ -1157,15 +1170,26 @@ const app = {
     
     renderRespuestaAbierta: function(pregunta) {
         var container = document.createElement('div');
+        
         var textarea = document.createElement('textarea');
         textarea.className = 'respuesta-abierta';
-        textarea.placeholder = 'Escribe tu análisis sistémico aquí... (mínimo 80 caracteres)';
         textarea.id = 'respuesta-' + pregunta.id;
+        textarea.placeholder = 'Escribe tu análisis sistémico aquí... (mínimo 80 caracteres)';
+        textarea.style.cssText = 'width:100%;min-height:120px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font);font-size:14px;resize:vertical;';
+        textarea.onfocus = function() {
+            this.style.borderColor = 'var(--blue)';
+            this.style.background = 'var(--white)';
+        };
+        textarea.onblur = function() {
+            this.style.borderColor = 'var(--border)';
+            this.style.background = 'var(--bg)';
+        };
         container.appendChild(textarea);
         
         if (pregunta.feedback_guiado) {
             var pista = document.createElement('div');
             pista.className = 'pista-experto';
+            pista.style.cssText = 'background:var(--blue-l);padding:12px 14px;border-radius:var(--radius-sm);margin-top:10px;font-size:12px;color:var(--blue);border-left:3px solid var(--blue);';
             pista.innerHTML = '💡 ' + pregunta.feedback_guiado;
             container.appendChild(pista);
         }
@@ -1180,20 +1204,46 @@ const app = {
         
         pregunta.roles.forEach(function(role, roleIdx) {
             var row = document.createElement('div');
-            row.className = 'role-row';
-            row.innerHTML = '<div class="role-name">' + role.rol + '</div>';
+            row.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;';
+            
+            var roleName = document.createElement('div');
+            roleName.className = 'role-name';
+            roleName.style.cssText = 'font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;';
+            roleName.textContent = role.rol;
+            row.appendChild(roleName);
             
             var optionsDiv = document.createElement('div');
             optionsDiv.className = 'role-options';
+            optionsDiv.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;';
             
             role.opciones.forEach(function(opt, optIdx) {
                 var label = document.createElement('label');
                 label.className = 'role-option';
-                label.innerHTML = '<input type="radio" name="responsabilidad-' + pregunta.id + '-' + roleIdx + '" value="' + optIdx + '"><span>' + opt.nivel + '</span>';
+                label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;';
+                
+                var radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = 'responsabilidad-' + pregunta.id + '-' + roleIdx;
+                radio.value = optIdx;
+                radio.style.width = '16px';
+                radio.style.height = '16px';
+                radio.style.cursor = 'pointer';
+                
+                var span = document.createElement('span');
+                span.style.cssText = 'font-size:12px;font-weight:500;color:var(--ink);';
+                span.textContent = opt.nivel;
+                
+                label.appendChild(radio);
+                label.appendChild(span);
+                
                 label.onclick = function(e) {
                     if (e.target.tagName === 'INPUT') {
-                        row.querySelectorAll('input').forEach(function(r) { r.closest('.role-option').classList.remove('seleccionada'); });
-                        label.classList.add('seleccionada');
+                        row.querySelectorAll('input').forEach(function(r) { 
+                            r.closest('label').style.borderColor = 'var(--border)';
+                            r.closest('label').style.background = 'var(--white)';
+                        });
+                        label.style.borderColor = 'var(--blue)';
+                        label.style.background = 'var(--blue-l)';
                     }
                 };
                 optionsDiv.appendChild(label);
@@ -1214,15 +1264,45 @@ const app = {
         pregunta.opciones.forEach(function(opt, idx) {
             var item = document.createElement('label');
             item.className = 'accion-item';
+            item.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;transition:all 0.15s;';
+            
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = 'plan-' + pregunta.id;
+            checkbox.value = idx;
+            checkbox.style.marginTop = '4px';
+            checkbox.style.width = '18px';
+            checkbox.style.height = '18px';
+            checkbox.style.cursor = 'pointer';
+            
             var texto = opt.texto || opt.accion || opt;
             var jerarquia = opt.jerarquia || opt.clasificacion || 'administrativo';
             var prioridad = opt.prioridad || '';
             
-            item.innerHTML = '<input type="checkbox" name="plan-' + pregunta.id + '" value="' + idx + '" style="margin-top:5px;"><div style="flex:1;"><strong>' + texto + '</strong><div style="margin-top:5px;"><span class="accion-jerarquia ' + jerarquia + '">' + jerarquia + '</span>' + (prioridad ? '<span style="margin-left:10px;font-size:12px;color:#666;">Prioridad: ' + prioridad + '</span>' : '') + '</div></div>';
+            var textoDiv = document.createElement('div');
+            textoDiv.style.cssText = 'flex:1;';
+            textoDiv.innerHTML = '<strong style="font-size:13px;color:var(--ink);">' + texto + '</strong>' +
+                                '<div style="margin-top:5px;">' +
+                                '<span class="accion-jerarquia ' + jerarquia + '" style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;' +
+                                (jerarquia === 'ingenieria' ? 'background:var(--blue-l);color:var(--blue);' : 
+                                 jerarquia === 'administrativo' ? 'background:var(--amber-l);color:var(--amber);' : 
+                                 'background:var(--green-l);color:var(--green);') + '">' + jerarquia + '</span>' +
+                                (prioridad ? '<span style="margin-left:10px;font-size:11px;color:var(--ink3);">• Prioridad: ' + prioridad + '</span>' : '') +
+                                '</div>';
+            
+            item.appendChild(checkbox);
+            item.appendChild(textoDiv);
             
             item.onclick = function(e) {
                 if (e.target.tagName === 'INPUT') {
                     item.classList.toggle('seleccionada');
+                    if (item.classList.contains('seleccionada')) {
+                        item.style.borderColor = 'var(--blue)';
+                        item.style.background = 'var(--blue-l)';
+                    } else {
+                        item.style.borderColor = 'var(--border)';
+                        item.style.background = 'var(--bg)';
+                    }
                 }
             };
             container.appendChild(item);
@@ -1236,28 +1316,28 @@ const app = {
         var self = this;
         
         var instrucciones = document.createElement('p');
-        instrucciones.style.cssText = 'color: #666; font-size: 14px; margin: 10px 0;';
+        instrucciones.style.cssText = 'color:var(--ink3);font-size:13px;margin:10px 0;';
         instrucciones.textContent = 'Arrastra los elementos para ordenarlos en la secuencia correcta';
         container.appendChild(instrucciones);
         
         var ordenContainer = document.createElement('div');
         ordenContainer.className = 'orden-container';
-        ordenContainer.style.cssText = 'display: flex; flex-direction: column; gap: 10px; margin: 15px 0;';
+        ordenContainer.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin:15px 0;';
         
         pregunta.opciones.forEach(function(opt, idx) {
             var item = document.createElement('div');
             item.className = 'orden-item';
-            item.style.cssText = 'display: flex; align-items: center; gap: 15px; padding: 15px; background: #f5f5f5; border-radius: 8px; cursor: move; border: 2px solid #ddd;';
+            item.style.cssText = 'display:flex;align-items:center;gap:15px;padding:15px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);cursor:move;transition:all 0.15s;';
             item.draggable = true;
             item.dataset.index = idx;
             
             var numero = document.createElement('div');
             numero.className = 'orden-numero';
-            numero.style.cssText = 'width: 30px; height: 30px; background: #2196F3; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;';
+            numero.style.cssText = 'width:30px;height:30px;background:var(--blue);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-family:var(--mono);font-size:13px;flex-shrink:0;';
             numero.textContent = idx + 1;
             
             var texto = document.createElement('span');
-            texto.style.cssText = 'flex: 1; font-size: 14px;';
+            texto.style.cssText = 'flex:1;font-size:13px;color:var(--ink);';
             texto.textContent = opt;
             
             item.appendChild(numero);
@@ -1266,21 +1346,26 @@ const app = {
             item.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', idx);
                 this.style.opacity = '0.5';
+                this.style.borderColor = 'var(--blue)';
             });
             item.addEventListener('dragend', function() {
                 this.style.opacity = '1';
+                this.style.borderColor = 'var(--border)';
                 self.actualizarOrdenNumeros(ordenContainer);
             });
             item.addEventListener('dragover', function(e) {
                 e.preventDefault();
-                this.style.borderColor = '#2196F3';
+                this.style.borderColor = 'var(--blue)';
+                this.style.background = 'var(--blue-l)';
             });
             item.addEventListener('dragleave', function() {
-                this.style.borderColor = '#ddd';
+                this.style.borderColor = 'var(--border)';
+                this.style.background = 'var(--bg)';
             });
             item.addEventListener('drop', function(e) {
                 e.preventDefault();
-                this.style.borderColor = '#ddd';
+                this.style.borderColor = 'var(--border)';
+                this.style.background = 'var(--bg)';
                 var fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
                 var toIdx = parseInt(this.dataset.index);
                 if (fromIdx !== toIdx) {
@@ -1330,30 +1415,38 @@ const app = {
         
         if (pregunta.variables) {
             var variablesDiv = document.createElement('div');
-            variablesDiv.style.cssText = 'background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 15px 0;';
+            variablesDiv.style.cssText = 'background:var(--bg);padding:15px;border-radius:var(--radius-sm);margin:15px 0;border:1px solid var(--border);';
             Object.keys(pregunta.variables).forEach(function(variable) {
                 var valor = Array.isArray(pregunta.variables[variable]) ? pregunta.variables[variable][0] : pregunta.variables[variable];
                 var p = document.createElement('p');
-                p.style.cssText = 'margin: 5px 0; font-size: 14px;';
-                p.innerHTML = '<strong>' + variable + ':</strong> ' + valor;
+                p.style.cssText = 'margin:5px 0;font-size:13px;color:var(--ink2);';
+                p.innerHTML = '<strong style="color:var(--ink);font-family:var(--mono);">' + variable + ':</strong> <span style="font-family:var(--mono);color:var(--blue);font-weight:600;">' + valor + '</span>';
                 variablesDiv.appendChild(p);
             });
             container.appendChild(variablesDiv);
         }
         
         var inputDiv = document.createElement('div');
-        inputDiv.style.cssText = 'margin: 15px 0;';
+        inputDiv.style.cssText = 'margin:15px 0;';
         var input = document.createElement('input');
         input.type = 'number';
         input.id = 'respuesta-' + pregunta.id;
         input.placeholder = 'Ingresa tu respuesta';
-        input.style.cssText = 'width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px;';
+        input.style.cssText = 'width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);font-family:var(--mono);';
+        input.onfocus = function() {
+            this.style.borderColor = 'var(--blue)';
+            this.style.background = 'var(--white)';
+        };
+        input.onblur = function() {
+            this.style.borderColor = 'var(--border)';
+            this.style.background = 'var(--bg)';
+        };
         inputDiv.appendChild(input);
         container.appendChild(inputDiv);
         
         if (pregunta.ayuda) {
             var ayudaDiv = document.createElement('div');
-            ayudaDiv.style.cssText = 'background: #E3F2FD; padding: 12px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #2196F3;';
+            ayudaDiv.style.cssText = 'background:var(--blue-l);padding:12px 14px;border-radius:var(--radius-sm);margin:15px 0;border-left:3px solid var(--blue);font-size:12px;color:var(--blue);';
             ayudaDiv.innerHTML = '<strong>💡 Ayuda:</strong> ' + pregunta.ayuda;
             container.appendChild(ayudaDiv);
         }
