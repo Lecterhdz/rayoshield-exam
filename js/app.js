@@ -1770,300 +1770,282 @@ const app = {
         });
     }
 };
-    // ═══════════════════════════════════════════════════════════════
-    // GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - SIN "app."
-    // ═══════════════════════════════════════════════════════════════
-    mostrarTrabajadores: function() {
-        this.renderTrabajadores();
-        this.mostrarPantalla('trabajadores-screen');
-    },
-    
-    renderTrabajadores: function() {
-        if (typeof MultiUsuario === 'undefined') {
-            console.error('❌ MultiUsuario no está definido');
-            return;
-        }
-        
-        var trabajadores = MultiUsuario.getTrabajadores();
-        var tbody = document.getElementById('trabajadores-tabla');
-        var vacio = document.getElementById('trabajadores-vacio');
-        
-        if (!tbody) return;
-        
-        if (trabajadores.length === 0) {
-            tbody.innerHTML = '';
-            if (vacio) vacio.style.display = 'block';
-            return;
-        }
-        
-        if (vacio) vacio.style.display = 'none';
-        
-        tbody.innerHTML = trabajadores.map(function(t) {
-            var progreso = MultiUsuario.getProgresoByTrabajador(t.id);
-            var estadoClass = t.estado === 'activo' ? 'status-ok' : 'status-pend';
-            var estadoTexto = t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo';
-            
-            return '<tr style="border-bottom:1px solid var(--border);">' +
-                '<td style="padding:14px 18px;">' +
-                    '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
-                    '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);margin-top:4px;">' + t.curp + '</div>' +
-                '</td>' +
-                '<td style="padding:14px 18px;">' +
-                    '<div style="color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
-                    '<div style="font-size:11px;color:var(--ink4);">' + (t.area || '') + '</div>' +
-                '</td>' +
-                '<td style="padding:14px 18px;">' +
-                    '<div style="color:var(--ink);">' + progreso.total_examenes + ' exámenes</div>' +
-                    '<div style="font-size:11px;color:var(--ink4);">' + progreso.total_casos + ' casos</div>' +
-                '</td>' +
-                '<td style="padding:14px 18px;">' +
-                    '<div style="font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
-                '</td>' +
-                '<td style="padding:14px 18px;">' +
-                    '<span class="activity-status ' + estadoClass + '" style="display:inline-block;">' + estadoTexto + '</span>' +
-                '</td>' +
-                '<td style="padding:14px 18px;text-align:center;">' +
-                    '<div class="td-actions" style="justify-content:center;">' +
-                        '<button class="tbl-btn view" onclick="app.verProgresoTrabajador(\'' + t.id + '\')" title="Ver progreso">📊</button>' +
-                        '<button class="tbl-btn pdf" onclick="app.editarTrabajador(\'' + t.id + '\')" title="Editar">✏️</button>' +
-                        '<button class="tbl-btn" style="background:var(--rose-l);color:var(--rose);" onclick="app.eliminarTrabajador(\'' + t.id + '\')" title="Eliminar">🗑️</button>' +
-                    '</div>' +
-                '</td>' +
-            '</tr>';
-        }).join('');
-        
-        this.actualizarEstadisticasTrabajadores();
-    },
-    
-    actualizarEstadisticasTrabajadores: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var stats = MultiUsuario.getEstadisticas();
-        var el1 = document.getElementById('stat-trabajadores-total');
-        var el2 = document.getElementById('stat-trabajadores-activos');
-        var el3 = document.getElementById('stat-examenes-total');
-        var el4 = document.getElementById('stat-tasa-aprobacion');
-        
-        if (el1) el1.textContent = stats.trabajadores_totales;
-        if (el2) el2.textContent = stats.trabajadores_activos;
-        if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
-        if (el4) el4.textContent = stats.tasa_aprobacion + '%';
-    },
-    
-    mostrarModalTrabajador: function() {
-        document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
-        document.getElementById('trabajador-id').value = '';
-        document.getElementById('trabajador-nombre').value = '';
-        document.getElementById('trabajador-curp').value = '';
-        document.getElementById('trabajador-puesto').value = '';
-        document.getElementById('trabajador-area').value = '';
-        document.getElementById('trabajador-email').value = '';
-        document.getElementById('trabajador-telefono').value = '';
-        document.getElementById('trabajador-notas').value = '';
-        document.getElementById('modal-trabajador').classList.add('active');
-    },
-    
-    cerrarModalTrabajador: function() {
-        document.getElementById('modal-trabajador').classList.remove('active');
-    },
-    
-    guardarTrabajador: function() {
-        if (typeof MultiUsuario === 'undefined') {
-            alert('❌ Error: Sistema Multi-Usuario no cargado');
-            return;
-        }
-        
-        var id = document.getElementById('trabajador-id').value;
-        var nombre = document.getElementById('trabajador-nombre').value.trim();
-        var curp = document.getElementById('trabajador-curp').value.trim().toUpperCase();
-        var puesto = document.getElementById('trabajador-puesto').value.trim();
-        var area = document.getElementById('trabajador-area').value.trim();
-        var email = document.getElementById('trabajador-email').value.trim();
-        var telefono = document.getElementById('trabajador-telefono').value.trim();
-        var notas = document.getElementById('trabajador-notas').value.trim();
-        
-        if (!nombre || !curp || !puesto) {
-            alert('⚠️ Nombre, CURP y Puesto son obligatorios');
-            return;
-        }
-        
-        var data = { nombre, curp, puesto, area, email, telefono, notas };
-        
-        if (id) {
-            MultiUsuario.updateTrabajador(id, data);
-            alert('✅ Trabajador actualizado correctamente');
-        } else {
-            MultiUsuario.addTrabajador(data);
-            alert('✅ Trabajador registrado correctamente');
-        }
-        
-        this.cerrarModalTrabajador();
-        this.renderTrabajadores();
-    },
-    
-    editarTrabajador: function(id) {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var t = MultiUsuario.getTrabajadorById(id);
-        if (!t) return;
-        
-        document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
-        document.getElementById('trabajador-id').value = t.id;
-        document.getElementById('trabajador-nombre').value = t.nombre;
-        document.getElementById('trabajador-curp').value = t.curp;
-        document.getElementById('trabajador-puesto').value = t.puesto || '';
-        document.getElementById('trabajador-area').value = t.area || '';
-        document.getElementById('trabajador-email').value = t.email || '';
-        document.getElementById('trabajador-telefono').value = t.telefono || '';
-        document.getElementById('trabajador-notas').value = t.notas || '';
-        
-        document.getElementById('modal-trabajador').classList.add('active');
-    },
-    
-    eliminarTrabajador: function(id) {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        if (!confirm('⚠️ ¿Estás seguro de eliminar este trabajador?\n\nSe eliminarán también todos sus resultados de exámenes y casos.')) {
-            return;
-        }
-        
-        MultiUsuario.deleteTrabajador(id);
-        alert('✅ Trabajador eliminado correctamente');
-        this.renderTrabajadores();
-    },
-    
-    verProgresoTrabajador: function(id) {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var t = MultiUsuario.getTrabajadorById(id);
-        var progreso = MultiUsuario.getProgresoByTrabajador(id);
-        var resultados = MultiUsuario.getResultadosByTrabajador(id);
-        
-        if (!t) return;
-        
-        var infoEl = document.getElementById('progreso-info');
-        var historialEl = document.getElementById('progreso-historial');
-        
-        if (infoEl) {
-            infoEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">' +
-                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-                    '<div style="font-size:10px;color:var(--ink4);">Nombre</div>' +
-                    '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + t.nombre + '</div>' +
-                '</div>' +
-                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-                    '<div style="font-size:10px;color:var(--ink4);">Puesto</div>' +
-                    '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
-                '</div>' +
-                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-                    '<div style="font-size:10px;color:var(--ink4);">Exámenes</div>' +
-                    '<div style="font-size:16px;font-weight:700;color:var(--blue);">' + progreso.total_examenes + '</div>' +
-                '</div>' +
-                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-                    '<div style="font-size:10px;color:var(--ink4);">Promedio</div>' +
-                    '<div style="font-size:16px;font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
-                '</div>' +
-            '</div>';
-        }
-        
-        if (historialEl) {
-            if (resultados.length === 0) {
-                historialEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink4);">Sin resultados registrados</div>';
-            } else {
-                historialEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
-                    '<thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Fecha</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Tipo</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Actividad</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:600;color:var(--ink4);">Puntaje</th><th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);">Estado</th></tr></thead>' +
-                    '<tbody>' +
-                    resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(function(r) {
-                        var estadoClass = r.aprobado ? 'status-ok' : 'status-pend';
-                        var estadoTexto = r.aprobado ? '✅ Aprobado' : '❌ Reprobado';
-                        return '<tr style="border-bottom:1px solid var(--border);">' +
-                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + new Date(r.fecha).toLocaleDateString('es-MX') + '</td>' +
-                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + (r.tipo === 'examen' ? '📝 Examen' : '⚠️ Caso') + '</td>' +
-                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink);">' + r.actividad + '</td>' +
-                            '<td style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--ink);text-align:right;">' + r.puntaje + '%</td>' +
-                            '<td style="padding:10px 14px;text-align:center;"><span class="activity-status ' + estadoClass + '">' + estadoTexto + '</span></td>' +
-                        '</tr>';
-                    }).join('') +
-                    '</tbody></table>';
-            }
-        }
-        
-        document.getElementById('modal-progreso-trabajador').classList.add('active');
-    },
-    
-    mostrarSeleccionarTrabajador: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
-        var lista = document.getElementById('kiosco-lista');
-        
-        if (!lista) return;
-        
-        lista.innerHTML = trabajadores.map(function(t) {
-            return '<div onclick="app.seleccionarTrabajadorKiosco(\'' + t.id + '\')" style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.background=\'var(--blue-l)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--bg)\'">' +
-                '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
-                '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">' + t.curp + ' • ' + (t.puesto || 'N/A') + '</div>' +
-            '</div>';
-        }).join('');
-        
-        document.getElementById('modal-seleccionar-trabajador').classList.add('active');
-    },
-    
-    cerrarModalSeleccionarTrabajador: function() {
-        document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
-    },
-    
-    filtrarKioscoTrabajadores: function() {
-        var busqueda = document.getElementById('kiosco-buscar').value.toLowerCase();
-        var items = document.querySelectorAll('#kiosco-lista > div');
-        items.forEach(function(item) {
-            var texto = item.textContent.toLowerCase();
-            item.style.display = texto.includes(busqueda) ? 'block' : 'none';
-        });
-    },
-    
-    seleccionarTrabajadorKiosco: function(id) {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        MultiUsuario.setTrabajadorActual(id);
-        this.cerrarModalSeleccionarTrabajador();
-        
-        var t = MultiUsuario.getTrabajadorById(id);
-        alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
-        
-        this.actualizarTrabajadorActualUI();
-    },
-    
-    actualizarTrabajadorActualUI: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var t = MultiUsuario.getTrabajadorActual();
-        var topbarSub = document.getElementById('topbar-sub');
-        
-        if (t && topbarSub) {
-            topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
-            topbarSub.style.color = 'var(--green)';
-        }
-    },
-    
-    cerrarSesionTrabajador: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        MultiUsuario.clearTrabajadorActual();
-        var topbarSub = document.getElementById('topbar-sub');
-        if (topbarSub) {
-            topbarSub.textContent = 'Plataforma de certificación';
-            topbarSub.style.color = 'var(--ink4)';
-        }
-        alert('👋 Sesión de trabajador cerrada');
+// ─────────────────────────────────────────────────────────────────────
+// GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - DENTRO DE APP
+// ─────────────────────────────────────────────────────────────────────
+mostrarTrabajadores: function() {
+    this.renderTrabajadores();
+    this.mostrarPantalla('trabajadores-screen');
+},
+
+renderTrabajadores: function() {
+    if (typeof MultiUsuario === 'undefined') {
+        console.error('❌ MultiUsuario no está definido');
+        return;
     }
-    
+    var trabajadores = MultiUsuario.getTrabajadores();
+    var filtro = document.getElementById('filtro-estado') ? document.getElementById('filtro-estado').value : 'todos';
+    var busqueda = document.getElementById('buscar-trabajador') ? document.getElementById('buscar-trabajador').value.toLowerCase() : '';
+    if (filtro !== 'todos') {
+        trabajadores = trabajadores.filter(t => t.estado === filtro);
+    }
+    if (busqueda) {
+        trabajadores = trabajadores.filter(t =>
+            t.nombre.toLowerCase().includes(busqueda) ||
+            t.curp.toLowerCase().includes(busqueda) ||
+            (t.puesto && t.puesto.toLowerCase().includes(busqueda))
+        );
+    }
+    var tbody = document.getElementById('trabajadores-tabla');
+    var vacio = document.getElementById('trabajadores-vacio');
+    if (!tbody) return;
+    if (trabajadores.length === 0) {
+        tbody.innerHTML = '';
+        if (vacio) vacio.style.display = 'block';
+        return;
+    }
+    if (vacio) vacio.style.display = 'none';
+    tbody.innerHTML = trabajadores.map(function(t) {
+        var progreso = MultiUsuario.getProgresoByTrabajador(t.id);
+        var estadoClass = t.estado === 'activo' ? 'status-ok' : 'status-pend';
+        var estadoTexto = t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo';
+        return '<tr style="border-bottom:1px solid var(--border);">' +
+            '<td style="padding:14px 18px;">' +
+            '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
+            '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);margin-top:4px;">' + t.curp + '</div>' +
+            '</td>' +
+            '<td style="padding:14px 18px;">' +
+            '<div style="color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
+            '<div style="font-size:11px;color:var(--ink4);">' + (t.area || '') + '</div>' +
+            '</td>' +
+            '<td style="padding:14px 18px;">' +
+            '<div style="color:var(--ink);">' + progreso.total_examenes + ' exámenes</div>' +
+            '<div style="font-size:11px;color:var(--ink4);">' + progreso.total_casos + ' casos</div>' +
+            '</td>' +
+            '<td style="padding:14px 18px;">' +
+            '<div style="font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
+            '</td>' +
+            '<td style="padding:14px 18px;">' +
+            '<span class="activity-status ' + estadoClass + '" style="display:inline-block;">' + estadoTexto + '</span>' +
+            '</td>' +
+            '<td style="padding:14px 18px;text-align:center;">' +
+            '<div class="td-actions" style="justify-content:center;">' +
+            '<button class="tbl-btn view" onclick="app.verProgresoTrabajador(\'' + t.id + '\')" title="Ver progreso">📊</button>' +
+            '<button class="tbl-btn pdf" onclick="app.editarTrabajador(\'' + t.id + '\')" title="Editar">✏️</button>' +
+            '<button class="tbl-btn" style="background:var(--rose-l);color:var(--rose);" onclick="app.eliminarTrabajador(\'' + t.id + '\')" title="Eliminar">🗑️</button>' +
+            '</div>' +
+            '</td>' +
+            '</tr>';
+    }).join('');
+    this.actualizarEstadisticasTrabajadores();
+},
+
+actualizarEstadisticasTrabajadores: function() {
+    if (typeof MultiUsuario === 'undefined') return;
+    var stats = MultiUsuario.getEstadisticas();
+    var el1 = document.getElementById('stat-trabajadores-total');
+    var el2 = document.getElementById('stat-trabajadores-activos');
+    var el3 = document.getElementById('stat-examenes-total');
+    var el4 = document.getElementById('stat-tasa-aprobacion');
+    if (el1) el1.textContent = stats.trabajadores_totales;
+    if (el2) el2.textContent = stats.trabajadores_activos;
+    if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
+    if (el4) el4.textContent = stats.tasa_aprobacion + '%';
+},
+
+mostrarModalTrabajador: function() {
+    document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
+    document.getElementById('trabajador-id').value = '';
+    document.getElementById('trabajador-nombre').value = '';
+    document.getElementById('trabajador-curp').value = '';
+    document.getElementById('trabajador-puesto').value = '';
+    document.getElementById('trabajador-area').value = '';
+    document.getElementById('trabajador-email').value = '';
+    document.getElementById('trabajador-telefono').value = '';
+    document.getElementById('trabajador-notas').value = '';
+    document.getElementById('modal-trabajador').classList.add('active');
+},
+
+cerrarModalTrabajador: function() {
+    document.getElementById('modal-trabajador').classList.remove('active');
+},
+
+guardarTrabajador: function() {
+    if (typeof MultiUsuario === 'undefined') {
+        alert('❌ Error: Sistema Multi-Usuario no cargado');
+        return;
+    }
+    var id = document.getElementById('trabajador-id').value;
+    var nombre = document.getElementById('trabajador-nombre').value.trim();
+    var curp = document.getElementById('trabajador-curp').value.trim().toUpperCase();
+    var puesto = document.getElementById('trabajador-puesto').value.trim();
+    var area = document.getElementById('trabajador-area').value.trim();
+    var email = document.getElementById('trabajador-email').value.trim();
+    var telefono = document.getElementById('trabajador-telefono').value.trim();
+    var notas = document.getElementById('trabajador-notas').value.trim();
+    if (!nombre || !curp || !puesto) {
+        alert('⚠️ Nombre, CURP y Puesto son obligatorios');
+        return;
+    }
+    var data = { nombre, curp, puesto, area, email, telefono, notas };
+    if (id) {
+        MultiUsuario.updateTrabajador(id, data);
+        alert('✅ Trabajador actualizado correctamente');
+    } else {
+        MultiUsuario.addTrabajador(data);
+        alert('✅ Trabajador registrado correctamente');
+    }
+    this.cerrarModalTrabajador();
+    this.renderTrabajadores();
+},
+
+editarTrabajador: function(id) {
+    if (typeof MultiUsuario === 'undefined') return;
+    var t = MultiUsuario.getTrabajadorById(id);
+    if (!t) return;
+    document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
+    document.getElementById('trabajador-id').value = t.id;
+    document.getElementById('trabajador-nombre').value = t.nombre;
+    document.getElementById('trabajador-curp').value = t.curp;
+    document.getElementById('trabajador-puesto').value = t.puesto || '';
+    document.getElementById('trabajador-area').value = t.area || '';
+    document.getElementById('trabajador-email').value = t.email || '';
+    document.getElementById('trabajador-telefono').value = t.telefono || '';
+    document.getElementById('trabajador-notas').value = t.notas || '';
+    document.getElementById('modal-trabajador').classList.add('active');
+},
+
+eliminarTrabajador: function(id) {
+    if (typeof MultiUsuario === 'undefined') return;
+    if (!confirm('⚠️ ¿Estás seguro de eliminar este trabajador?\nSe eliminarán también todos sus resultados de exámenes y casos.')) {
+        return;
+    }
+    MultiUsuario.deleteTrabajador(id);
+    alert('✅ Trabajador eliminado correctamente');
+    this.renderTrabajadores();
+},
+
+verProgresoTrabajador: function(id) {
+    if (typeof MultiUsuario === 'undefined') return;
+    var t = MultiUsuario.getTrabajadorById(id);
+    var progreso = MultiUsuario.getProgresoByTrabajador(id);
+    var resultados = MultiUsuario.getResultadosByTrabajador(id);
+    if (!t) return;
+    var infoEl = document.getElementById('progreso-info');
+    var historialEl = document.getElementById('progreso-historial');
+    if (infoEl) {
+        infoEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">' +
+            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+            '<div style="font-size:10px;color:var(--ink4);">Nombre</div>' +
+            '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + t.nombre + '</div>' +
+            '</div>' +
+            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+            '<div style="font-size:10px;color:var(--ink4);">Puesto</div>' +
+            '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
+            '</div>' +
+            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+            '<div style="font-size:10px;color:var(--ink4);">Exámenes</div>' +
+            '<div style="font-size:16px;font-weight:700;color:var(--blue);">' + progreso.total_examenes + '</div>' +
+            '</div>' +
+            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+            '<div style="font-size:10px;color:var(--ink4);">Promedio</div>' +
+            '<div style="font-size:16px;font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
+            '</div>' +
+            '</div>';
+    }
+    if (historialEl) {
+        if (resultados.length === 0) {
+            historialEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink4);">Sin resultados registrados</div>';
+        } else {
+            historialEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
+                '<thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Fecha</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Tipo</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Actividad</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:600;color:var(--ink4);">Puntaje</th><th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);">Estado</th></tr></thead>' +
+                '<tbody>' +
+                resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(function(r) {
+                    var estadoClass = r.aprobado ? 'status-ok' : 'status-pend';
+                    var estadoTexto = r.aprobado ? '✅ Aprobado' : '❌ Reprobado';
+                    return '<tr style="border-bottom:1px solid var(--border);">' +
+                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + new Date(r.fecha).toLocaleDateString('es-MX') + '</td>' +
+                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + (r.tipo === 'examen' ? '📝 Examen' : '⚠️ Caso') + '</td>' +
+                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink);">' + r.actividad + '</td>' +
+                        '<td style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--ink);text-align:right;">' + r.puntaje + '%</td>' +
+                        '<td style="padding:10px 14px;text-align:center;"><span class="activity-status ' + estadoClass + '">' + estadoTexto + '</span></td>' +
+                        '</tr>';
+                }).join('') +
+                '</tbody></table>';
+        }
+    }
+    document.getElementById('modal-progreso-trabajador').classList.add('active');
+},
+
+mostrarSeleccionarTrabajador: function() {
+    if (typeof MultiUsuario === 'undefined') return;
+    var trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
+    var lista = document.getElementById('kiosco-lista');
+    if (!lista) return;
+    lista.innerHTML = trabajadores.map(function(t) {
+        return '<div onclick="app.seleccionarTrabajadorKiosco(\'' + t.id + '\')" style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.background=\'var(--blue-l)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--bg)\'">' +
+            '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
+            '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">' + t.curp + ' • ' + (t.puesto || 'N/A') + '</div>' +
+            '</div>';
+    }).join('');
+    document.getElementById('modal-seleccionar-trabajador').classList.add('active');
+},
+
+cerrarModalSeleccionarTrabajador: function() {
+    document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
+},
+
+filtrarKioscoTrabajadores: function() {
+    var busqueda = document.getElementById('kiosco-buscar').value.toLowerCase();
+    var items = document.querySelectorAll('#kiosco-lista > div');
+    items.forEach(function(item) {
+        var texto = item.textContent.toLowerCase();
+        item.style.display = texto.includes(busqueda) ? 'block' : 'none';
+    });
+},
+
+seleccionarTrabajadorKiosco: function(id) {
+    if (typeof MultiUsuario === 'undefined') return;
+    MultiUsuario.setTrabajadorActual(id);
+    this.cerrarModalSeleccionarTrabajador();
+    var t = MultiUsuario.getTrabajadorById(id);
+    alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
+    this.actualizarTrabajadorActualUI();
+},
+
+actualizarTrabajadorActualUI: function() {
+    if (typeof MultiUsuario === 'undefined') return;
+    var t = MultiUsuario.getTrabajadorActual();
+    var topbarSub = document.getElementById('topbar-sub');
+    if (t && topbarSub) {
+        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
+        topbarSub.style.color = 'var(--green)';
+    }
+},
+
+cerrarSesionTrabajador: function() {
+    if (typeof MultiUsuario === 'undefined') return;
+    MultiUsuario.clearTrabajadorActual();
+    var topbarSub = document.getElementById('topbar-sub');
+    if (topbarSub) {
+        topbarSub.textContent = 'Plataforma de certificación';
+        topbarSub.style.color = 'var(--ink4)';
+    }
+    alert('👋 Sesión de trabajador cerrada');
+},
+
+toggleTema: function() {
+    document.body.classList.toggle('tema-claro');
+    var esClaro = document.body.classList.contains('tema-claro');
+    localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
+}
+
 };  // ←══════════════════ CIERRA EL OBJETO APP AQUÍ
 
 // ═══════════════════════════════════════════════════════════════
-// SISTEMA MULTI-USUARIO - AGREGAR AQUÍ
+// OBJETO MULTI-USUARIO (FUERA DEL OBJETO APP)
 // ═══════════════════════════════════════════════════════════════
 const MultiUsuario = {
-    // Inicializar base de datos
     init: function() {
         if (!localStorage.getItem('rayoshield_empresa')) {
             localStorage.setItem('rayoshield_empresa', JSON.stringify({
@@ -2075,25 +2057,18 @@ const MultiUsuario = {
                 fecha_registro: new Date().toISOString()
             }));
         }
-        
         if (!localStorage.getItem('rayoshield_trabajadores')) {
             localStorage.setItem('rayoshield_trabajadores', JSON.stringify([]));
         }
-        
         if (!localStorage.getItem('rayoshield_resultados')) {
             localStorage.setItem('rayoshield_resultados', JSON.stringify([]));
         }
-        
         if (!localStorage.getItem('rayoshield_trabajador_actual')) {
             localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
         }
-        
         console.log('✅ Sistema Multi-Usuario inicializado');
     },
     
-    // ═══════════════════════════════════════════════════════════════
-    // EMPRESA
-    // ═══════════════════════════════════════════════════════════════
     getEmpresa: function() {
         return JSON.parse(localStorage.getItem('rayoshield_empresa'));
     },
@@ -2102,9 +2077,6 @@ const MultiUsuario = {
         localStorage.setItem('rayoshield_empresa', JSON.stringify(data));
     },
     
-    // ═══════════════════════════════════════════════════════════════
-    // TRABAJADORES
-    // ═══════════════════════════════════════════════════════════════
     getTrabajadores: function() {
         return JSON.parse(localStorage.getItem('rayoshield_trabajadores'));
     },
@@ -2134,12 +2106,9 @@ const MultiUsuario = {
         var trabajadores = this.getTrabajadores();
         trabajadores = trabajadores.filter(t => t.id !== id);
         localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
-        
-        // También eliminar sus resultados
         var resultados = this.getResultados();
         resultados = resultados.filter(r => r.trabajador_id !== id);
         localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
-        
         return true;
     },
     
@@ -2148,9 +2117,6 @@ const MultiUsuario = {
         return trabajadores.find(t => t.id === id);
     },
     
-    // ═══════════════════════════════════════════════════════════════
-    // TRABAJADOR ACTUAL (KIOSCO MODE)
-    // ═══════════════════════════════════════════════════════════════
     setTrabajadorActual: function(id) {
         localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(id));
     },
@@ -2167,9 +2133,6 @@ const MultiUsuario = {
         localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
     },
     
-    // ═══════════════════════════════════════════════════════════════
-    // RESULTADOS
-    // ═══════════════════════════════════════════════════════════════
     getResultados: function() {
         return JSON.parse(localStorage.getItem('rayoshield_resultados'));
     },
@@ -2192,10 +2155,8 @@ const MultiUsuario = {
         var resultados = this.getResultadosByTrabajador(trabajadorId);
         var examenes = resultados.filter(r => r.tipo === 'examen');
         var casos = resultados.filter(r => r.tipo === 'caso');
-        
         var aprobados = examenes.filter(r => r.aprobado).length;
         var casosCompletados = casos.filter(r => r.aprobado).length;
-        
         return {
             total_examenes: examenes.length,
             examenes_aprobados: aprobados,
@@ -2205,18 +2166,13 @@ const MultiUsuario = {
         };
     },
     
-    // ═══════════════════════════════════════════════════════════════
-    // ESTADÍSTICAS GENERALES
-    // ═══════════════════════════════════════════════════════════════
     getEstadisticas: function() {
         var trabajadores = this.getTrabajadores();
         var resultados = this.getResultados();
-        
         var activos = trabajadores.filter(t => t.estado === 'activo').length;
         var examenesTotales = resultados.filter(r => r.tipo === 'examen').length;
         var casosTotales = resultados.filter(r => r.tipo === 'caso').length;
         var aprobados = resultados.filter(r => r.aprobado).length;
-        
         return {
             trabajadores_totales: trabajadores.length,
             trabajadores_activos: activos,
@@ -2231,14 +2187,13 @@ const MultiUsuario = {
 MultiUsuario.init();
 
 // ═══════════════════════════════════════════════════════════════
-// INTEGRAR RESULTADOS CON MULTI-USUARIO
+// INTEGRAR RESULTADOS CON MULTI-USUARIO (FUERA DE APP)
 // ═══════════════════════════════════════════════════════════════
 
 // Sobrescribir mostrarResultado para guardar con trabajador
 const originalMostrarResultado = app.mostrarResultado;
 app.mostrarResultado = function() {
     originalMostrarResultado.call(this);
-    
     var t = MultiUsuario.getTrabajadorActual();
     if (t && this.resultadoActual) {
         MultiUsuario.addResultado({
@@ -2258,7 +2213,6 @@ app.mostrarResultado = function() {
 const originalMostrarResultadoCaso = app.mostrarResultadoCaso;
 app.mostrarResultadoCaso = function(resultado) {
     originalMostrarResultadoCaso.call(this, resultado);
-    
     var t = MultiUsuario.getTrabajadorActual();
     if (t && resultado) {
         MultiUsuario.addResultado({
@@ -2274,17 +2228,15 @@ app.mostrarResultadoCaso = function(resultado) {
     }
 };
 
-
 // ─────────────────────────────────────────────────────────────────────
 // INICIAR CUANDO DOM ESTÉ LISTO
 // ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function() { 
-    console.log('DOM listo'); 
-    app.init(); 
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM listo');
+    app.init();
 });
 
-window.addEventListener('beforeunload', function() { 
-    if (app.timerExamen) clearInterval(app.timerExamen); 
-    if (app.timerCaso) clearInterval(app.timerCaso); 
+window.addEventListener('beforeunload', function() {
+    if (app.timerExamen) clearInterval(app.timerExamen);
+    if (app.timerCaso) clearInterval(app.timerCaso);
 });
-
