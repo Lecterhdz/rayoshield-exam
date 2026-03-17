@@ -983,40 +983,33 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // CARGAR CASO MASTER (CORREGIDO CON VALIDACIONES)
+    // CARGAR CASO MASTER (CORREGIDO - SOLO ESPERAR CARGA)
     // ─────────────────────────────────────────────────────────────────────
     cargarCasoMaster: async function(casoId) {
         console.log('📋 Cargando caso:', casoId);
         
-        // ✅ VALIDAR QUE CASOS_INVESTIGACION EXISTA
-        if (typeof CASOS_INVESTIGACION === 'undefined') {
-            alert('❌ Error: No hay casos disponibles. Recarga la página.');
+        // ✅ VALIDAR ELEMENTOS DEL DOM PRIMERO
+        var casosList = document.getElementById('casos-list');
+        var casoDetalle = document.getElementById('caso-detalle');
+        
+        if (casosList) casosList.style.display = 'none';
+        if (casoDetalle) casoDetalle.style.display = 'block';
+        
+        // ✅ CARGAR CASO DESDE JSON (ya tienes la función)
+        var caso = await cargarCasoInvestigacion(casoId);
+        
+        if (!caso) {
+            console.error('❌ Caso no encontrado:', casoId);
+            alert('❌ Error: Caso no encontrado. Verifica el archivo JSON.');
             return;
         }
         
-        // ✅ BUSCAR EL CASO
-        var caso = CASOS_INVESTIGACION.find(function(c) { return c.id === casoId; });
-        if (!caso) {
-            console.error('❌ Caso no encontrado:', casoId);
-            alert('❌ Error: Caso no encontrado');
-            return;
-        }
+        console.log('✅ Caso cargado:', caso.titulo);
         
         this.casoActual = caso;
         this.respuestasCaso = {};
         
-        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
-        var casosList = document.getElementById('casos-list');
-        var casoDetalle = document.getElementById('caso-detalle');
-        var casoBotones = document.getElementById('caso-botones');
-        var casoResultado = document.getElementById('caso-resultado');
-        
-        if (casosList) casosList.style.display = 'none';
-        if (casoDetalle) casoDetalle.style.display = 'block';
-        if (casoBotones) casoBotones.style.display = 'flex';
-        if (casoResultado) casoResultado.style.display = 'none';
-        
-        // ✅ LLENAR FICHA DEL CASO (CON VALIDACIÓN DE CADA ELEMENTO)
+        // ✅ LLENAR FICHA DEL CASO
         var elId = document.getElementById('caso-id');
         var elFecha = document.getElementById('caso-fecha');
         var elIndustria = document.getElementById('caso-industria');
@@ -1030,83 +1023,59 @@ const app = {
         if (elId) elId.textContent = caso.id || 'N/A';
         if (elFecha) elFecha.textContent = caso.fecha_evento || 'N/A';
         if (elIndustria) elIndustria.textContent = caso.industria || 'N/A';
-        if (elTiempo) elTiempo.textContent = (caso.tiempo_estimado || '25 min') + ' min';
+        if (elTiempo) elTiempo.textContent = caso.tiempo_estimado || '15 min';
         
-        // ✅ DESCRIPCIÓN DEL EVENTO
+        // ✅ DESCRIPCIÓN (tu estructura ya es correcta)
         if (elDescripcion && caso.descripcion_evento) {
             var desc = caso.descripcion_evento;
-            elDescripcion.innerHTML = '<strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '<br>' +
-                                      '<strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '<br>' +
-                                      '<strong>Evento:</strong> ' + (desc.evento || 'N/A') + '<br>' +
-                                      '<strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '<br>' +
-                                      '<strong style="color:var(--rose);">Clasificación:</strong> ' + (desc.clasificacion || 'N/A');
+            elDescripcion.innerHTML = '<div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;">' +
+                '<strong>📋 Descripción del Evento:</strong>' +
+                '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">' +
+                '<div><strong>Actividad:</strong> ' + (desc.actividad || 'N/A') + '</div>' +
+                '<div><strong>Equipo:</strong> ' + (desc.equipo || 'N/A') + '</div>' +
+                '<div><strong>Evento:</strong> ' + (desc.evento || 'N/A') + '</div>' +
+                '<div><strong>Resultado:</strong> ' + (desc.resultado || 'N/A') + '</div>' +
+                '<div><strong style="color:var(--rose);">Clasificación:</strong> ' + (desc.clasificacion || 'N/A') + '</div>' +
+                '</div></div>';
         }
         
-        // ✅ TIMELINE
-        if (elTimeline && caso.linea_tiempo && Array.isArray(caso.linea_tiempo)) {
-            elTimeline.innerHTML = '';
-            caso.linea_tiempo.forEach(function(evento) {
-                var item = document.createElement('div');
-                item.className = 'timeline-item' + (evento.toLowerCase().includes('liberación') || evento.toLowerCase().includes('fatal') ? ' evento-critico' : '');
-                item.textContent = evento;
-                elTimeline.appendChild(item);
-            });
+        // ✅ TIMELINE (tu array ya es correcto)
+        if (elTimeline && caso.linea_tiempo) {
+            elTimeline.innerHTML = '<div class="timeline">' + caso.linea_tiempo.map(function(evento) {
+                var esCritico = evento.toLowerCase().includes('descarga') || evento.toLowerCase().includes('contacto');
+                return '<div class="timeline-item' + (esCritico ? ' evento-critico' : '') + '">' + evento + '</div>';
+            }).join('') + '</div>';
         }
         
-        // ✅ ENERGÍAS
+        // ✅ ENERGÍAS (tu objeto ya es correcto)
         if (elEnergias && caso.energias_identificadas) {
-            elEnergias.innerHTML = '';
-            var energias = caso.energias_identificadas;
-            Object.keys(energias).forEach(function(tipo) {
-                var estado = energias[tipo];
-                var clase = estado === 'Aisladas' ? 'aislada' : (estado === 'No aplican' ? 'na' : 'no-aislada');
-                var item = document.createElement('div');
-                item.className = 'energia-item ' + clase;
-                item.innerHTML = '<strong>' + tipo + '</strong><br><small>' + estado + '</small>';
-                elEnergias.appendChild(item);
-            });
+            elEnergias.innerHTML = '<div class="energia-grid">' + Object.keys(caso.energias_identificadas).map(function(tipo) {
+                var estado = caso.energias_identificadas[tipo];
+                var esPeligro = estado.includes('ENERGIZADO') || estado.includes('SIN');
+                return '<div class="energia-item ' + (esPeligro ? 'no-aislada' : 'aislada') + '">' +
+                    '<strong>' + tipo + '</strong><br><small>' + estado + '</small></div>';
+            }).join('') + '</div>';
         }
         
-        // ✅ PREGUNTAS
-        if (elPreguntas && caso.preguntas && Array.isArray(caso.preguntas)) {
+        // ✅ PREGUNTAS (tu array ya es correcto)
+        if (elPreguntas && caso.preguntas) {
+            console.log('📝 Renderizando', caso.preguntas.length, 'preguntas');
             elPreguntas.innerHTML = '';
             var self = this;
             
             caso.preguntas.forEach(function(pregunta, idx) {
                 var preguntaDiv = document.createElement('div');
                 preguntaDiv.className = 'pregunta-master';
-                preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' (' + pregunta.tipo.replace('_', ' ') + ') - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
+                preguntaDiv.innerHTML = '<h4>🔍 Pregunta ' + (idx + 1) + ' - ' + pregunta.peso + ' pts</h4><p>' + pregunta.pregunta + '</p>';
                 
-                switch(pregunta.tipo) {
-                    case 'analisis_multiple':
-                    case 'deteccion_omisiones':
-                    case 'identificacion_sesgos':
-                    case 'analisis_normativo':
-                    case 'deteccion_inconsistencias':
-                    case 'diagnostico_sistema':
-                        preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
-                        break;
-                    case 'respuesta_abierta_guiada':
-                    case 'redaccion_tecnica':
-                        preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
-                        break;
-                    case 'analisis_responsabilidad':
-                        preguntaDiv.appendChild(self.renderAnalisisResponsabilidad(pregunta));
-                        break;
-                    case 'plan_accion':
-                    case 'evaluacion_correctivas':
-                        preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
-                        break;
-                    case 'ordenamiento_dinamico':
-                    case 'matriz_priorizacion':
-                        preguntaDiv.appendChild(self.renderOrdenamientoDinamico(pregunta));
-                        break;
-                    case 'calculo_tecnico':
-                        preguntaDiv.appendChild(self.renderCalculoTecnico(pregunta));
-                        break;
-                    default:
-                        preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
+                if (pregunta.tipo === 'analisis_multiple') {
+                    preguntaDiv.appendChild(self.renderAnalisisMultiple(pregunta));
+                } else if (pregunta.tipo === 'respuesta_abierta_guiada') {
+                    preguntaDiv.appendChild(self.renderRespuestaAbierta(pregunta));
+                } else if (pregunta.tipo === 'plan_accion') {
+                    preguntaDiv.appendChild(self.renderPlanAccion(pregunta));
                 }
+                
                 elPreguntas.appendChild(preguntaDiv);
             });
         }
@@ -1117,7 +1086,7 @@ const app = {
         // ✅ INICIAR TIMER
         this.iniciarTimerCaso();
         
-        console.log('✅ Caso cargado correctamente:', casoId);
+        console.log('✅ Caso cargado correctamente');
     },
     
     // ─────────────────────────────────────────────────────────────────────
