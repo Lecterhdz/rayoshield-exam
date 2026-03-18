@@ -133,11 +133,11 @@ const app = {
         if (infoLic) {
             if (this.licencia.tipo === 'DEMO') {
                 infoLic.textContent = '📋 DEMO: ' + this.licencia.examenesRestantes + '/3 hoy';
-                infoLic.style.color = '#FF9800';
+                infoLic.className = 'licencia-info-card demo';
             } else {
                 var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : '∞';
                 infoLic.textContent = '✅ ' + this.licencia.tipo + ': ' + this.licencia.clienteId + ' (exp: ' + exp + ')';
-                infoLic.style.color = '#4CAF50';
+                infoLic.className = 'licencia-info-card activo';
             }
         }
         
@@ -153,7 +153,9 @@ const app = {
         
         var infoUser = document.getElementById('usuario-info');
         if (infoUser && this.userData.nombre) {
-            infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + (this.userData.empresa || '') + ' • ' + (this.userData.puesto || '');
+            infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + 
+                               (this.userData.empresa || '') + ' • ' + (this.userData.puesto || '');
+            infoUser.className = 'usuario-info-card';
         }
         
         var btnExamen = document.getElementById('btn-comenzar');
