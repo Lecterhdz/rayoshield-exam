@@ -1428,6 +1428,60 @@
         body.tema-claro .stat-card::after {
             opacity: 0.03;
         }
+
+        /* ═══════════════════════════════════════════════════════════════
+        USUARIO INFO CARD - CORREGIDO PARA TEMA CLARO/OSCURO
+        ═══════════════════════════════════════════════════════════════ */
+        .usuario-info-card {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+            background: var(--blue-l);
+            border: 1px solid var(--blue-m);
+            color: var(--ink);
+        }
+        
+        /* Tema oscuro (default) */
+        .usuario-info-card {
+            background: rgba(68, 138, 255, 0.15);
+            border-color: rgba(68, 138, 255, 0.4);
+            color: var(--ink);
+        }
+        
+        /* Tema claro - CORREGIDO */
+        body.tema-claro .usuario-info-card {
+            background: rgba(37, 99, 235, 0.1);
+            border-color: rgba(37, 99, 235, 0.3);
+            color: #1a1a1a;
+        }
+        
+        .usuario-info-card strong {
+            color: var(--blue);
+            font-weight: 700;
+        }
+        
+        body.tema-claro .usuario-info-card strong {
+            color: #2563eb;
+        }
+        
+        /* LICENCIA INFO CARD - TAMBIÉN CORREGIDO */
+        #licencia-info {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            margin: 15px 0;
+            background: var(--amber-l);
+            border: 1px solid var(--amber);
+            color: var(--amber);
+        }
+        
+        body.tema-claro #licencia-info {
+            background: rgba(217, 119, 6, 0.1);
+            border-color: rgba(217, 119, 6, 0.3);
+            color: #d97706;
+        }
         
     </style>
 </head>
@@ -1561,7 +1615,7 @@
                                 📋 Licencia DEMO
                             </div>
                             
-                            <div id="usuario-info" style="padding:15px;background:#E3F2FD;border-radius:10px;margin:15px 0;font-size:14px;">
+                            <div id="usuario-info" class="usuario-info-card">
                                 <!-- Se llena con JS -->
                             </div>
                             
