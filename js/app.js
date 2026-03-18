@@ -177,6 +177,51 @@ const app = {
                 btnWhiteLabel.style.display = 'none';
             }
         }
+
+        // ✅ ACTUALIZAR SIDEBAR LICENSE PILL
+        var sidebarPlan = document.getElementById('sidebar-license-plan');
+        var sidebarExpiry = document.getElementById('sidebar-license-expiry');
+        var sidebarPill = document.getElementById('sidebar-license-pill');
+        
+        if (sidebarPlan) sidebarPlan.textContent = this.licencia.tipo;
+        
+        if (sidebarExpiry) {
+            if (this.licencia.expiracion) {
+                var exp = new Date(this.licencia.expiracion);
+                var ahora = new Date();
+                var dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
+                sidebarExpiry.textContent = dias + ' días restantes';
+                
+                // Cambiar color según días restantes
+                if (dias <= 7) {
+                    sidebarExpiry.style.color = 'var(--rose)';
+                } else if (dias <= 15) {
+                    sidebarExpiry.style.color = 'var(--amber)';
+                } else {
+                    sidebarExpiry.style.color = 'var(--ink4)';
+                }
+            } else {
+                sidebarExpiry.textContent = 'Sin expiración';
+                sidebarExpiry.style.color = 'var(--green)';
+            }
+        }
+        
+        // ✅ ACTUALIZAR COLOR DEL PILL SEGÚN PLAN
+        if (sidebarPill) {
+            if (this.licencia.tipo === 'EMPRESARIAL') {
+                sidebarPill.style.background = 'linear-gradient(135deg, var(--amber-l), var(--amber))';
+                sidebarPill.style.borderColor = 'var(--amber)';
+            } else if (this.licencia.tipo === 'CONSULTOR') {
+                sidebarPill.style.background = 'linear-gradient(135deg, var(--indigo), var(--blue))';
+                sidebarPill.style.borderColor = 'var(--indigo)';
+            } else if (this.licencia.tipo === 'PROFESIONAL') {
+                sidebarPill.style.background = 'linear-gradient(135deg, var(--blue-l), var(--blue))';
+                sidebarPill.style.borderColor = 'var(--blue)';
+            } else {
+                sidebarPill.style.background = 'linear-gradient(135deg, var(--bg2), var(--border))';
+                sidebarPill.style.borderColor = 'var(--border)';
+            }
+        }        
         // Actualizar Info Screen
         var infoLicPlan = document.getElementById('info-licencia-plan');
         var infoUsuarioNombre = document.getElementById('info-usuario-nombre');
