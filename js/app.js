@@ -185,6 +185,8 @@ const app = {
         if (infoLicPlan) infoLicPlan.textContent = this.licencia.tipo;
         if (infoUsuarioNombre) infoUsuarioNombre.textContent = this.userData.nombre || '—';
         if (btnInstalarPWA && this.deferredPrompt) btnInstalarPWA.style.display = 'flex';
+        // ✅ Actualizar UI de licencia
+        this.actualizarLicenciaUI();
     },
     
     // ─────────────────────────────────────────────────────────────────────
@@ -381,6 +383,98 @@ const app = {
             }
         });
     },
+
+    // ─────────────────────────────────────────────────────────────────────
+    // ACTIVAR LICENCIA CON PLAN PREDEFINIDO
+    // ─────────────────────────────────────────────────────────────────────
+    activarLicenciaConPlan: function(plan) {
+        var datos = {
+            'PROFESIONAL': { id: 'PROFESIONAL_001', clave: 'RS-PKDF-9826-A1B2' },
+            'CONSULTOR': { id: 'CONSULTOR_001', clave: 'RS-COZS-2XT6-C3D4' },
+            'EMPRESARIAL': { id: 'EMPRESARIAL_001', clave: 'RS-EVP4-Y02I-E5F6' }
+        };
+        
+        if (!datos[plan]) {
+            alert('❌ Plan no válido');
+            return;
+        }
+        
+        document.getElementById('license-id').value = datos[plan].id;
+        document.getElementById('license-key').value = datos[plan].clave;
+        document.getElementById('activar-licencia-section').scrollIntoView({ behavior: 'smooth' });
+        
+        // Resaltar campos
+        document.getElementById('license-id').style.borderColor = 'var(--blue)';
+        document.getElementById('license-key').style.borderColor = 'var(--blue)';
+        
+        setTimeout(function() {
+            document.getElementById('license-id').style.borderColor = 'var(--border)';
+            document.getElementById('license-key').style.borderColor = 'var(--border)';
+        }, 2000);
+    },
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // ACTUALIZAR UI DE LICENCIA
+    // ─────────────────────────────────────────────────────────────────────
+    actualizarLicenciaUI: function() {
+        // Plan actual
+        var planEl = document.getElementById('licencia-screen-plan');
+        var clienteEl = document.getElementById('licencia-screen-cliente');
+        var expiryEl = document.getElementById('licencia-screen-expiry');
+        var daysEl = document.getElementById('licencia-screen-days');
+        var featuresEl = document.getElementById('licencia-features');
+        
+        if (planEl) planEl.textContent = this.licencia.tipo;
+        if (clienteEl) clienteEl.textContent = this.licencia.clienteId || 'N/A';
+        
+        if (expiryEl) {
+            if (this.licencia.expiracion) {
+                var exp = new Date(this.licencia.expiracion);
+                expiryEl.textContent = exp.toLocaleDateString('es-MX');
+                
+                // Días restantes
+                var ahora = new Date();
+                var dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
+                if (daysEl) {
+                    if (dias > 0) {
+                        daysEl.textContent = dias + ' días restantes';
+                        daysEl.style.color = dias > 7 ? 'var(--green)' : 'var(--amber)';
+                    } else {
+                        daysEl.textContent = 'Expirada';
+                        daysEl.style.color = 'var(--rose)';
+                    }
+                }
+            } else {
+                expiryEl.textContent = 'Sin expiración';
+                if (daysEl) {
+                    daysEl.textContent = 'Licencia permanente';
+                    daysEl.style.color = 'var(--green)';
+                }
+            }
+        }
+        
+        // Características
+        if (featuresEl) {
+            var features = this.licencia.features || {};
+            var html = '';
+            
+            if (features.casosBasicos) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos BÁSICOS</div>';
+            if (features.casosMaster) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos MASTER</div>';
+            if (features.casosElite) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos ELITE</div>';
+            if (features.casosPericial) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos PERICIAL</div>';
+            if (features.insignias) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Insignias PNG</div>';
+            if (features.dashboard) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Dashboard ' + features.dashboard + '</div>';
+            if (features.predictivo) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Riesgo Predictivo</div>';
+            if (features.whiteLabel) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> White Label</div>';
+            if (features.multiUsuario) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> ' + features.multiUsuario + ' Trabajadores</div>';
+            
+            if (html === '') {
+                html = '<div style="font-size:12px;color:var(--ink4);">Plan DEMO - Características básicas</div>';
+            }
+            
+            featuresEl.innerHTML = html;
+        }
+    },    
     
     // ─────────────────────────────────────────────────────────────────────
     // DATOS DE USUARIO
