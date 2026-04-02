@@ -128,6 +128,13 @@ const app = {
     },
     
     mostrarPantalla: function(id) {
+    var pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
+    
+    if (this.esTrabajador() && pantallasRestringidas.includes(id)) {
+        console.warn('🔐 Acceso bloqueado a pantalla:', id);
+        this.verificarAccesoAdmin('acceso_a_' + id, true);
+        return;
+    }
         if (this.timerExamen && id !== 'exam-screen') {
             clearInterval(this.timerExamen);
             this.timerExamen = null;
