@@ -262,7 +262,46 @@ const app = {
             this.actualizarUIPorRol();
         }
     },
+    // ─────────────────────────────────────────────────────────────────────
+    // CONTRASEÑA DE ADMINISTRADOR
+    // ─────────────────────────────────────────────────────────────────────
+    cambiarPasswordAdmin: function() {
+        var current = document.getElementById('admin-password-current').value;
+        var nueva = document.getElementById('admin-password-new').value;
+        
+        if (!nueva || nueva.length < 6) {
+            alert('⚠️ La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+        
+        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        
+        if (current && current !== passwordGuardada) {
+            alert('❌ Contraseña actual incorrecta');
+            return;
+        }
+        
+        localStorage.setItem('rayoshield_admin_password', nueva);
+        alert('✅ Contraseña de administrador actualizada correctamente');
+        
+        document.getElementById('admin-password-current').value = '';
+        document.getElementById('admin-password-new').value = '';
+    },
     
+    // Verificar contraseña de admin
+    verificarPasswordAdmin: function() {
+        var password = prompt('🔐 Contraseña de administrador:');
+        if (!password) return false;
+        
+        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        
+        if (password !== passwordGuardada) {
+            alert('❌ Contraseña incorrecta');
+            return false;
+        }
+        
+        return true;
+    },    
     // ─────────────────────────────────────────────────────────────────────
     // LICENCIAS
     // ─────────────────────────────────────────────────────────────────────
@@ -1200,6 +1239,19 @@ const app = {
         
         var filtro = document.getElementById('historial-filtro-trabajador');
         var filtroValor = filtro ? filtro.value : 'todos';
+        
+        // ✅ SI ES TRABAJADOR, SOLO PUEDE VER SU PROPIO HISTORIAL
+        if (this.esTrabajador()) {
+            var t = MultiUsuario.getTrabajadorActual();
+            if (!t) {
+                list.innerHTML = '<p style="text-align:center;color:var(--ink4);padding:40px 20px;">⚠️ Error: No hay trabajador seleccionado</p>';
+                return;
+            }
+            filtroValor = t.id; // Forzar filtro a su propio ID
+            if (filtro) filtro.style.display = 'none'; // Ocultar filtro
+        } else {
+            if (filtro) filtro.style.display = 'block';
+        } 
         
         var hist = this.obtenerHistorial();
         
