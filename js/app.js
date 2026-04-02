@@ -111,6 +111,7 @@ const app = {
         this.actualizarUI();
         this.mostrarPantalla('home-screen');
         this.verificarExpiracionLicencia();
+        this.actualizarBadgeTrabajadores();
     },
     
     mostrarPantalla: function(id) {
@@ -2114,6 +2115,7 @@ renderTrabajadores: function() {
             '</tr>';
     }).join('');
     this.actualizarEstadisticasTrabajadores();
+    this.actualizarBadgeTrabajadores();
 },
 
 actualizarEstadisticasTrabajadores: function() {
@@ -2199,6 +2201,7 @@ eliminarTrabajador: function(id) {
     MultiUsuario.deleteTrabajador(id);
     alert('✅ Trabajador eliminado correctamente');
     this.renderTrabajadores();
+    this.actualizarBadgeTrabajadores();
 },
 
 verProgresoTrabajador: function(id) {
@@ -2282,25 +2285,6 @@ filtrarKioscoTrabajadores: function() {
 
 seleccionarTrabajadorKiosco: function(id) {
     if (typeof MultiUsuario === 'undefined') return;
-    MultiUsuario.setTrabajadorActual(id);
-    this.cerrarModalSeleccionarTrabajador();
-    var t = MultiUsuario.getTrabajadorById(id);
-    alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
-    this.actualizarTrabajadorActualUI();
-},
-
-actualizarTrabajadorActualUI: function() {
-    if (typeof MultiUsuario === 'undefined') return;
-    var t = MultiUsuario.getTrabajadorActual();
-    var topbarSub = document.getElementById('topbar-sub');
-    if (t && topbarSub) {
-        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
-        topbarSub.style.color = 'var(--green)';
-    }
-},
-
-seleccionarTrabajadorKiosco: function(id) {
-    if (typeof MultiUsuario === 'undefined') return;
     
     var t = MultiUsuario.getTrabajadorById(id);
     if (!t) return;
@@ -2321,6 +2305,41 @@ seleccionarTrabajadorKiosco: function(id) {
     
     alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
 },    
+// ─────────────────────────────────────────────────────────────────────
+// ACTUALIZAR BADGE DE TRABAJADORES
+// ─────────────────────────────────────────────────────────────────────
+actualizarBadgeTrabajadores: function() {
+    var badge = document.getElementById('nav-badge-trabajadores');
+    if (!badge) return;
+    
+    if (typeof MultiUsuario === 'undefined') {
+        badge.textContent = '0';
+        return;
+    }
+    
+    var trabajadores = MultiUsuario.getTrabajadores();
+    var count = trabajadores ? trabajadores.length : 0;
+    
+    badge.textContent = count;
+    
+    // Mostrar/ocultar badge según cantidad
+    if (count > 0) {
+        badge.style.display = 'inline-block';
+        badge.style.background = count > 10 ? 'var(--rose)' : 'var(--blue)';
+    } else {
+        badge.style.display = 'none';
+    }
+},
+actualizarTrabajadorActualUI: function() {
+    if (typeof MultiUsuario === 'undefined') return;
+    var t = MultiUsuario.getTrabajadorActual();
+    var topbarSub = document.getElementById('topbar-sub');
+    if (t && topbarSub) {
+        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
+        topbarSub.style.color = 'var(--green)';
+    }
+},
+
 // ─────────────────────────────────────────────────────────────────────
 // VOLVER A MODO ADMIN
 // ─────────────────────────────────────────────────────────────────────
