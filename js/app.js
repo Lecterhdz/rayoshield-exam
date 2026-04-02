@@ -2475,7 +2475,155 @@ toggleTema: function() {
             var c = document.getElementById('pwa-install-container');
             if (c) c.style.display = 'none';
         });
-    }
+    },
+    // ─────────────────────────────────────────────────────────────────────
+    // EXPORTAR DATOS (RESPALDO)
+    // ─────────────────────────────────────────────────────────────────────
+    exportarDatos: function() {
+        try {
+            // Recolectar todos los datos de localStorage
+            var respaldo = {
+                version: '2.4.1',
+                fecha: new Date().toISOString(),
+                licencia: localStorage.getItem('rayoshield_licencia'),
+                usuario: localStorage.getItem('rayoshield_usuario'),
+                empresa: localStorage.getItem('rayoshield_empresa'),
+                trabajadores: localStorage.getItem('rayoshield_trabajadores'),
+                resultados: localStorage.getItem('rayoshield_resultados'),
+                historial: localStorage.getItem('rayoshield_historial'),
+                progreso: localStorage.getItem('rayoshield_progreso'),
+                whiteLabel: localStorage.getItem('rayoshield_wl_config'),
+                tema: localStorage.getItem('rayoshield_tema')
+            };
+            
+            // Validar que haya datos para exportar
+            var tieneDatos = Object.values(respaldo).some(v => v && v !== 'null' && v !== 'undefined');
+            if (!tieneDatos) {
+                alert('⚠️ No hay datos para exportar. Configura primero tu cuenta.');
+                return;
+            }
+            
+            // Convertir a JSON y descargar
+            var json = JSON.stringify(respaldo, null, 2);
+            var blob = new Blob([json], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'RayoShield_Respaldo_' + new Date().toISOString().slice(0,10) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('✅ Respaldo exportado:', respaldo);
+            alert('✅ Respaldo exportado correctamente\n📁 Archivo: RayoShield_Respaldo_YYYY-MM-DD.json\n\nGuarda este archivo en un lugar seguro.');
+            
+        } catch(e) {
+            console.error('❌ Error exportando:', e);
+            alert('❌ Error al exportar: ' + e.message);
+        }
+    },
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // IMPORTAR DATOS (RESTAURAR)
+    // ─────────────────────────────────────────────────────────────────────
+    importarDatos: function(input) {
+        var file = input.files[0];
+        if (!file) return;
+        
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var respaldo = JSON.parse(e.target.result);
+                
+                // Validar estructura del respaldo
+                if (!respaldo.version || !respaldo.licencia) {
+                    throw new Error('Archivo de respaldo inválido');
+                }
+                
+                // Confirmar antes de sobrescribir
+                var confirmar = confirm(
+                    '⚠️ ¿Restaurar datos desde respaldo?\n\n' +
+                    'Esto reemplazará:\n' +
+                    '• Configuración de licencia\n' +
+                    '• Datos de usuario y trabajadores\n' +
+                    '• Historial de exámenes\n' +
+                    '• Configuraciones personalizadas\n\n' +
+                    '¿Deseas continuar?'
+                );
+                
+                if (!confirmar) {
+                    input.value = ''; // Reset input
+                    return;
+                }
+                
+                // Restaurar cada elemento si existe en el respaldo
+                if (respaldo.licencia) localStorage.setItem('rayoshield_licencia', respaldo.licencia);
+                if (respaldo.usuario) localStorage.setItem('rayoshield_usuario', respaldo.usuario);
+                if (respaldo.empresa) localStorage.setItem('rayoshield_empresa', respaldo.empresa);
+                if (respaldo.trabajadores) localStorage.setItem('rayoshield_trabajadores', respaldo.trabajadores);
+                if (respaldo.resultados) localStorage.setItem('rayoshield_resultados', respaldo.resultados);
+                if (respaldo.historial) localStorage.setItem('rayoshield_historial', respaldo.historial);
+                if (respaldo.progreso) localStorage.setItem('rayoshield_progreso', respaldo.progreso);
+                if (respaldo.whiteLabel) localStorage.setItem('rayoshield_wl_config', respaldo.whiteLabel);
+                if (respaldo.tema) localStorage.setItem('rayoshield_tema', respaldo.tema);
+                
+                console.log('✅ Datos importados:', respaldo);
+                alert('✅ Datos restaurados correctamente\n\nLa página se recargará para aplicar los cambios.');
+                
+                // Recargar para aplicar cambios
+                location.reload();
+                
+            } catch(err) {
+                console.error('❌ Error importando:', err);
+                alert('❌ Error al importar: ' + err.message + '\n\nVerifica que el archivo sea un respaldo válido de RayoShield Exam.');
+            } finally {
+                input.value = ''; // Reset input siempre
+            }
+        };
+        
+        reader.readAsText(file);
+    },
+    
+    // ─────────────────────────────────────────────────────────────────────
+    // LIMPIAR DATOS (CON CONFIRMACIÓN)
+    // ─────────────────────────────────────────────────────────────────────
+    limpiarDatosConfirmar: function() {
+        var confirmar = confirm(
+            '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
+            'Esto eliminará PERMANENTEMENTE:\n' +
+            '• Configuración de licencia\n' +
+            '• Datos de usuario y trabajadores\n' +
+            '• Historial de exámenes y resultados\n' +
+            '• Configuraciones personalizadas\n\n' +
+            '⚠️ Esta acción NO se puede deshacer.\n\n' +
+            '¿Deseas continuar?'
+        );
+        
+        if (!confirmar) return;
+        
+        // Segunda confirmación por seguridad
+        var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
+        if (confirmar2 !== 'BORRAR') {
+            alert('Operación cancelada');
+            return;
+        }
+        
+        // Limpiar localStorage
+        localStorage.removeItem('rayoshield_licencia');
+        localStorage.removeItem('rayoshield_usuario');
+        localStorage.removeItem('rayoshield_empresa');
+        localStorage.removeItem('rayoshield_trabajadores');
+        localStorage.removeItem('rayoshield_resultados');
+        localStorage.removeItem('rayoshield_historial');
+        localStorage.removeItem('rayoshield_progreso');
+        localStorage.removeItem('rayoshield_wl_config');
+        localStorage.removeItem('rayoshield_tema');
+        
+        console.log('🗑️ Datos limpiados');
+        alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
+        location.reload();
+    },   
 };
 
 
