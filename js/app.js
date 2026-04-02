@@ -1128,20 +1128,84 @@ const app = {
         this.mostrarPantalla('user-data-screen');
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // MOSTRAR HISTORIAL (ACTUALIZADO)
+    // ─────────────────────────────────────────────────────────────────────
     mostrarHistorial: function() {
-        var list = document.getElementById('history-list'); if (!list) return;
-        var hist = this.obtenerHistorial();
+        this.renderHistorial();
+        this.llenarFiltroTrabajadoresHistorial();
+        this.mostrarPantalla('history-screen');
+    },
+    
+    // ✅ NUEVA FUNCIÓN - Llenar filtro de trabajadores
+    llenarFiltroTrabajadoresHistorial: function() {
+        var select = document.getElementById('historial-filtro-trabajador');
+        if (!select) return;
         
-        if (hist.length === 0) { list.innerHTML = '<p style="text-align:center;color:#666">Sin exámenes</p>'; }
-        else {
-            list.innerHTML = '';
-            hist.slice(-10).reverse().forEach(function(item) {
-                var d = document.createElement('div'); d.className = 'history-item';
-                d.innerHTML = '<div><strong>' + item.examen + '</strong><br><small>' + new Date(item.fecha).toLocaleDateString('es-MX') + '</small></div><span class="score ' + getColorEstado(item.estado) + '">' + item.score + '%</span>';
-                list.appendChild(d);
+        // Guardar selección actual
+        var seleccionActual = select.value;
+        
+        // Limpiar opciones (mantener primeras 2)
+        select.innerHTML = '<option value="todos">Todos los usuarios</option><option value="admin">Solo Admin</option>';
+        
+        // Agregar trabajadores
+        if (typeof MultiUsuario !== 'undefined') {
+            var trabajadores = MultiUsuario.getTrabajadores();
+            trabajadores.forEach(function(t) {
+                var option = document.createElement('option');
+                option.value = t.id;
+                option.textContent = '👷 ' + t.nombre;
+                select.appendChild(option);
             });
         }
-        this.mostrarPantalla('history-screen');
+        
+        // Restaurar selección
+        select.value = seleccionActual;
+    },
+    
+    // ✅ NUEVA FUNCIÓN - Renderizar historial con filtro
+    renderHistorial: function() {
+        var list = document.getElementById('history-list');
+        if (!list) return;
+        
+        var filtro = document.getElementById('historial-filtro-trabajador');
+        var filtroValor = filtro ? filtro.value : 'todos';
+        
+        var hist = this.obtenerHistorial();
+        
+        // Aplicar filtro
+        if (filtroValor === 'admin') {
+            hist = hist.filter(h => h.tipoUsuario === 'admin');
+        } else if (filtroValor !== 'todos') {
+            hist = hist.filter(h => h.trabajadorId === filtroValor);
+        }
+        
+        if (hist.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:var(--ink4);padding:40px 20px;">📭 Sin exámenes registrados</p>';
+            return;
+        }
+        
+        list.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
+            '<thead><tr style="background:var(--bg);">' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Fecha</th>' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Usuario</th>' +
+            '<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Examen</th>' +
+            '<th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:600;color:var(--ink4);">Puntaje</th>' +
+            '<th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);">Estado</th>' +
+            '</tr></thead>' +
+            '<tbody>' +
+            hist.slice(-20).reverse().map(function(item) {
+                var estadoClass = item.estado === 'Aprobado' ? 'status-ok' : 'status-pend';
+                var estadoIcono = item.estado === 'Aprobado' ? '✅' : '❌';
+                return '<tr style="border-bottom:1px solid var(--border);">' +
+                    '<td style="padding:12px 16px;font-size:12px;color:var(--ink3);">' + new Date(item.fecha).toLocaleDateString('es-MX') + '</td>' +
+                    '<td style="padding:12px 16px;font-size:12px;color:var(--ink);font-weight:600;">' + (item.usuario || 'N/A') + '</td>' +
+                    '<td style="padding:12px 16px;font-size:12px;color:var(--ink2);">' + item.examen + '</td>' +
+                    '<td style="padding:12px 16px;font-size:12px;font-weight:700;color:var(--ink);text-align:right;">' + item.score + '%</td>' +
+                    '<td style="padding:12px 16px;text-align:center;"><span class="activity-status ' + estadoClass + '">' + estadoIcono + ' ' + item.estado + '</span></td>' +
+                    '</tr>';
+            }).join('') +
+            '</tbody></table>';
     },
     
     mostrarLicencia: function() {
