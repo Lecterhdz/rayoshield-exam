@@ -2298,7 +2298,82 @@ actualizarTrabajadorActualUI: function() {
         topbarSub.style.color = 'var(--green)';
     }
 },
+// ─────────────────────────────────────────────────────────────────────
+// VOLVER A MODO ADMIN
+// ─────────────────────────────────────────────────────────────────────
+volverAModoAdmin: function() {
+    // Limpiar trabajador actual
+    MultiUsuario.clearTrabajadorActual();
+    
+    // Actualizar UI
+    this.actualizarTrabajadorActualUI();
+    
+    // Actualizar indicador del sidebar
+    this.actualizarSidebarModoIndicador();
+    
+    // Mensaje de confirmación
+    alert('✅ Modo Admin activado\n\nLos próximos exámenes se guardarán a nombre del administrador:\n' + this.userData.nombre);
+    
+    // Cerrar modal si está abierto
+    this.cerrarModalSeleccionarTrabajador();
+},
 
+// ─────────────────────────────────────────────────────────────────────
+// ACTUALIZAR INDICADOR DEL SIDEBAR
+// ─────────────────────────────────────────────────────────────────────
+actualizarSidebarModoIndicador: function() {
+    var indicador = document.getElementById('sidebar-modo-indicador');
+    var nombre = document.getElementById('sidebar-modo-nombre');
+    var btnVolverAdmin = document.getElementById('btn-volver-admin');
+    
+    if (!indicador || !nombre) return;
+    
+    var t = MultiUsuario.getTrabajadorActual();
+    
+    if (t) {
+        // MODO TRABAJADOR ACTIVO
+        if (indicador) indicador.style.display = 'block';
+        if (nombre) nombre.textContent = '👷 ' + t.nombre;
+        if (btnVolverAdmin) btnVolverAdmin.style.display = 'block';
+    } else {
+        // MODO ADMIN
+        if (indicador) indicador.style.display = 'none';
+        if (nombre) nombre.textContent = '👤 Admin';
+        if (btnVolverAdmin) btnVolverAdmin.style.display = 'none';
+    }
+},
+
+// ─────────────────────────────────────────────────────────────────────
+// ACTUALIZAR UI (ACTUALIZADA)
+// ─────────────────────────────────────────────────────────────────────
+actualizarUI: function() {
+    // ... código existente de actualizarUI ...
+    
+    // ✅ Actualizar indicador de modo
+    this.actualizarSidebarModoIndicador();
+},
+
+// ─────────────────────────────────────────────────────────────────────
+// ACTUALIZAR TRABAJADOR ACTUAL UI (ACTUALIZADA)
+// ─────────────────────────────────────────────────────────────────────
+actualizarTrabajadorActualUI: function() {
+    var t = MultiUsuario.getTrabajadorActual();
+    var topbarSub = document.getElementById('topbar-sub');
+    var btnVolverAdmin = document.getElementById('btn-volver-admin');
+    
+    if (t && topbarSub) {
+        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
+        topbarSub.style.color = 'var(--amber)';
+        if (btnVolverAdmin) btnVolverAdmin.style.display = 'block';
+    } else {
+        topbarSub.textContent = 'Plataforma de certificación';
+        topbarSub.style.color = 'var(--ink4)';
+        if (btnVolverAdmin) btnVolverAdmin.style.display = 'none';
+    }
+    
+    // Actualizar sidebar
+    this.actualizarSidebarModoIndicador();
+},
 cerrarSesionTrabajador: function() {
     if (typeof MultiUsuario === 'undefined') return;
     MultiUsuario.clearTrabajadorActual();
