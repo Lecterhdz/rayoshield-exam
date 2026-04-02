@@ -2298,6 +2298,29 @@ actualizarTrabajadorActualUI: function() {
         topbarSub.style.color = 'var(--green)';
     }
 },
+
+seleccionarTrabajadorKiosco: function(id) {
+    if (typeof MultiUsuario === 'undefined') return;
+    
+    var t = MultiUsuario.getTrabajadorById(id);
+    if (!t) return;
+    
+    // ✅ MENSAJE DE CONFIRMACIÓN
+    var confirmar = confirm('👷 Cambiar a modo trabajador\n\n' +
+        'Trabajador: ' + t.nombre + '\n' +
+        'Puesto: ' + (t.puesto || 'N/A') + '\n\n' +
+        '⚠️ Los próximos exámenes se guardarán a nombre de este trabajador.\n\n' +
+        '¿Continuar?');
+    
+    if (!confirmar) return;
+    
+    MultiUsuario.setTrabajadorActual(id);
+    this.cerrarModalSeleccionarTrabajador();
+    this.actualizarTrabajadorActualUI();
+    this.actualizarSidebarModoIndicador();
+    
+    alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
+},    
 // ─────────────────────────────────────────────────────────────────────
 // VOLVER A MODO ADMIN
 // ─────────────────────────────────────────────────────────────────────
