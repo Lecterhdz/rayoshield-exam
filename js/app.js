@@ -2623,7 +2623,75 @@ toggleTema: function() {
         console.log('🗑️ Datos limpiados');
         alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
         location.reload();
-    },   
+    },
+    // ─────────────────────────────────────────────────────────────────────
+    // ENCRIPTACIÓN INTERMEDIA (XOR + Base64 + Salt)
+    // ─────────────────────────────────────────────────────────────────────
+    
+    // Clave base para encriptación (puedes cambiarla)
+    _encryptKey: 'RayoShield_v2.4.1_2026',
+    
+    // Generar salt basado en fecha + clave
+    _generateSalt: function() {
+        var date = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+        return btoa(this._encryptKey + date).slice(0, 16);
+    },
+    
+    // Encriptar texto con XOR + Base64
+    _encrypt: function(text) {
+        try {
+            var salt = this._generateSalt();
+            var result = '';
+            
+            // XOR character by character
+            for (var i = 0; i < text.length; i++) {
+                var charCode = text.charCodeAt(i) ^ salt.charCodeAt(i % salt.length);
+                result += String.fromCharCode(charCode);
+            }
+            
+            // Base64 encode + add salt header
+            var encrypted = btoa(unescape(encodeURIComponent(result)));
+            return 'RS:' + salt + ':' + encrypted;
+            
+        } catch(e) {
+            console.error('Error encriptando:', e);
+            return null;
+        }
+    },
+    
+    // Desencriptar texto con XOR + Base64
+    _decrypt: function(encryptedText) {
+        try {
+            // Validar formato
+            if (!encryptedText || !encryptedText.startsWith('RS:')) {
+                throw new Error('Formato inválido');
+            }
+            
+            var parts = encryptedText.split(':');
+            if (parts.length !== 3) {
+                throw new Error('Estructura inválida');
+            }
+            
+            var salt = parts[1];
+            var data = parts[2];
+            
+            // Base64 decode
+            var decoded = decodeURIComponent(escape(atob(data)));
+            
+            // XOR decrypt
+            var result = '';
+            for (var i = 0; i < decoded.length; i++) {
+                var charCode = decoded.charCodeAt(i) ^ salt.charCodeAt(i % salt.length);
+                result += String.fromCharCode(charCode);
+            }
+            
+            return result;
+            
+        } catch(e) {
+            console.error('Error desencriptando:', e);
+            return null;
+        }
+    },    
 };
 
 
