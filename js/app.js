@@ -2480,6 +2480,11 @@ toggleTema: function() {
     // EXPORTAR DATOS CON ENCRIPTACIÓN
     // ─────────────────────────────────────────────────────────────────────
     exportarDatos: function() {
+        // ✅ BLOQUEAR PARA DEMO
+        if (this.licencia.tipo === 'DEMO') {
+            alert('⚠️ La función de respaldo no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
+            return;
+        }
         try {
             // Recolectar datos
             var respaldo = {
@@ -2503,7 +2508,7 @@ toggleTema: function() {
                 return;
             }
             
-            // ✅ ENCRYPTAR EL JSON
+            // ✅ ENCRIPTAR EL JSON
             var json = JSON.stringify(respaldo);
             var encrypted = this._encrypt(json);
             
@@ -2523,7 +2528,7 @@ toggleTema: function() {
             URL.revokeObjectURL(url);
             
             console.log('✅ Respaldo encriptado exportado');
-            alert('✅ Respaldo ENCRYPTADO exportado correctamente\n📁 Archivo: RayoShield_Respaldo_ENC_YYYY-MM-DD.rsb\n\n🔐 Este archivo está protegido. Guárdalo en un lugar seguro.');
+            alert('✅ Respaldo ENCRIPTADO exportado correctamente\n📁 Archivo: RayoShield_Respaldo_ENC_YYYY-MM-DD.rsb\n\n🔐 Este archivo está protegido. Guárdalo en un lugar seguro.');
             
         } catch(e) {
             console.error('❌ Error exportando:', e);
@@ -2532,9 +2537,16 @@ toggleTema: function() {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // IMPORTAR DATOS CON DESENCRIPTACIÓN
+    // IMPORTAR DATOS CON DESENCRIPTACIÓN (BLOQUEADO PARA DEMO)
     // ─────────────────────────────────────────────────────────────────────
     importarDatos: function(input) {
+        // ✅ BLOQUEAR PARA DEMO
+        if (this.licencia.tipo === 'DEMO') {
+            alert('⚠️ La función de respaldo no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
+            input.value = '';
+            return;
+        }
+        
         var file = input.files[0];
         if (!file) return;
         
@@ -2726,7 +2738,45 @@ toggleTema: function() {
 };
 
 
-
+// ─────────────────────────────────────────────────────────────────────
+// LIMPIAR DATOS (CON CONFIRMACIÓN)
+// ─────────────────────────────────────────────────────────────────────
+limpiarDatosConfirmar: function() {
+    var confirmar = confirm(
+        '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
+        'Esto eliminará PERMANENTEMENTE:\n' +
+        '• Configuración de licencia\n' +
+        '• Datos de usuario y trabajadores\n' +
+        '• Historial de exámenes y resultados\n' +
+        '• Configuraciones personalizadas\n\n' +
+        '⚠️ Esta acción NO se puede deshacer.\n\n' +
+        '¿Deseas continuar?'
+    );
+    
+    if (!confirmar) return;
+    
+    // Segunda confirmación por seguridad
+    var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
+    if (confirmar2 !== 'BORRAR') {
+        alert('Operación cancelada');
+        return;
+    }
+    
+    // Limpiar localStorage
+    localStorage.removeItem('rayoshield_licencia');
+    localStorage.removeItem('rayoshield_usuario');
+    localStorage.removeItem('rayoshield_empresa');
+    localStorage.removeItem('rayoshield_trabajadores');
+    localStorage.removeItem('rayoshield_resultados');
+    localStorage.removeItem('rayoshield_historial');
+    localStorage.removeItem('rayoshield_progreso');
+    localStorage.removeItem('rayoshield_wl_config');
+    localStorage.removeItem('rayoshield_tema');
+    
+    console.log('🗑️ Datos limpiados');
+    alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
+    location.reload();
+},
 
 // ═══════════════════════════════════════════════════════════════
 // OBJETO MULTI-USUARIO (FUERA DEL OBJETO APP)
