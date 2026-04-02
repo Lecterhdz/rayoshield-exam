@@ -2477,11 +2477,11 @@ toggleTema: function() {
         });
     },
     // ─────────────────────────────────────────────────────────────────────
-    // EXPORTAR DATOS (RESPALDO)
+    // EXPORTAR DATOS CON ENCRIPTACIÓN
     // ─────────────────────────────────────────────────────────────────────
     exportarDatos: function() {
         try {
-            // Recolectar todos los datos de localStorage
+            // Recolectar datos
             var respaldo = {
                 version: '2.4.1',
                 fecha: new Date().toISOString(),
@@ -2496,27 +2496,34 @@ toggleTema: function() {
                 tema: localStorage.getItem('rayoshield_tema')
             };
             
-            // Validar que haya datos para exportar
+            // Validar que haya datos
             var tieneDatos = Object.values(respaldo).some(v => v && v !== 'null' && v !== 'undefined');
             if (!tieneDatos) {
                 alert('⚠️ No hay datos para exportar. Configura primero tu cuenta.');
                 return;
             }
             
-            // Convertir a JSON y descargar
-            var json = JSON.stringify(respaldo, null, 2);
-            var blob = new Blob([json], { type: 'application/json' });
+            // ✅ ENCRYPTAR EL JSON
+            var json = JSON.stringify(respaldo);
+            var encrypted = this._encrypt(json);
+            
+            if (!encrypted) {
+                throw new Error('Error al encriptar');
+            }
+            
+            // Descargar archivo encriptado
+            var blob = new Blob([encrypted], { type: 'application/octet-stream' });
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = 'RayoShield_Respaldo_' + new Date().toISOString().slice(0,10) + '.json';
+            a.download = 'RayoShield_Respaldo_ENC_' + new Date().toISOString().slice(0,10) + '.rsb';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            console.log('✅ Respaldo exportado:', respaldo);
-            alert('✅ Respaldo exportado correctamente\n📁 Archivo: RayoShield_Respaldo_YYYY-MM-DD.json\n\nGuarda este archivo en un lugar seguro.');
+            console.log('✅ Respaldo encriptado exportado');
+            alert('✅ Respaldo ENCRYPTADO exportado correctamente\n📁 Archivo: RayoShield_Respaldo_ENC_YYYY-MM-DD.rsb\n\n🔐 Este archivo está protegido. Guárdalo en un lugar seguro.');
             
         } catch(e) {
             console.error('❌ Error exportando:', e);
@@ -2525,39 +2532,58 @@ toggleTema: function() {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // IMPORTAR DATOS (RESTAURAR)
+    // IMPORTAR DATOS CON DESENCRIPTACIÓN
     // ─────────────────────────────────────────────────────────────────────
     importarDatos: function(input) {
         var file = input.files[0];
         if (!file) return;
         
+        // Validar extensión
+        if (!file.name.endsWith('.rsb')) {
+            alert('❌ Archivo inválido. Solo se aceptan archivos .rsb de RayoShield.');
+            input.value = '';
+            return;
+        }
+        
         var reader = new FileReader();
+        var self = this;
+        
         reader.onload = function(e) {
             try {
-                var respaldo = JSON.parse(e.target.result);
+                var encryptedText = e.target.result;
                 
-                // Validar estructura del respaldo
+                // ✅ DESENCRIPTAR
+                var decrypted = self._decrypt(encryptedText);
+                if (!decrypted) {
+                    throw new Error('No se pudo desencriptar el archivo. Verifica que sea un respaldo válido de RayoShield Exam.');
+                }
+                
+                var respaldo = JSON.parse(decrypted);
+                
+                // Validar estructura
                 if (!respaldo.version || !respaldo.licencia) {
-                    throw new Error('Archivo de respaldo inválido');
+                    throw new Error('Estructura de respaldo inválida');
                 }
                 
                 // Confirmar antes de sobrescribir
                 var confirmar = confirm(
-                    '⚠️ ¿Restaurar datos desde respaldo?\n\n' +
+                    '⚠️ ¿Restaurar datos desde respaldo encriptado?\n\n' +
                     'Esto reemplazará:\n' +
                     '• Configuración de licencia\n' +
                     '• Datos de usuario y trabajadores\n' +
                     '• Historial de exámenes\n' +
                     '• Configuraciones personalizadas\n\n' +
+                    'Versión del respaldo: ' + (respaldo.version || 'Desconocida') + '\n' +
+                    'Fecha: ' + (respaldo.fecha ? new Date(respaldo.fecha).toLocaleDateString('es-MX') : 'Desconocida') + '\n\n' +
                     '¿Deseas continuar?'
                 );
                 
                 if (!confirmar) {
-                    input.value = ''; // Reset input
+                    input.value = '';
                     return;
                 }
                 
-                // Restaurar cada elemento si existe en el respaldo
+                // Restaurar datos
                 if (respaldo.licencia) localStorage.setItem('rayoshield_licencia', respaldo.licencia);
                 if (respaldo.usuario) localStorage.setItem('rayoshield_usuario', respaldo.usuario);
                 if (respaldo.empresa) localStorage.setItem('rayoshield_empresa', respaldo.empresa);
@@ -2568,8 +2594,8 @@ toggleTema: function() {
                 if (respaldo.whiteLabel) localStorage.setItem('rayoshield_wl_config', respaldo.whiteLabel);
                 if (respaldo.tema) localStorage.setItem('rayoshield_tema', respaldo.tema);
                 
-                console.log('✅ Datos importados:', respaldo);
-                alert('✅ Datos restaurados correctamente\n\nLa página se recargará para aplicar los cambios.');
+                console.log('✅ Datos importados y desencriptados');
+                alert('✅ Datos restaurados correctamente desde respaldo encriptado\n\nLa página se recargará para aplicar los cambios.');
                 
                 // Recargar para aplicar cambios
                 location.reload();
@@ -2578,8 +2604,13 @@ toggleTema: function() {
                 console.error('❌ Error importando:', err);
                 alert('❌ Error al importar: ' + err.message + '\n\nVerifica que el archivo sea un respaldo válido de RayoShield Exam.');
             } finally {
-                input.value = ''; // Reset input siempre
+                input.value = '';
             }
+        };
+        
+        reader.onerror = function() {
+            alert('❌ Error al leer el archivo');
+            input.value = '';
         };
         
         reader.readAsText(file);
