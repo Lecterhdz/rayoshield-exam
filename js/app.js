@@ -2837,9 +2837,13 @@ toggleTema: function() {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // LIMPIAR DATOS (CON CONFIRMACIÓN)
+    // LIMPIAR DATOS (CON CONFIRMACIÓN) - PERMITIDO PARA DEMO
     // ─────────────────────────────────────────────────────────────────────
     limpiarDatosConfirmar: function() {
+        // ✅ PERMITIR PARA DEMO (deben poder borrar sus propios datos)
+        // Pero mostrar advertencia si es DEMO
+        var esDemo = this.licencia.tipo === 'DEMO';
+        
         var confirmar = confirm(
             '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
             'Esto eliminará PERMANENTEMENTE:\n' +
@@ -2847,6 +2851,7 @@ toggleTema: function() {
             '• Datos de usuario y trabajadores\n' +
             '• Historial de exámenes y resultados\n' +
             '• Configuraciones personalizadas\n\n' +
+            (esDemo ? '⚠️ Estás en plan DEMO - Perderás tu progreso actual.\n\n' : '') +
             '⚠️ Esta acción NO se puede deshacer.\n\n' +
             '¿Deseas continuar?'
         );
