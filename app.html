@@ -2718,7 +2718,41 @@
             </button>
         </div>
     </nav>
-
+    <!-- ══════════════ FIREBASE CONFIG ══════════════ -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
+    <script>
+    // ═══════════════════════════════════════════════════════════════
+    // CONFIGURACIÓN DE FIREBASE - REEMPLAZA CON TUS DATOS
+    // ═══════════════════════════════════════════════════════════════
+    const firebaseConfig = {
+        const firebaseConfig = {
+          apiKey: "AIzaSyCxNlnX3G6kPQxKaSb3I6iJ-qGXQVH-ADs",
+          authDomain: "techqual-calc.firebaseapp.com",
+          projectId: "techqual-calc",
+          storageBucket: "techqual-calc.firebasestorage.app",
+          messagingSenderId: "354534030487",
+          appId: "1:354534030487:web:e9ff3a03e8db2132cd7dd2"
+        };
+    
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    
+    // Habilitar persistencia offline (opcional)
+    db.enablePersistence().catch(function(err) {
+        if (err.code == 'failed-precondition') {
+            console.log('⚠️ Persistencia no disponible (múltiples pestañas abiertas)');
+        } else if (err.code == 'unimplemented') {
+            console.log('⚠️ Navegador no soporta persistencia');
+        }
+    });
+    
+    console.log('✅ Firebase inicializado correctamente');
+    </script>
     <!-- Scripts -->
     <script src="js/exams.js"></script>
     <script src="js/scoring.js"></script>
