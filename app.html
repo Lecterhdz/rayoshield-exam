@@ -1591,6 +1591,12 @@
                     </div>
                 </div>
                 <div class="topbar-right">
+                    <!-- ✅ BOTÓN VOLVER A ADMIN (SOLO SE MUESTRA CON TRABAJADOR SELECCIONADO) -->
+                    <button id="btn-volver-admin" onclick="app.volverAModoAdmin()" 
+                        style="display:none;padding:7px 14px;background:var(--amber-l);border:1px solid var(--amber);border-radius:var(--radius-sm);font-size:12px;font-weight:600;color:var(--amber);cursor:pointer;font-family:var(--font);min-height:44px;">
+                        👤 Volver a Admin
+                    </button>
+                    
                     <button class="topbar-btn primary" onclick="app.toggleTema()" title="Cambiar tema" style="min-width:44px;padding:8px;">🌓</button>
                     <button class="topbar-btn ghost" onclick="app.mostrarLicencia()">◈ Licencia</button>
                 </div>
