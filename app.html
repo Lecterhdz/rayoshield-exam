@@ -2060,6 +2060,47 @@
                             </div>
                             <button onclick="app.activarLicencia()" style="padding:12px 24px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);box-shadow:0 2px 8px rgba(37,99,235,.3);">🔓 Activar Licencia</button>
                         </div>
+
+                        <!-- ══════════════ RESPALDO DE DATOS ══════════════ -->
+                        <div style="margin-top:28px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);">
+                            <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:15px;display:flex;align-items:center;gap:8px;">
+                                💾 Respaldo de Datos
+                            </div>
+                            <p style="font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.5;">
+                                Exporta tus datos para crear un respaldo o migrar a otro dispositivo. 
+                                Incluye: licencia, usuarios, trabajadores, historial y configuraciones.
+                            </p>
+                            
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+                                <!-- Botón Exportar -->
+                                <button onclick="app.exportarDatos()" 
+                                    style="padding:12px 16px;background:linear-gradient(135deg,var(--green),#00c853);color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;">
+                                    📤 Exportar
+                                </button>
+                                
+                                <!-- Botón Importar -->
+                                <button onclick="document.getElementById('input-importar').click()" 
+                                    style="padding:12px 16px;background:linear-gradient(135deg,var(--blue),var(--indigo));color:white;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;">
+                                    📥 Importar
+                                </button>
+                                
+                                <!-- Input oculto para importar -->
+                                <input type="file" id="input-importar" accept=".json" style="display:none;" onchange="app.importarDatos(this)">
+                                
+                                <!-- Botón Limpiar (con confirmación) -->
+                                <button onclick="app.limpiarDatosConfirmar()" 
+                                    style="padding:12px 16px;background:var(--rose-l);border:1px solid var(--rose);color:var(--rose);border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;">
+                                    🗑️ Limpiar Todo
+                                </button>
+                            </div>
+                            
+                            <!-- Mensaje de ayuda -->
+                            <div style="margin-top:15px;padding:12px 14px;background:var(--blue-l);border-radius:var(--radius-sm);font-size:11px;color:var(--blue);">
+                                <strong>💡 Tip:</strong> Exporta antes de actualizar el navegador o cambiar de dispositivo. 
+                                El archivo de respaldo es encriptado y solo funciona con RayoShield Exam.
+                            </div>
+                        </div> 
+                        
                         <div style="font-size:12px;color:var(--ink4);margin-top:12px;">
                             ¿Compraste una licencia? Ingresa tu ID y clave para activarla. Contacto: <strong style="color:var(--blue);">hdzlecter@gmail.com</strong>
                         </div>
