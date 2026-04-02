@@ -127,9 +127,12 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // ACTUALIZAR UI
+    // ACTUALIZAR UI (CORREGIDO Y OPTIMIZADO)
     // ─────────────────────────────────────────────────────────────────────
     actualizarUI: function() {
+        // ═══════════════════════════════════════════════════════════════
+        // LICENCIA INFO (HOME SCREEN)
+        // ═══════════════════════════════════════════════════════════════
         var infoLic = document.getElementById('licencia-info');
         if (infoLic) {
             if (this.licencia.tipo === 'DEMO') {
@@ -142,16 +145,26 @@ const app = {
             }
         }
         
+        // ═══════════════════════════════════════════════════════════════
+        // LICENCIA INFO DETAIL (LICENSE SCREEN) - CORREGIR SALTOS DE LÍNEA
+        // ═══════════════════════════════════════════════════════════════
         var infoLicDetail = document.getElementById('licencia-info-detail');
         if (infoLicDetail) {
             if (this.licencia.tipo === 'DEMO') {
                 infoLicDetail.textContent = '📋 Licencia DEMO - ' + this.licencia.examenesRestantes + ' exámenes hoy';
             } else {
                 var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
-                infoLicDetail.textContent = '✅ ' + this.licencia.tipo + '\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
+                // ✅ OPCIÓN A: Usar innerHTML con <br> para saltos de línea
+                infoLicDetail.innerHTML = '✅ ' + this.licencia.tipo + '<br>Cliente: ' + this.licencia.clienteId + '<br>Válido hasta: ' + exp;
+                // ✅ OPCIÓN B: Usar textContent + CSS (descomentar si prefieres esta opción)
+                // infoLicDetail.textContent = '✅ ' + this.licencia.tipo + '\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
+                // infoLicDetail.style.whiteSpace = 'pre-line';
             }
         }
         
+        // ═══════════════════════════════════════════════════════════════
+        // INFO DE USUARIO
+        // ═══════════════════════════════════════════════════════════════
         var infoUser = document.getElementById('usuario-info');
         if (infoUser && this.userData.nombre) {
             infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + 
@@ -159,6 +172,9 @@ const app = {
             infoUser.className = 'usuario-info-card';
         }
         
+        // ═══════════════════════════════════════════════════════════════
+        // BOTONES CONDICIONALES
+        // ═══════════════════════════════════════════════════════════════
         var btnExamen = document.getElementById('btn-comenzar');
         if (btnExamen) {
             var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -168,20 +184,19 @@ const app = {
         
         var btnCasosMaster = document.getElementById('btn-casos-master');
         if (btnCasosMaster) {
-            // ✅ TODOS los planes tienen acceso a casos (al menos 1 básico)
             btnCasosMaster.style.display = 'inline-block';
         }
         
         var btnWhiteLabel = document.getElementById('btn-white-label');
         if (btnWhiteLabel) {
-            if (this.licencia.features && this.licencia.features.whiteLabel) {
-                btnWhiteLabel.style.display = 'inline-block';
-            } else {
-                btnWhiteLabel.style.display = 'none';
-            }
+            // ✅ VALIDACIÓN SEGURA DE FEATURES
+            var tieneWhiteLabel = this.licencia.features && this.licencia.features.whiteLabel;
+            btnWhiteLabel.style.display = tieneWhiteLabel ? 'inline-block' : 'none';
         }
 
-        // ✅ ACTUALIZAR SIDEBAR LICENSE PILL
+        // ═══════════════════════════════════════════════════════════════
+        // SIDEBAR LICENSE PILL
+        // ═══════════════════════════════════════════════════════════════
         var sidebarPlan = document.getElementById('sidebar-license-plan');
         var sidebarExpiry = document.getElementById('sidebar-license-expiry');
         var sidebarPill = document.getElementById('sidebar-license-pill');
@@ -195,7 +210,6 @@ const app = {
                 var dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
                 sidebarExpiry.textContent = dias + ' días restantes';
                 
-                // Cambiar color según días restantes
                 if (dias <= 7) {
                     sidebarExpiry.style.color = 'var(--rose)';
                 } else if (dias <= 15) {
@@ -209,7 +223,6 @@ const app = {
             }
         }
         
-        // ✅ ACTUALIZAR COLOR DEL PILL SEGÚN PLAN
         if (sidebarPill) {
             if (this.licencia.tipo === 'EMPRESARIAL') {
                 sidebarPill.style.background = 'linear-gradient(135deg, var(--amber-l), var(--amber))';
@@ -225,7 +238,9 @@ const app = {
                 sidebarPill.style.borderColor = 'var(--border)';
             }
         }        
-        // Actualizar Info Screen
+        // ═══════════════════════════════════════════════════════════════
+        // INFO SCREEN
+        // ═══════════════════════════════════════════════════════════════
         var infoLicPlan = document.getElementById('info-licencia-plan');
         var infoUsuarioNombre = document.getElementById('info-usuario-nombre');
         var btnInstalarPWA = document.getElementById('btn-instalar-pwa');
@@ -233,8 +248,14 @@ const app = {
         if (infoLicPlan) infoLicPlan.textContent = this.licencia.tipo;
         if (infoUsuarioNombre) infoUsuarioNombre.textContent = this.userData.nombre || '—';
         if (btnInstalarPWA && this.deferredPrompt) btnInstalarPWA.style.display = 'flex';
-        // ✅ Actualizar UI de licencia
+        
+        // ✅ ACTUALIZAR UI DE LICENCIA (PANTALLA LICENSE-SCREEN)
         this.actualizarLicenciaUI();
+        
+        // ✅ ACTUALIZAR BADGE DE TRABAJADORES
+        if (typeof this.actualizarBadgeTrabajadores === 'function') {
+            this.actualizarBadgeTrabajadores();
+        }
     },
     
     // ─────────────────────────────────────────────────────────────────────
