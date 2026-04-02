@@ -1900,15 +1900,27 @@
                     </div>
                 </section>
 
-                <!-- HISTORY SCREEN -->
+                <!-- ══════════════ HISTORY SCREEN ══════════════ -->
                 <section id="history-screen" class="screen">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+                        <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
+                        <span style="font-size:14px;font-weight:700;color:var(--ink);">📋 Historial de Exámenes</span>
+                        
+                        <!-- Filtro de trabajador -->
+                        <select id="historial-filtro-trabajador" onchange="app.renderHistorial()" style="padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;color:var(--ink);font-family:var(--font);">
+                            <option value="todos">Todos los usuarios</option>
+                            <option value="admin">Solo Admin</option>
+                            <!-- Se llena dinámicamente con trabajadores -->
+                        </select>
+                    </div>
+                    
                     <div class="card">
                         <div class="card-header">
                             <div>
                                 <div class="card-title">📋 Historial de Exámenes</div>
                                 <div class="card-sub">Exámenes completados</div>
                             </div>
-                            <button class="btn btn-secondary" onclick="app.volverHome()">← Volver</button>
+                            <button class="btn btn-secondary" onclick="app.exportarHistorialPDF()">📄 Exportar PDF</button>
                         </div>
                         <div class="card-body">
                             <div id="history-list" class="history-list"></div>
