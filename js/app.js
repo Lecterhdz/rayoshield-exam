@@ -51,6 +51,15 @@ const app = {
     // ─────────────────────────────────────────────────────────────────────
     init: function() {
         console.log('RayoShield iniciado');
+        // ✅ INICIALIZAR CONTRASEÑA DE ADMIN SI NO EXISTE
+        if (!localStorage.getItem('rayoshield_admin_password')) {
+            localStorage.setItem('rayoshield_admin_password', 'admin123');
+            console.log('🔐 Contraseña de admin inicializada (cambiar en configuración)');
+        }
+        
+        // ✅ INICIALIZAR MODO
+        this.modoActual = 'admin';
+        
         this.cargarLicencia();
 
         // ✅ Inicializar Multi-Usuario
@@ -115,6 +124,7 @@ const app = {
         this.mostrarPantalla('home-screen');
         this.verificarExpiracionLicencia();
         this.actualizarBadgeTrabajadores();
+        this.actualizarUIMenuPorRol();
     },
     
     mostrarPantalla: function(id) {
@@ -261,6 +271,7 @@ const app = {
             this.actualizarSidebarModoIndicador();
             this.actualizarUIPorRol();
         }
+        this.actualizarUIMenuPorRol();
     },
     // ─────────────────────────────────────────────────────────────────────
     // CONTRASEÑA DE ADMINISTRADOR
@@ -2375,10 +2386,14 @@ seleccionarTrabajadorKiosco: function(id) {
     
     if (!confirmar) return;
     
+    // ✅ CAMBIAR MODO A TRABAJADOR
+    this.modoActual = 'trabajador';    
     MultiUsuario.setTrabajadorActual(id);
+    
     this.cerrarModalSeleccionarTrabajador();
     this.actualizarTrabajadorActualUI();
     this.actualizarSidebarModoIndicador();
+    this.actualizarUIMenuPorRol();
     
     alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
 },    
@@ -2532,10 +2547,11 @@ toggleTema: function() {
             if (c) c.style.display = 'none';
         });
     },
+
     // ─────────────────────────────────────────────────────────────────────
-    // CONTROL DE ACCESO POR ROL
+    // SISTEMA DE ROLES Y SEGURIDAD
     // ─────────────────────────────────────────────────────────────────────
-    
+
     // Verificar si es administrador
     esAdmin: function() {
         return this.modoActual === 'admin' || !MultiUsuario.getTrabajadorActual();
@@ -2546,106 +2562,60 @@ toggleTema: function() {
         return this.modoActual === 'trabajador' && MultiUsuario.getTrabajadorActual() !== null;
     },
     
-    // Actualizar UI según rol
-    actualizarUIPorRol: function() {
-        var esTrabajador = this.esTrabajador();
-        
-        // Ocultar/mostrar elementos según rol
-        var elementosAdmin = [
-            'nav-badge-trabajadores',
-            'btn-volver-admin',
-            'sidebar-license-pill'
-        ];
-        
-        var elementosTrabajador = [
-            // Elementos que SOLO ve el trabajador
-        ];
-        
-        // Ocultar secciones completas para trabajadores
-        var seccionesRestringidas = [
-            'trabajadores-screen',
-            'license-screen'
-        ];
-        
-        // Navegación del sidebar
-        var navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(function(item) {
-            var texto = item.textContent.toLowerCase();
-            
-            // Ocultar "Trabajadores" y "Licencia" para trabajadores
-            if (esTrabajador) {
-                if (texto.includes('trabajadores') || texto.includes('licencia') || texto.includes('empresa')) {
-                    item.style.display = 'none';
-                }
-            } else {
-                item.style.display = 'flex';
+    // Verificar acceso a función administrativa
+    verificarAccesoAdmin: function(funcionNombre, mostrarAlerta = true) {
+        if (this.esTrabajador()) {
+            if (mostrarAlerta) {
+                alert('⚠️ Esta función solo está disponible para administradores.\n\nContacta a tu supervisor.');
             }
-        });
+            console.warn('🔐 Acceso denegado:', funcionNombre, '- Solo para administradores');
+            return false;
+        }
+        return true;
+    },
+    
+    // Verificar contraseña de admin
+    verificarPasswordAdmin: function() {
+        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        var password = prompt('🔐 Contraseña de administrador:');
         
-        // Bottom nav (móvil)
-        var bnItems = document.querySelectorAll('.bn-item');
-        bnItems.forEach(function(item) {
-            var texto = item.textContent.toLowerCase();
-            if (esTrabajador) {
-                if (texto.includes('licencia')) {
-                    item.style.display = 'none';
-                }
-            } else {
-                item.style.display = 'flex';
-            }
-        });
+        if (!password) return false;
+        if (password !== passwordGuardada) {
+            alert('❌ Contraseña incorrecta');
+            console.warn('🔐 Intento fallido de acceso admin');
+            return false;
+        }
+        return true;
+    },
+    
+    // Cambiar contraseña de admin
+    cambiarPasswordAdmin: function() {
+        if (!this.verificarAccesoAdmin('cambiarPasswordAdmin')) return;
         
-        // Botón de volver a admin
-        var btnAdmin = document.getElementById('btn-volver-admin');
-        if (btnAdmin) {
-            btnAdmin.style.display = esTrabajador ? 'block' : 'none';
+        var passwordActual = prompt('🔐 Contraseña actual:');
+        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        
+        if (passwordActual !== passwordGuardada) {
+            alert('❌ Contraseña actual incorrecta');
+            return;
         }
         
-        console.log('🔐 Modo actual:', this.modoActual, '| ¿Es admin?:', this.esAdmin());
+        var passwordNueva = prompt('🔐 Nueva contraseña (mínimo 6 caracteres):');
+        if (!passwordNueva || passwordNueva.length < 6) {
+            alert('⚠️ La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+        
+        localStorage.setItem('rayoshield_admin_password', passwordNueva);
+        alert('✅ Contraseña de administrador actualizada correctamente');
     },
     
-    // Seleccionar trabajador con validaciones
-    seleccionarTrabajadorKiosco: function(id) {
-        if (typeof MultiUsuario === 'undefined') return;
-        
-        var t = MultiUsuario.getTrabajadorById(id);
-        if (!t) return;
-        
-        // ✅ MENSAJE DE CONFIRMACIÓN CON ADVERTENCIA
-        var confirmar = confirm(
-            '👷 Cambiar a modo trabajador\n\n' +
-            'Trabajador: ' + t.nombre + '\n' +
-            'Puesto: ' + (t.puesto || 'N/A') + '\n\n' +
-            '⚠️ MODO RESTRINGIDO:\n' +
-            '• Solo podrás ver TU progreso\n' +
-            '• No podrás acceder a Licencia\n' +
-            '• No podrás ver otros trabajadores\n' +
-            '• No podrás exportar datos\n\n' +
-            '¿Continuar?'
-        );
-        
-        if (!confirmar) return;
-        
-        // ✅ CAMBIAR MODO A TRABAJADOR
-        this.modoActual = 'trabajador';
-        MultiUsuario.setTrabajadorActual(id);
-        
-        this.cerrarModalSeleccionarTrabajador();
-        this.actualizarTrabajadorActualUI();
-        this.actualizarSidebarModoIndicador();
-        this.actualizarUIPorRol(); // ✅ OCULTAR ELEMENTOS RESTRINGIDOS
-        
-        alert('✅ Modo trabajador activado\n\n' + t.nombre + '\n\nSolo tienes acceso a:\n• Exámenes\n• Casos\n• TU historial personal');
-    },
-    
-    // Volver a modo admin con validación
+    // Volver a modo admin CON CONTRASEÑA
     volverAModoAdmin: function() {
-        // ✅ PEDIR CONTRASEÑA PARA VOLVER A ADMIN (OPCIONAL)
-        // var password = prompt('🔐 Contraseña de administrador:');
-        // if (password !== 'admin123') {
-        //     alert('❌ Contraseña incorrecta');
-        //     return;
-        // }
+        // ✅ REQUERIR CONTRASEÑA PARA VOLVER A ADMIN
+        if (!this.verificarPasswordAdmin()) {
+            return;
+        }
         
         // Limpiar trabajador actual
         this.modoActual = 'admin';
@@ -2654,37 +2624,83 @@ toggleTema: function() {
         // Actualizar UI
         this.actualizarTrabajadorActualUI();
         this.actualizarSidebarModoIndicador();
-        this.actualizarUIPorRol(); // ✅ MOSTRAR ELEMENTOS DE ADMIN
+        this.actualizarUIMenuPorRol();
         
         alert('✅ Modo administrador activado\n\nAcceso completo restaurado');
     },
     
-    // Bloquear funciones sensibles para trabajadores
-    verificarAccesoAdmin: function(funcionNombre) {
-        if (this.esTrabajador()) {
-            console.warn('🔐 Acceso denegado:', funcionNombre, '- Solo para administradores');
-            alert('⚠️ Esta función solo está disponible para administradores.\n\nContacta a tu supervisor.');
-            return false;
+    // Actualizar menú según rol (OCULTAR elementos para trabajadores)
+    actualizarUIMenuPorRol: function() {
+        var esTrabajador = this.esTrabajador();
+        
+        // Elementos del sidebar que deben ocultarse para trabajadores
+        var elementosRestringidos = [
+            { selector: '#nav-badge-trabajadores', accion: 'display' },
+            { selector: '.nav-item[onclick*="mostrarTrabajadores"]', accion: 'display' },
+            { selector: '.nav-item[onclick*="mostrarLicencia"]', accion: 'display' },
+            { selector: '.nav-item[onclick*="mostrarInfo"]', accion: 'display' }
+        ];
+        
+        // Bottom nav (móvil)
+        var bnItems = [
+            { selector: '#bn-licencia', accion: 'display' }
+        ];
+        
+        // Botón de volver a admin
+        var btnAdmin = document.getElementById('btn-volver-admin');
+        
+        if (esTrabajador) {
+            // OCULTAR elementos restringidos
+            elementosRestringidos.forEach(function(item) {
+                var el = document.querySelector(item.selector);
+                if (el) el.style.display = 'none';
+            });
+            
+            bnItems.forEach(function(item) {
+                var el = document.querySelector(item.selector);
+                if (el) el.style.display = 'none';
+            });
+            
+            // MOSTRAR botón de volver a admin
+            if (btnAdmin) btnAdmin.style.display = 'block';
+            
+            console.log('🔐 Modo trabajador: Menú restringido activado');
+        } else {
+            // MOSTRAR todos los elementos
+            elementosRestringidos.forEach(function(item) {
+                var el = document.querySelector(item.selector);
+                if (el) el.style.display = '';
+            });
+            
+            bnItems.forEach(function(item) {
+                var el = document.querySelector(item.selector);
+                if (el) el.style.display = '';
+            });
+            
+            // OCULTAR botón de volver a admin
+            if (btnAdmin) btnAdmin.style.display = 'none';
+            
+            console.log('🔓 Modo admin: Menú completo activado');
         }
-        return true;
     },
     
-    // Sobrescribir mostrarLicencia con validación
+    // Sobrescribir funciones sensibles con validación
     mostrarLicencia: function() {
         if (!this.verificarAccesoAdmin('mostrarLicencia')) return;
         this.mostrarPantalla('license-screen');
     },
     
-    // Sobrescribir mostrarTrabajadores con validación
     mostrarTrabajadores: function() {
         if (!this.verificarAccesoAdmin('mostrarTrabajadores')) return;
         this.renderTrabajadores();
         this.mostrarPantalla('trabajadores-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // EXPORTAR DATOS CON ENCRIPTACIÓN
-    // ─────────────────────────────────────────────────────────────────────
+    mostrarInfo: function() {
+        if (!this.verificarAccesoAdmin('mostrarInfo')) return;
+        this.mostrarPantalla('info-screen');
+    },
+    
     exportarDatos: function() {
         if (!this.verificarAccesoAdmin('exportarDatos')) return;
         
@@ -2840,6 +2856,7 @@ toggleTema: function() {
     // LIMPIAR DATOS (CON CONFIRMACIÓN) - PERMITIDO PARA DEMO
     // ─────────────────────────────────────────────────────────────────────
     limpiarDatosConfirmar: function() {
+        if (!this.verificarAccesoAdmin('limpiarDatosConfirmar')) return;
         // ✅ PERMITIR PARA DEMO (deben poder borrar sus propios datos)
         // Pero mostrar advertencia si es DEMO
         var esDemo = this.licencia.tipo === 'DEMO';
