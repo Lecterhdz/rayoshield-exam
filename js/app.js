@@ -255,6 +255,7 @@ const app = {
         // ✅ ACTUALIZAR BADGE DE TRABAJADORES
         if (typeof this.actualizarBadgeTrabajadores === 'function') {
             this.actualizarBadgeTrabajadores();
+            this.actualizarSidebarModoIndicador();
         }
     },
     
@@ -486,8 +487,11 @@ const app = {
     // ACTUALIZAR UI DE LICENCIA
     // ─────────────────────────────────────────────────────────────────────
     actualizarLicenciaUI: function() {
-        // Plan actual
+        // ✅ VALIDAR QUE ESTAMOS EN LA PANTALLA CORRECTA
         var planEl = document.getElementById('licencia-screen-plan');
+        if (!planEl) return; // Si no existe, no estamos en license-screen
+       
+        // Plan actual
         var clienteEl = document.getElementById('licencia-screen-cliente');
         var expiryEl = document.getElementById('licencia-screen-expiry');
         var daysEl = document.getElementById('licencia-screen-days');
@@ -2062,10 +2066,6 @@ const app = {
         return hist.filter(h => h.tipoUsuario === 'admin');
     },
     
-    obtenerHistorial: function() {
-        try { var h = localStorage.getItem('rayoshield_historial'); return h ? JSON.parse(h) : []; } catch(e) { return []; }
-    },
-    
     cargarHistorial: function() { console.log('Historial:', this.obtenerHistorial().length, 'exámenes'); },
 
 // ─────────────────────────────────────────────────────────────────────
@@ -2406,15 +2406,6 @@ actualizarSidebarModoIndicador: function() {
     }
 },
 
-// ─────────────────────────────────────────────────────────────────────
-// ACTUALIZAR UI (ACTUALIZADA)
-// ─────────────────────────────────────────────────────────────────────
-actualizarUI: function() {
-    // ... código existente de actualizarUI ...
-    
-    // ✅ Actualizar indicador de modo
-    this.actualizarSidebarModoIndicador();
-},
 
 // ─────────────────────────────────────────────────────────────────────
 // ACTUALIZAR TRABAJADOR ACTUAL UI (ACTUALIZADA)
