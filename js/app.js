@@ -884,10 +884,20 @@ const app = {
         this.consumirExamen();
     },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // DESCARGAR CERTIFICADO DE EXAMEN (CORREGIDO PARA MULTI-USUARIO)
+    // ─────────────────────────────────────────────────────────────────────
     descargarCertificado: function() {
-        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { alert('Solo para aprobados'); return; }
+        if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { 
+            alert('Solo para aprobados'); 
+            return; 
+        }
         
         var self = this;
+        
+        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
+        var t = MultiUsuario.getTrabajadorActual();
+        var usuarioParaCertificado = t ? t : this.userData;
         
         if (typeof generarCertificado !== 'function') {
             alert('❌ Error: Función de certificado no cargada. Recarga la página (Ctrl+F5).');
@@ -895,9 +905,9 @@ const app = {
             return;
         }
         
-        generarCertificado(this.userData, this.examenActual, this.resultadoActual).then(function(url) {
+        generarCertificado(usuarioParaCertificado, this.examenActual, this.resultadoActual).then(function(url) {
             var a = document.createElement('a');
-            a.download = 'RayoShield_CERTIFICADO_EXAMEN_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = 'RayoShield_CERTIFICADO_EXAMEN_' + usuarioParaCertificado.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.href = url;
             document.body.appendChild(a);
             a.click();
@@ -909,7 +919,7 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR CERTIFICADO DE CASO (CON/SIN MARCA DE AGUA)
+    // DESCARGAR CERTIFICADO DE CASO (CORREGIDO PARA MULTI-USUARIO)
     // ─────────────────────────────────────────────────────────────────────
     descargarCertificadoCaso: function(conMarcaDeAgua) {
         if (!this.casoActual || !this.resultadoCaso) {
@@ -923,6 +933,10 @@ const app = {
         
         var self = this;
         
+        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
+        var t = MultiUsuario.getTrabajadorActual();
+        var usuarioParaCertificado = t ? t : this.userData;
+        
         // ✅ DETERMINAR NIVEL DEL CERTIFICADO
         var nivelCertificado = '';
         if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
@@ -931,16 +945,15 @@ const app = {
         else if (this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
         else nivelCertificado = 'COMPLETADO';
         
-        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
         if (typeof generarCertificadoCaso !== 'function') {
             alert('❌ Error: Función de certificado no cargada. Recarga la página.');
             console.error('generarCertificadoCaso no está definida');
             return;
         }
         
-        generarCertificadoCaso(this.userData, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
+        generarCertificadoCaso(usuarioParaCertificado, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
             var a = document.createElement('a');
-            a.download = 'RayoShield_CERTIFICADO_' + nivelCertificado + '_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = 'RayoShield_CERTIFICADO_' + nivelCertificado + '_' + usuarioParaCertificado.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.href = url;
             document.body.appendChild(a);
             a.click();
@@ -1000,7 +1013,7 @@ const app = {
         });
     },
     // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR INSIGNIA
+    // DESCARGAR INSIGNIA (CORREGIDO PARA MULTI-USUARIO)
     // ─────────────────────────────────────────────────────────────────────
     descargarInsignia: function() {
         if (!this.casoActual || !this.resultadoCaso) {
@@ -1014,16 +1027,19 @@ const app = {
         
         var self = this;
         
-        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
+        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
+        var t = MultiUsuario.getTrabajadorActual();
+        var usuarioParaCertificado = t ? t : this.userData;
+        
         if (typeof generarInsigniaPNG !== 'function') {
             alert('❌ Error: Función de insignia no cargada. Recarga la página.');
             console.error('generarInsigniaPNG no está definida');
             return;
         }
-    
-        generarInsigniaPNG(this.userData, this.casoActual, this.resultadoCaso).then(function(url) {
+        
+        generarInsigniaPNG(usuarioParaCertificado, this.casoActual, this.resultadoCaso).then(function(url) {
             var a = document.createElement('a');
-            a.download = 'RayoShield_INSIGNIA_' + self.userData.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.download = 'RayoShield_INSIGNIA_' + usuarioParaCertificado.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
             a.href = url;
             document.body.appendChild(a);
             a.click();
@@ -1047,7 +1063,16 @@ const app = {
         this.respuestaTemporal = null;
         this.mostrarPantalla('home-screen');
     },
-
+    // ✅ AGREGAR ESTA FUNCIÓN
+    cerrarSesion: function() {
+        if (confirm('¿Cerrar sesión? Se borrarán los datos locales.')) {
+            localStorage.removeItem('rayoshield_licencia');
+            localStorage.removeItem('rayoshield_usuario');
+            localStorage.removeItem('rayoshield_historial');
+            localStorage.removeItem('rayoshield_progreso');
+            location.reload();
+        }
+    },
     // ✅ AGREGAR ESTA FUNCIÓN
     mostrarPerfil: function() {
         this.actualizarPerfil();
@@ -1911,19 +1936,44 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // HISTORIAL
+    // HISTORIAL (ACTUALIZADO PARA MULTI-USUARIO)
     // ─────────────────────────────────────────────────────────────────────
     guardarEnHistorial: function() {
         var hist = this.obtenerHistorial();
+        
+        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
+        var t = MultiUsuario.getTrabajadorActual();
+        var usuarioParaHistorial = t ? t.nombre : this.userData.nombre;
+        var tipoUsuario = t ? 'trabajador' : 'admin';
+        
         hist.push({
             examen: this.examenActual ? this.examenActual.titulo : 'Desconocido',
             norma: this.examenActual ? this.examenActual.norma : '',
             score: this.resultadoActual ? this.resultadoActual.score : 0,
             estado: this.resultadoActual ? this.resultadoActual.estado : '',
             fecha: this.resultadoActual ? this.resultadoActual.fecha : new Date().toISOString(),
-            usuario: this.userData.nombre
+            usuario: usuarioParaHistorial,
+            tipoUsuario: tipoUsuario,
+            trabajadorId: t ? t.id : null
         });
         localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
+    },
+    
+    obtenerHistorial: function() {
+        try { var h = localStorage.getItem('rayoshield_historial'); return h ? JSON.parse(h) : []; } catch(e) { return []; }
+    },
+    
+    // ✅ NUEVA FUNCIÓN - Historial filtrado por trabajador
+    obtenerHistorialPorTrabajador: function(trabajadorId) {
+        var hist = this.obtenerHistorial();
+        if (!trabajadorId) return hist;
+        return hist.filter(h => h.trabajadorId === trabajadorId);
+    },
+    
+    // ✅ NUEVA FUNCIÓN - Historial solo del admin
+    obtenerHistorialAdmin: function() {
+        var hist = this.obtenerHistorial();
+        return hist.filter(h => h.tipoUsuario === 'admin');
     },
     
     obtenerHistorial: function() {
