@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL v4.3 - COMPLETA)
+// RAYOSHIELD EXAM - app.js (VERSIÓN FINAL v4.4 - CORREGIDA)
 // Guardar con codificación UTF-8
 // ─────────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ const app = {
     // Licencia
     licencia: { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} },
 
-    // SISTEMA MULTI-USUARIO - AGREGAR AQUÍ
+    // SISTEMA MULTI-USUARIO
     trabajadorActual: null,   
     
     // Timer Examen
@@ -51,23 +51,19 @@ const app = {
     // ─────────────────────────────────────────────────────────────────────
     init: function() {
         console.log('RayoShield iniciado');
-        // ✅ INICIALIZAR CONTRASEÑA DE ADMIN SI NO EXISTE
+        
         if (!localStorage.getItem('rayoshield_admin_password')) {
             localStorage.setItem('rayoshield_admin_password', 'admin123');
-            console.log('🔐 Contraseña de admin inicializada (cambiar en configuración)');
+            console.log('🔐 Contraseña de admin inicializada');
         }
         
-        // ✅ INICIALIZAR MODO
         this.modoActual = 'admin';
-        
         this.cargarLicencia();
-
-        // ✅ Inicializar Multi-Usuario
+        
         if (typeof MultiUsuario !== 'undefined') {
             MultiUsuario.init();
         }
         
-        // ✅ Inicializar features si están vacías o no existen
         if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
             if (this.licencia.tipo === 'DEMO') {
                 this.licencia.features = {
@@ -128,13 +124,13 @@ const app = {
     },
     
     mostrarPantalla: function(id) {
-    var pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
-    
-    if (this.esTrabajador() && pantallasRestringidas.includes(id)) {
-        console.warn('🔐 Acceso bloqueado a pantalla:', id);
-        this.verificarAccesoAdmin('acceso_a_' + id, true);
-        return;
-    }
+        var pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
+        
+        if (this.esTrabajador() && pantallasRestringidas.includes(id)) {
+            console.warn('🔐 Acceso bloqueado a pantalla:', id);
+            this.verificarAccesoAdmin('acceso_a_' + id, true);
+            return;
+        }
         if (this.timerExamen && id !== 'exam-screen') {
             clearInterval(this.timerExamen);
             this.timerExamen = null;
@@ -147,12 +143,9 @@ const app = {
     },
     
     // ─────────────────────────────────────────────────────────────────────
-    // ACTUALIZAR UI (CORREGIDO Y OPTIMIZADO)
+    // ACTUALIZAR UI (CORREGIDO)
     // ─────────────────────────────────────────────────────────────────────
     actualizarUI: function() {
-        // ═══════════════════════════════════════════════════════════════
-        // LICENCIA INFO (HOME SCREEN)
-        // ═══════════════════════════════════════════════════════════════
         var infoLic = document.getElementById('licencia-info');
         if (infoLic) {
             if (this.licencia.tipo === 'DEMO') {
@@ -165,26 +158,16 @@ const app = {
             }
         }
         
-        // ═══════════════════════════════════════════════════════════════
-        // LICENCIA INFO DETAIL (LICENSE SCREEN) - CORREGIR SALTOS DE LÍNEA
-        // ═══════════════════════════════════════════════════════════════
         var infoLicDetail = document.getElementById('licencia-info-detail');
         if (infoLicDetail) {
             if (this.licencia.tipo === 'DEMO') {
                 infoLicDetail.textContent = '📋 Licencia DEMO - ' + this.licencia.examenesRestantes + ' exámenes hoy';
             } else {
                 var exp = this.licencia.expiracion ? new Date(this.licencia.expiracion).toLocaleDateString('es-MX') : 'Sin expiración';
-                // ✅ OPCIÓN A: Usar innerHTML con <br> para saltos de línea
                 infoLicDetail.innerHTML = '✅ ' + this.licencia.tipo + '<br>Cliente: ' + this.licencia.clienteId + '<br>Válido hasta: ' + exp;
-                // ✅ OPCIÓN B: Usar textContent + CSS (descomentar si prefieres esta opción)
-                // infoLicDetail.textContent = '✅ ' + this.licencia.tipo + '\nCliente: ' + this.licencia.clienteId + '\nVálido hasta: ' + exp;
-                // infoLicDetail.style.whiteSpace = 'pre-line';
             }
         }
         
-        // ═══════════════════════════════════════════════════════════════
-        // INFO DE USUARIO
-        // ═══════════════════════════════════════════════════════════════
         var infoUser = document.getElementById('usuario-info');
         if (infoUser && this.userData.nombre) {
             infoUser.innerHTML = '<strong>👤 ' + this.userData.nombre + '</strong><br>' + 
@@ -192,9 +175,6 @@ const app = {
             infoUser.className = 'usuario-info-card';
         }
         
-        // ═══════════════════════════════════════════════════════════════
-        // BOTONES CONDICIONALES
-        // ═══════════════════════════════════════════════════════════════
         var btnExamen = document.getElementById('btn-comenzar');
         if (btnExamen) {
             var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -209,14 +189,10 @@ const app = {
         
         var btnWhiteLabel = document.getElementById('btn-white-label');
         if (btnWhiteLabel) {
-            // ✅ VALIDACIÓN SEGURA DE FEATURES
             var tieneWhiteLabel = this.licencia.features && this.licencia.features.whiteLabel;
             btnWhiteLabel.style.display = tieneWhiteLabel ? 'inline-block' : 'none';
         }
-
-        // ═══════════════════════════════════════════════════════════════
-        // SIDEBAR LICENSE PILL
-        // ═══════════════════════════════════════════════════════════════
+        
         var sidebarPlan = document.getElementById('sidebar-license-plan');
         var sidebarExpiry = document.getElementById('sidebar-license-expiry');
         var sidebarPill = document.getElementById('sidebar-license-pill');
@@ -257,10 +233,8 @@ const app = {
                 sidebarPill.style.background = 'linear-gradient(135deg, var(--bg2), var(--border))';
                 sidebarPill.style.borderColor = 'var(--border)';
             }
-        }        
-        // ═══════════════════════════════════════════════════════════════
-        // INFO SCREEN
-        // ═══════════════════════════════════════════════════════════════
+        }
+        
         var infoLicPlan = document.getElementById('info-licencia-plan');
         var infoUsuarioNombre = document.getElementById('info-usuario-nombre');
         var btnInstalarPWA = document.getElementById('btn-instalar-pwa');
@@ -269,10 +243,8 @@ const app = {
         if (infoUsuarioNombre) infoUsuarioNombre.textContent = this.userData.nombre || '—';
         if (btnInstalarPWA && this.deferredPrompt) btnInstalarPWA.style.display = 'flex';
         
-        // ✅ ACTUALIZAR UI DE LICENCIA (PANTALLA LICENSE-SCREEN)
         this.actualizarLicenciaUI();
         
-        // ✅ ACTUALIZAR BADGE DE TRABAJADORES
         if (typeof this.actualizarBadgeTrabajadores === 'function') {
             this.actualizarBadgeTrabajadores();
             this.actualizarSidebarModoIndicador();
@@ -280,6 +252,28 @@ const app = {
         }
         this.actualizarUIMenuPorRol();
     },
+    
+    // ✅ FUNCIÓN AGREGADA - SOLUCIONA EL ERROR PRINCIPAL
+    actualizarUIPorRol: function() {
+        var esTrabajador = this.esTrabajador();
+        var esAdmin = !esTrabajador;
+        
+        // Elementos solo para admin
+        document.querySelectorAll('.admin-only').forEach(function(el) {
+            el.style.display = esAdmin ? 'flex' : 'none';
+        });
+        
+        // Botones IMPORTAR y LIMPIAR
+        var importContainer = document.querySelector('#input-importar')?.parentElement;
+        var limpiarBtn = document.querySelector('button[onclick*="limpiarDatosConfirmar"]');
+        var volverAdminBtn = document.getElementById('btn-volver-admin');
+        
+        if (importContainer) importContainer.style.display = esAdmin ? 'flex' : 'none';
+        if (limpiarBtn) limpiarBtn.style.display = esAdmin ? 'inline-flex' : 'none';
+        
+        console.log('UI actualizada por rol - Modo admin:', esAdmin);
+    },
+    
     // ─────────────────────────────────────────────────────────────────────
     // CONTRASEÑA DE ADMINISTRADOR
     // ─────────────────────────────────────────────────────────────────────
@@ -319,7 +313,8 @@ const app = {
         }
         
         return true;
-    },    
+    },
+    
     // ─────────────────────────────────────────────────────────────────────
     // LICENCIAS
     // ─────────────────────────────────────────────────────────────────────
@@ -362,7 +357,6 @@ const app = {
         }
         
         var licenciasValidas = {
-            // PLAN DEMO
             'RS-DEMO-2026-DEMO': {
                 clienteId: 'DEMO_USER',
                 tipo: 'DEMO',
@@ -377,7 +371,6 @@ const app = {
                     casosPericial: false
                 }
             },
-            // PLAN PROFESIONAL
             'RS-PKDF-9826-A1B2': {
                 clienteId: 'PROFESIONAL_001',
                 tipo: 'PROFESIONAL',
@@ -394,7 +387,6 @@ const app = {
                     dashboard: false
                 }
             },
-            // PLAN CONSULTOR
             'RS-COZS-2XT6-C3D4': {
                 clienteId: 'CONSULTOR_001',
                 tipo: 'CONSULTOR',
@@ -411,7 +403,6 @@ const app = {
                     dashboard: 'basico'
                 }
             },
-            // PLAN EMPRESARIAL
             'RS-EVP4-Y02I-E5F6': {
                 clienteId: 'EMPRESARIAL_001',
                 tipo: 'EMPRESARIAL',
@@ -491,7 +482,6 @@ const app = {
                 };
                 self.guardarLicencia();
                 
-                // ✅ Verificar que features no esté vacío
                 if (!self.licencia.features || Object.keys(self.licencia.features).length === 0) {
                     console.log('Features vacías, inicializando...');
                     localStorage.removeItem('rayoshield_licencia');
@@ -515,9 +505,6 @@ const app = {
         });
     },
 
-    // ─────────────────────────────────────────────────────────────────────
-    // ACTIVAR LICENCIA CON PLAN PREDEFINIDO
-    // ─────────────────────────────────────────────────────────────────────
     activarLicenciaConPlan: function(plan) {
         var datos = {
             'PROFESIONAL': { id: 'PROFESIONAL_001', clave: 'RS-PKDF-9826-A1B2' },
@@ -534,7 +521,6 @@ const app = {
         document.getElementById('license-key').value = datos[plan].clave;
         document.getElementById('activar-licencia-section').scrollIntoView({ behavior: 'smooth' });
         
-        // Resaltar campos
         document.getElementById('license-id').style.borderColor = 'var(--blue)';
         document.getElementById('license-key').style.borderColor = 'var(--blue)';
         
@@ -544,15 +530,10 @@ const app = {
         }, 2000);
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // ACTUALIZAR UI DE LICENCIA
-    // ─────────────────────────────────────────────────────────────────────
     actualizarLicenciaUI: function() {
-        // ✅ VALIDAR QUE ESTAMOS EN LA PANTALLA CORRECTA
         var planEl = document.getElementById('licencia-screen-plan');
-        if (!planEl) return; // Si no existe, no estamos en license-screen
+        if (!planEl) return;
        
-        // Plan actual
         var clienteEl = document.getElementById('licencia-screen-cliente');
         var expiryEl = document.getElementById('licencia-screen-expiry');
         var daysEl = document.getElementById('licencia-screen-days');
@@ -566,7 +547,6 @@ const app = {
                 var exp = new Date(this.licencia.expiracion);
                 expiryEl.textContent = exp.toLocaleDateString('es-MX');
                 
-                // Días restantes
                 var ahora = new Date();
                 var dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
                 if (daysEl) {
@@ -587,7 +567,6 @@ const app = {
             }
         }
         
-        // Características
         if (featuresEl) {
             var features = this.licencia.features || {};
             var html = '';
@@ -608,7 +587,7 @@ const app = {
             
             featuresEl.innerHTML = html;
         }
-    },    
+    },
     
     // ─────────────────────────────────────────────────────────────────────
     // DATOS DE USUARIO
@@ -639,7 +618,6 @@ const app = {
         alert('Datos guardados');
         this.volverHome();
     },
-
     
     // ─────────────────────────────────────────────────────────────────────
     // EXÁMENES
@@ -654,9 +632,6 @@ const app = {
         if (this.licencia.tipo === 'DEMO') { this.licencia.examenesRestantes = Math.max(0, this.licencia.examenesRestantes - 1); this.guardarLicencia(); }
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN EXÁMENES (MEJORADA)
-    // ─────────────────────────────────────────────────────────────────────
     irASeleccionarExamen: function() {
         var self = this;
         var datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -721,7 +696,6 @@ const app = {
             list.appendChild(item);
         });
     },
-
     
     volverACategorias: function() {
         document.getElementById('categorias-view').style.display = 'block';
@@ -749,9 +723,6 @@ const app = {
         }).catch(function() { alert('Error cargando examen'); });
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // MOSTRAR PREGUNTA (MEJORADA)
-    // ─────────────────────────────────────────────────────────────────────
     mostrarPregunta: function() {
         if (!this.examenActual) return;
         
@@ -809,9 +780,6 @@ const app = {
         }
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // TIMER EXAMEN
-    // ─────────────────────────────────────────────────────────────────────
     iniciarTimerExamen: function() {
         var self = this;
         this.tiempoInicio = Date.now();
@@ -843,9 +811,6 @@ const app = {
         if (this.timerExamen) { clearInterval(this.timerExamen); this.timerExamen = null; }
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // TIMER CASOS MASTER
-    // ─────────────────────────────────────────────────────────────────────
     iniciarTimerCaso: function() {
         var self = this;
         this.tiempoCasoInicio = Date.now();
@@ -892,9 +857,6 @@ const app = {
         }
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // PROGRESO GUARDADO
-    // ─────────────────────────────────────────────────────────────────────
     guardarExamenProgreso: function() {
         if (this.examenActual) {
             this.examenGuardado = {
@@ -935,9 +897,6 @@ const app = {
         localStorage.removeItem('rayoshield_progreso');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // RESULTADOS EXAMEN
-    // ─────────────────────────────────────────────────────────────────────
     mostrarResultado: function() {
         if (!this.examenActual) return;
         this.detenerTimer();
@@ -971,9 +930,6 @@ const app = {
         this.consumirExamen();
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR CERTIFICADO DE EXAMEN (CORREGIDO PARA MULTI-USUARIO)
-    // ─────────────────────────────────────────────────────────────────────
     descargarCertificado: function() {
         if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') { 
             alert('Solo para aprobados'); 
@@ -982,7 +938,6 @@ const app = {
         
         var self = this;
         
-        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
         var t = MultiUsuario.getTrabajadorActual();
         var usuarioParaCertificado = t ? t : this.userData;
         
@@ -1005,9 +960,6 @@ const app = {
         });
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR CERTIFICADO DE CASO (CORREGIDO PARA MULTI-USUARIO)
-    // ─────────────────────────────────────────────────────────────────────
     descargarCertificadoCaso: function(conMarcaDeAgua) {
         if (!this.casoActual || !this.resultadoCaso) {
             alert('❌ No hay certificado disponible');
@@ -1020,11 +972,9 @@ const app = {
         
         var self = this;
         
-        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
         var t = MultiUsuario.getTrabajadorActual();
         var usuarioParaCertificado = t ? t : this.userData;
         
-        // ✅ DETERMINAR NIVEL DEL CERTIFICADO
         var nivelCertificado = '';
         if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
         else if (this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
@@ -1050,9 +1000,7 @@ const app = {
             alert('❌ Error generando certificado: ' + err.message);
         });
     },
-    // ─────────────────────────────────────────────────────────────────────
-    // IMPRIMIR CERTIFICADO DE CASO
-    // ─────────────────────────────────────────────────────────────────────
+    
     imprimirCertificadoCaso: function(conMarcaDeAgua) {
         if (!this.casoActual || !this.resultadoCaso) {
             alert('❌ No hay certificado disponible');
@@ -1065,7 +1013,6 @@ const app = {
     
         var self = this;
     
-        // ✅ DETERMINAR NIVEL DEL CERTIFICADO
         var nivelCertificado = '';
         if (this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
         else if (this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
@@ -1073,16 +1020,13 @@ const app = {
         else if (this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
         else nivelCertificado = 'COMPLETADO';
     
-        // ✅ VERIFICAR QUE LA FUNCIÓN EXISTA
         if (typeof generarCertificadoCaso !== 'function') {
             alert('❌ Error: Función de certificado no cargada. Recarga la página.');
             console.error('generarCertificadoCaso no está definida');
             return;
         }
     
-        // ✅ GENERAR CERTIFICADO Y ABRIR DIÁLOGO DE IMPRESIÓN
         generarCertificadoCaso(this.userData, this.casoActual, this.resultadoCaso, nivelCertificado, conMarcaDeAgua).then(function(url) {
-            // Crear ventana emergente para imprimir
             var printWindow = window.open('', '_blank');
             printWindow.document.write('<html><head><title>Imprimir Certificado</title></head><body style="margin:0;padding:20px;text-align:center;">');
             printWindow.document.write('<img src="' + url + '" style="max-width:100%;height:auto;" onload="window.print();">');
@@ -1090,18 +1034,13 @@ const app = {
             printWindow.document.close();
             printWindow.focus();
         
-            // Cerrar ventana después de imprimir (opcional)
-            setTimeout(function() {
-                // printWindow.close(); // Descomentar si quieres cerrar automáticamente
-            }, 5000);
+            setTimeout(function() {}, 5000);
         }).catch(function(err) {
             console.error('Error generando certificado:', err);
             alert('❌ Error generando certificado: ' + err.message);
         });
     },
-    // ─────────────────────────────────────────────────────────────────────
-    // DESCARGAR INSIGNIA (CORREGIDO PARA MULTI-USUARIO)
-    // ─────────────────────────────────────────────────────────────────────
+    
     descargarInsignia: function() {
         if (!this.casoActual || !this.resultadoCaso) {
             alert('❌ No hay insignia disponible');
@@ -1114,7 +1053,6 @@ const app = {
         
         var self = this;
         
-        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
         var t = MultiUsuario.getTrabajadorActual();
         var usuarioParaCertificado = t ? t : this.userData;
         
@@ -1137,9 +1075,6 @@ const app = {
         });
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN
-    // ─────────────────────────────────────────────────────────────────────
     volverHome: function() {
         this.detenerTimer();
         this.detenerTimerCaso();
@@ -1150,7 +1085,7 @@ const app = {
         this.respuestaTemporal = null;
         this.mostrarPantalla('home-screen');
     },
-    // ✅ AGREGAR ESTA FUNCIÓN
+    
     cerrarSesion: function() {
         if (confirm('¿Cerrar sesión? Se borrarán los datos locales.')) {
             localStorage.removeItem('rayoshield_licencia');
@@ -1160,13 +1095,18 @@ const app = {
             location.reload();
         }
     },
-    // ✅ AGREGAR ESTA FUNCIÓN
+    
+    // ✅ MODIFICADA - RESTRINGIR PERFIL PARA TRABAJADORES
     mostrarPerfil: function() {
+        if (this.esTrabajador()) {
+            alert('🔐 Acceso denegado\n\nEsta función solo está disponible para administradores.');
+            return;
+        }
+        
         this.actualizarPerfil();
         this.mostrarPantalla('perfil-screen');
     },
     
-    // ✅ AGREGAR ESTA FUNCIÓN
     actualizarPerfil: function() {
         document.getElementById('perfil-nombre').textContent = this.userData.nombre || 'Usuario';
         document.getElementById('perfil-nombre-input').value = this.userData.nombre || '';
@@ -1200,11 +1140,10 @@ const app = {
         }
     },
     
-    // ✅ AGREGAR ESTA FUNCIÓN
     editarPerfil: function() {
         this.mostrarDatosUsuario();
     },
-
+    
     mostrarDatosUsuario: function() {
         var e = document.getElementById('user-empresa'), n = document.getElementById('user-nombre');
         var c = document.getElementById('user-curp'), p = document.getElementById('user-puesto');
@@ -1215,27 +1154,20 @@ const app = {
         this.mostrarPantalla('user-data-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // MOSTRAR HISTORIAL (ACTUALIZADO)
-    // ─────────────────────────────────────────────────────────────────────
     mostrarHistorial: function() {
         this.renderHistorial();
         this.llenarFiltroTrabajadoresHistorial();
         this.mostrarPantalla('history-screen');
     },
     
-    // ✅ NUEVA FUNCIÓN - Llenar filtro de trabajadores
     llenarFiltroTrabajadoresHistorial: function() {
         var select = document.getElementById('historial-filtro-trabajador');
         if (!select) return;
         
-        // Guardar selección actual
         var seleccionActual = select.value;
         
-        // Limpiar opciones (mantener primeras 2)
         select.innerHTML = '<option value="todos">Todos los usuarios</option><option value="admin">Solo Admin</option>';
         
-        // Agregar trabajadores
         if (typeof MultiUsuario !== 'undefined') {
             var trabajadores = MultiUsuario.getTrabajadores();
             trabajadores.forEach(function(t) {
@@ -1246,11 +1178,9 @@ const app = {
             });
         }
         
-        // Restaurar selección
         select.value = seleccionActual;
     },
     
-    // ✅ NUEVA FUNCIÓN - Renderizar historial con filtro
     renderHistorial: function() {
         var list = document.getElementById('history-list');
         if (!list) return;
@@ -1258,22 +1188,20 @@ const app = {
         var filtro = document.getElementById('historial-filtro-trabajador');
         var filtroValor = filtro ? filtro.value : 'todos';
         
-        // ✅ SI ES TRABAJADOR, SOLO PUEDE VER SU PROPIO HISTORIAL
         if (this.esTrabajador()) {
             var t = MultiUsuario.getTrabajadorActual();
             if (!t) {
                 list.innerHTML = '<p style="text-align:center;color:var(--ink4);padding:40px 20px;">⚠️ Error: No hay trabajador seleccionado</p>';
                 return;
             }
-            filtroValor = t.id; // Forzar filtro a su propio ID
-            if (filtro) filtro.style.display = 'none'; // Ocultar filtro
+            filtroValor = t.id;
+            if (filtro) filtro.style.display = 'none';
         } else {
             if (filtro) filtro.style.display = 'block';
         } 
         
         var hist = this.obtenerHistorial();
         
-        // Aplicar filtro
         if (filtroValor === 'admin') {
             hist = hist.filter(h => h.tipoUsuario === 'admin');
         } else if (filtroValor !== 'todos') {
@@ -1309,16 +1237,13 @@ const app = {
     },
     
     mostrarLicencia: function() {
+        if (!this.verificarAccesoAdmin('mostrarLicencia')) return;
         this.mostrarPantalla('license-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // CASOS CRÍTICOS - INVESTIGACIÓN MASTER (CORREGIDO)
-    // ─────────────────────────────────────────────────────────────────────
     irACasosMaster: function() {
         this.detenerTimerCaso();
         
-        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN
         var casosList = document.getElementById('casos-list');
         var casoDetalle = document.getElementById('caso-detalle');
         var casosMainButtons = document.getElementById('casos-main-buttons');
@@ -1374,20 +1299,15 @@ const app = {
         this.mostrarPantalla('casos-master-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // CARGAR CASO MASTER (CORREGIDO - SOLO ESPERAR CARGA)
-    // ─────────────────────────────────────────────────────────────────────
     cargarCasoMaster: async function(casoId) {
         console.log('📋 Cargando caso:', casoId);
         
-        // ✅ VALIDAR ELEMENTOS DEL DOM PRIMERO
         var casosList = document.getElementById('casos-list');
         var casoDetalle = document.getElementById('caso-detalle');
         
         if (casosList) casosList.style.display = 'none';
         if (casoDetalle) casoDetalle.style.display = 'block';
         
-        // ✅ CARGAR CASO DESDE JSON (ya tienes la función)
         var caso = await cargarCasoInvestigacion(casoId);
         
         if (!caso) {
@@ -1401,7 +1321,6 @@ const app = {
         this.casoActual = caso;
         this.respuestasCaso = {};
         
-        // ✅ LLENAR FICHA DEL CASO
         var elId = document.getElementById('caso-id');
         var elFecha = document.getElementById('caso-fecha');
         var elIndustria = document.getElementById('caso-industria');
@@ -1417,7 +1336,6 @@ const app = {
         if (elIndustria) elIndustria.textContent = caso.industria || 'N/A';
         if (elTiempo) elTiempo.textContent = caso.tiempo_estimado || '15 min';
         
-        // ✅ DESCRIPCIÓN (tu estructura ya es correcta)
         if (elDescripcion && caso.descripcion_evento) {
             var desc = caso.descripcion_evento;
             elDescripcion.innerHTML = '<div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;">' +
@@ -1431,7 +1349,6 @@ const app = {
                 '</div></div>';
         }
         
-        // ✅ TIMELINE (tu array ya es correcto)
         if (elTimeline && caso.linea_tiempo) {
             elTimeline.innerHTML = '<div class="timeline">' + caso.linea_tiempo.map(function(evento) {
                 var esCritico = evento.toLowerCase().includes('descarga') || evento.toLowerCase().includes('contacto');
@@ -1439,7 +1356,6 @@ const app = {
             }).join('') + '</div>';
         }
         
-        // ✅ ENERGÍAS (tu objeto ya es correcto)
         if (elEnergias && caso.energias_identificadas) {
             elEnergias.innerHTML = '<div class="energia-grid">' + Object.keys(caso.energias_identificadas).map(function(tipo) {
                 var estado = caso.energias_identificadas[tipo];
@@ -1449,7 +1365,6 @@ const app = {
             }).join('') + '</div>';
         }
         
-        // ✅ PREGUNTAS (tu array ya es correcto)
         if (elPreguntas && caso.preguntas) {
             console.log('📝 Renderizando', caso.preguntas.length, 'preguntas');
             elPreguntas.innerHTML = '';
@@ -1472,18 +1387,12 @@ const app = {
             });
         }
         
-        // ✅ MOSTRAR BOTÓN ENVIAR
         if (btnEnviar) btnEnviar.style.display = 'inline-block';
         
-        // ✅ INICIAR TIMER
         this.iniciarTimerCaso();
         
         console.log('✅ Caso cargado correctamente');
     },
-    
-    // ─────────────────────────────────────────────────────────────────────
-    // RENDERIZAR PREGUNTAS DE CASO (ACTUALIZADO CON TEMA SMARTCOT)
-    // ─────────────────────────────────────────────────────────────────────
     
     renderAnalisisMultiple: function(pregunta) {
         var container = document.createElement('div');
@@ -1558,65 +1467,6 @@ const app = {
         return container;
     },
     
-    renderAnalisisResponsabilidad: function(pregunta) {
-        var container = document.createElement('div');
-        container.className = 'matriz-responsabilidad';
-        var self = this;
-        
-        pregunta.roles.forEach(function(role, roleIdx) {
-            var row = document.createElement('div');
-            row.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;';
-            
-            var roleName = document.createElement('div');
-            roleName.className = 'role-name';
-            roleName.style.cssText = 'font-size:12px;font-weight:700;color:var(--ink);margin-bottom:8px;';
-            roleName.textContent = role.rol;
-            row.appendChild(roleName);
-            
-            var optionsDiv = document.createElement('div');
-            optionsDiv.className = 'role-options';
-            optionsDiv.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;';
-            
-            role.opciones.forEach(function(opt, optIdx) {
-                var label = document.createElement('label');
-                label.className = 'role-option';
-                label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all 0.15s;';
-                
-                var radio = document.createElement('input');
-                radio.type = 'radio';
-                radio.name = 'responsabilidad-' + pregunta.id + '-' + roleIdx;
-                radio.value = optIdx;
-                radio.style.width = '16px';
-                radio.style.height = '16px';
-                radio.style.cursor = 'pointer';
-                
-                var span = document.createElement('span');
-                span.style.cssText = 'font-size:12px;font-weight:500;color:var(--ink);';
-                span.textContent = opt.nivel;
-                
-                label.appendChild(radio);
-                label.appendChild(span);
-                
-                label.onclick = function(e) {
-                    if (e.target.tagName === 'INPUT') {
-                        row.querySelectorAll('input').forEach(function(r) { 
-                            r.closest('label').style.borderColor = 'var(--border)';
-                            r.closest('label').style.background = 'var(--white)';
-                        });
-                        label.style.borderColor = 'var(--blue)';
-                        label.style.background = 'var(--blue-l)';
-                    }
-                };
-                optionsDiv.appendChild(label);
-            });
-            
-            row.appendChild(optionsDiv);
-            container.appendChild(row);
-        });
-        
-        return container;
-    },
-    
     renderPlanAccion: function(pregunta) {
         var container = document.createElement('div');
         container.className = 'plan-accion-grid';
@@ -1672,152 +1522,6 @@ const app = {
         return container;
     },
     
-    renderOrdenamientoDinamico: function(pregunta) {
-        var container = document.createElement('div');
-        var self = this;
-        
-        var instrucciones = document.createElement('p');
-        instrucciones.style.cssText = 'color:var(--ink3);font-size:13px;margin:10px 0;';
-        instrucciones.textContent = 'Arrastra los elementos para ordenarlos en la secuencia correcta';
-        container.appendChild(instrucciones);
-        
-        var ordenContainer = document.createElement('div');
-        ordenContainer.className = 'orden-container';
-        ordenContainer.style.cssText = 'display:flex;flex-direction:column;gap:10px;margin:15px 0;';
-        
-        pregunta.opciones.forEach(function(opt, idx) {
-            var item = document.createElement('div');
-            item.className = 'orden-item';
-            item.style.cssText = 'display:flex;align-items:center;gap:15px;padding:15px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);cursor:move;transition:all 0.15s;';
-            item.draggable = true;
-            item.dataset.index = idx;
-            
-            var numero = document.createElement('div');
-            numero.className = 'orden-numero';
-            numero.style.cssText = 'width:30px;height:30px;background:var(--blue);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-family:var(--mono);font-size:13px;flex-shrink:0;';
-            numero.textContent = idx + 1;
-            
-            var texto = document.createElement('span');
-            texto.style.cssText = 'flex:1;font-size:13px;color:var(--ink);';
-            texto.textContent = opt;
-            
-            item.appendChild(numero);
-            item.appendChild(texto);
-            
-            item.addEventListener('dragstart', function(e) {
-                e.dataTransfer.setData('text/plain', idx);
-                this.style.opacity = '0.5';
-                this.style.borderColor = 'var(--blue)';
-            });
-            item.addEventListener('dragend', function() {
-                this.style.opacity = '1';
-                this.style.borderColor = 'var(--border)';
-                self.actualizarOrdenNumeros(ordenContainer);
-            });
-            item.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                this.style.borderColor = 'var(--blue)';
-                this.style.background = 'var(--blue-l)';
-            });
-            item.addEventListener('dragleave', function() {
-                this.style.borderColor = 'var(--border)';
-                this.style.background = 'var(--bg)';
-            });
-            item.addEventListener('drop', function(e) {
-                e.preventDefault();
-                this.style.borderColor = 'var(--border)';
-                this.style.background = 'var(--bg)';
-                var fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
-                var toIdx = parseInt(this.dataset.index);
-                if (fromIdx !== toIdx) {
-                    var items = Array.from(ordenContainer.children);
-                    var fromItem = items[fromIdx];
-                    var toItem = items[toIdx];
-                    if (fromIdx < toIdx) {
-                        ordenContainer.insertBefore(fromItem, toItem.nextSibling);
-                    } else {
-                        ordenContainer.insertBefore(fromItem, toItem);
-                    }
-                }
-            });
-            ordenContainer.appendChild(item);
-        });
-        
-        container.appendChild(ordenContainer);
-        
-        var inputOrden = document.createElement('input');
-        inputOrden.type = 'hidden';
-        inputOrden.id = 'respuesta-' + pregunta.id;
-        inputOrden.className = 'respuesta-orden';
-        container.appendChild(inputOrden);
-        
-        return container;
-    },
-    
-    actualizarOrdenNumeros: function(container) {
-        var items = container.children;
-        for (var i = 0; i < items.length; i++) {
-            var numero = items[i].querySelector('.orden-numero');
-            if (numero) numero.textContent = i + 1;
-            items[i].dataset.index = i;
-        }
-        var inputOrden = container.querySelector('.respuesta-orden');
-        if (inputOrden) {
-            var orden = [];
-            for (var i = 0; i < items.length; i++) {
-                orden.push(parseInt(items[i].dataset.index));
-            }
-            inputOrden.value = JSON.stringify(orden);
-        }
-    },
-    
-    renderCalculoTecnico: function(pregunta) {
-        var container = document.createElement('div');
-        
-        if (pregunta.variables) {
-            var variablesDiv = document.createElement('div');
-            variablesDiv.style.cssText = 'background:var(--bg);padding:15px;border-radius:var(--radius-sm);margin:15px 0;border:1px solid var(--border);';
-            Object.keys(pregunta.variables).forEach(function(variable) {
-                var valor = Array.isArray(pregunta.variables[variable]) ? pregunta.variables[variable][0] : pregunta.variables[variable];
-                var p = document.createElement('p');
-                p.style.cssText = 'margin:5px 0;font-size:13px;color:var(--ink2);';
-                p.innerHTML = '<strong style="color:var(--ink);font-family:var(--mono);">' + variable + ':</strong> <span style="font-family:var(--mono);color:var(--blue);font-weight:600;">' + valor + '</span>';
-                variablesDiv.appendChild(p);
-            });
-            container.appendChild(variablesDiv);
-        }
-        
-        var inputDiv = document.createElement('div');
-        inputDiv.style.cssText = 'margin:15px 0;';
-        var input = document.createElement('input');
-        input.type = 'number';
-        input.id = 'respuesta-' + pregunta.id;
-        input.placeholder = 'Ingresa tu respuesta';
-        input.style.cssText = 'width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);font-family:var(--mono);';
-        input.onfocus = function() {
-            this.style.borderColor = 'var(--blue)';
-            this.style.background = 'var(--white)';
-        };
-        input.onblur = function() {
-            this.style.borderColor = 'var(--border)';
-            this.style.background = 'var(--bg)';
-        };
-        inputDiv.appendChild(input);
-        container.appendChild(inputDiv);
-        
-        if (pregunta.ayuda) {
-            var ayudaDiv = document.createElement('div');
-            ayudaDiv.style.cssText = 'background:var(--blue-l);padding:12px 14px;border-radius:var(--radius-sm);margin:15px 0;border-left:3px solid var(--blue);font-size:12px;color:var(--blue);';
-            ayudaDiv.innerHTML = '<strong>💡 Ayuda:</strong> ' + pregunta.ayuda;
-            container.appendChild(ayudaDiv);
-        }
-        
-        return container;
-    },
-    
-    // ─────────────────────────────────────────────────────────────────────
-    // ENVIAR RESPUESTAS DE CASO (CORREGIDO)
-    // ─────────────────────────────────────────────────────────────────────
     enviarRespuestasCaso: function() {
         if (!this.casoActual) {
             console.error('❌ No hay caso actual');
@@ -1868,15 +1572,11 @@ const app = {
             }
         });
         
-        // ✅ EVALUAR CON SMART EVALUATION V2
         var resultado = SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual);
         this.resultadoCaso = resultado;
         this.mostrarResultadoCaso(resultado);
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // MOSTRAR RESULTADO DE CASO (CORREGIDO)
-    // ─────────────────────────────────────────────────────────────────────
     mostrarResultadoCaso: function(resultado) {
         var resultadoEl = document.getElementById('caso-resultado');
         if (!resultadoEl) {
@@ -1889,13 +1589,11 @@ const app = {
         
         this.detenerTimerCaso();
         
-        // ✅ VALIDAR ELEMENTOS DE BOTONES
         var btnEnviar = document.getElementById('btn-enviar-caso');
         var casoBotones = document.getElementById('caso-botones');
         
         if (btnEnviar) btnEnviar.style.display = 'none';
         
-        // ✅ DETERMINAR QUÉ BOTONES MOSTRAR SEGÚN PLAN
         var mostrarCertificado = false;
         var mostrarInsignia = false;
         var conMarcaDeAgua = false;
@@ -1918,7 +1616,6 @@ const app = {
             conMarcaDeAgua = false;
         }
         
-        // ✅ DETERMINAR NIVEL DEL CERTIFICADO
         var nivelCertificado = '';
         if (this.casoActual && this.casoActual.nivel === 'basico') nivelCertificado = 'BÁSICO';
         else if (this.casoActual && this.casoActual.nivel === 'master') nivelCertificado = 'MASTER';
@@ -1926,7 +1623,6 @@ const app = {
         else if (this.casoActual && this.casoActual.nivel === 'pericial') nivelCertificado = 'PERICIAL';
         else nivelCertificado = 'COMPLETADO';
         
-        // ✅ GENERAR BOTONES
         var botonesHTML = '';
         if (resultado.aprobado) {
             botonesHTML = '<div class="button-group" style="margin-top:20px;display:flex;gap:15px;flex-wrap:wrap;justify-content:center;">';
@@ -1949,7 +1645,6 @@ const app = {
             botonesHTML += '</div>';
         }
         
-        // ✅ RENDERIZAR RESULTADO CON COLORES CORRECTOS
         var claseEstado = resultado.aprobado ? 'aprobado' : 'no-aprobado';
         var icono = resultado.aprobado ? '✅' : '📚';
         var estadoTexto = resultado.aprobado ? '✅ APROBADO - Nivel ' + nivelCertificado : '📚 Requiere repaso';
@@ -1962,27 +1657,9 @@ const app = {
         if (casoBotones) casoBotones.style.display = 'none';
     },
     
-    obtenerInsigniaPorPuntaje: function(puntaje) {
-        if (puntaje >= 95) {
-            return { nombre: 'PERICIAL', icono: '⚖️', descripcion: 'Excelencia en investigación de incidentes', color: '#D4AF37' };
-        } else if (puntaje >= 90) {
-            return { nombre: 'ELITE', icono: '🥇', descripcion: 'Competencia avanzada en análisis SHE', color: '#9C27B0' };
-        } else if (puntaje >= 80) {
-            return { nombre: 'MASTER', icono: '🥈', descripcion: 'Competencia sólida en investigación', color: '#2196F3' };
-        } else if (puntaje >= 75) {
-            return { nombre: 'AVANZADO', icono: '🥉', descripcion: 'Competencia en desarrollo', color: '#4CAF50' };
-        } else {
-            return { nombre: 'PARTICIPACIÓN', icono: '📚', descripcion: 'Continúa practicando', color: '#FF9800' };
-        }
-    },
-    
-    // ─────────────────────────────────────────────────────────────────────
-    // VOLVER A LISTA DE CASOS (CORREGIDO CON VALIDACIONES)
-    // ─────────────────────────────────────────────────────────────────────
     volverAListaCasos: function() {
         this.detenerTimerCaso();
         
-        // ✅ VALIDAR QUE LOS ELEMENTOS EXISTEN ANTES DE ACCEDER
         var casosList = document.getElementById('casos-list');
         var casoDetalle = document.getElementById('caso-detalle');
         var casosMainButtons = document.getElementById('casos-main-buttons');
@@ -1995,18 +1672,13 @@ const app = {
         if (casoResultado) casoResultado.style.display = 'none';
         if (btnEnviar) btnEnviar.style.display = 'none';
         
-        // ✅ LIMPIAR ESTADO
         this.casoActual = null;
         this.respuestasCaso = {};
         this.resultadoCaso = null;
         
         console.log('✅ Volviendo a lista de casos');
     },
-
-
-    // ─────────────────────────────────────────────────────────────────────
-    // WHITE LABEL MANAGER
-    // ─────────────────────────────────────────────────────────────────────
+    
     aplicarConfiguracionWhiteLabel: function() {
         if (!this.licencia.features || !this.licencia.features.whiteLabel) {
             return;
@@ -2057,55 +1729,35 @@ const app = {
         this.mostrarPantalla('white-label-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // INFORMACIÓN
-    // ─────────────────────────────────────────────────────────────────────
     mostrarInfo: function() {
+        if (!this.verificarAccesoAdmin('mostrarInfo')) return;
         this.mostrarPantalla('info-screen');
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // IMPRIMIR DASHBOARD
-    // ─────────────────────────────────────────────────────────────────────
     imprimirDashboard: function() {
         var dashboardEl = document.querySelector('.dashboard-container');
         if (dashboardEl) {
-            // ✅ Guardar estado actual
             var contenidoOriginal = document.body.innerHTML;
             var scrollPos = window.scrollY;
         
-            // ✅ Preparar para imprimir
             document.body.innerHTML = dashboardEl.outerHTML;
         
-            // ✅ Imprimir
             window.print();
         
-            // ✅ RESTAURAR estado (NO recargar)
             document.body.innerHTML = contenidoOriginal;
             window.scrollTo(0, scrollPos);
         
-            // ✅ Re-bindear eventos si es necesario
             this.reiniciarEventosDashboard();
         } else {
             window.print();
         }
     },
-
-    // ✅ NUEVA FUNCIÓN - Reiniciar eventos después de imprimir
-    reiniciarEventosDashboard: function() {
-        // Restaurar listeners de botones si se perdieron
-        var btnImprimir = document.querySelector('button[onclick*="imprimirDashboard"]');
-        var btnOtroCaso = document.querySelector('button[onclick*="volverAListaCasos"]');
-        // Los botones ya tienen onclick inline, no necesitan re-bind
-    },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // HISTORIAL (ACTUALIZADO PARA MULTI-USUARIO)
-    // ─────────────────────────────────────────────────────────────────────
+    reiniciarEventosDashboard: function() {},
+    
     guardarEnHistorial: function() {
         var hist = this.obtenerHistorial();
         
-        // ✅ VERIFICAR SI HAY TRABAJADOR SELECCIONADO
         var t = MultiUsuario.getTrabajadorActual();
         var usuarioParaHistorial = t ? t.nombre : this.userData.nombre;
         var tipoUsuario = t ? 'trabajador' : 'admin';
@@ -2127,405 +1779,370 @@ const app = {
         try { var h = localStorage.getItem('rayoshield_historial'); return h ? JSON.parse(h) : []; } catch(e) { return []; }
     },
     
-    // ✅ NUEVA FUNCIÓN - Historial filtrado por trabajador
     obtenerHistorialPorTrabajador: function(trabajadorId) {
         var hist = this.obtenerHistorial();
         if (!trabajadorId) return hist;
         return hist.filter(h => h.trabajadorId === trabajadorId);
     },
     
-    // ✅ NUEVA FUNCIÓN - Historial solo del admin
     obtenerHistorialAdmin: function() {
         var hist = this.obtenerHistorial();
         return hist.filter(h => h.tipoUsuario === 'admin');
     },
     
     cargarHistorial: function() { console.log('Historial:', this.obtenerHistorial().length, 'exámenes'); },
-
-// ─────────────────────────────────────────────────────────────────────
-// GESTIÓN DE TRABAJADORES (MULTI-USUARIO) - DENTRO DE APP
-// ─────────────────────────────────────────────────────────────────────
-mostrarTrabajadores: function() {
-    this.renderTrabajadores();
-    this.mostrarPantalla('trabajadores-screen');
-},
-
-renderTrabajadores: function() {
-    if (typeof MultiUsuario === 'undefined') {
-        console.error('❌ MultiUsuario no está definido');
-        return;
-    }
-    var trabajadores = MultiUsuario.getTrabajadores();
-    var filtro = document.getElementById('filtro-estado') ? document.getElementById('filtro-estado').value : 'todos';
-    var busqueda = document.getElementById('buscar-trabajador') ? document.getElementById('buscar-trabajador').value.toLowerCase() : '';
-    if (filtro !== 'todos') {
-        trabajadores = trabajadores.filter(t => t.estado === filtro);
-    }
-    if (busqueda) {
-        trabajadores = trabajadores.filter(t =>
-            t.nombre.toLowerCase().includes(busqueda) ||
-            t.curp.toLowerCase().includes(busqueda) ||
-            (t.puesto && t.puesto.toLowerCase().includes(busqueda))
-        );
-    }
-    var tbody = document.getElementById('trabajadores-tabla');
-    var vacio = document.getElementById('trabajadores-vacio');
-    if (!tbody) return;
-    if (trabajadores.length === 0) {
-        tbody.innerHTML = '';
-        if (vacio) vacio.style.display = 'block';
-        return;
-    }
-    if (vacio) vacio.style.display = 'none';
-    tbody.innerHTML = trabajadores.map(function(t) {
-        var progreso = MultiUsuario.getProgresoByTrabajador(t.id);
-        var estadoClass = t.estado === 'activo' ? 'status-ok' : 'status-pend';
-        var estadoTexto = t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo';
-        return '<tr style="border-bottom:1px solid var(--border);">' +
-            '<td style="padding:14px 18px;">' +
-            '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
-            '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);margin-top:4px;">' + t.curp + '</div>' +
-            '</td>' +
-            '<td style="padding:14px 18px;">' +
-            '<div style="color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
-            '<div style="font-size:11px;color:var(--ink4);">' + (t.area || '') + '</div>' +
-            '</td>' +
-            '<td style="padding:14px 18px;">' +
-            '<div style="color:var(--ink);">' + progreso.total_examenes + ' exámenes</div>' +
-            '<div style="font-size:11px;color:var(--ink4);">' + progreso.total_casos + ' casos</div>' +
-            '</td>' +
-            '<td style="padding:14px 18px;">' +
-            '<div style="font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
-            '</td>' +
-            '<td style="padding:14px 18px;">' +
-            '<span class="activity-status ' + estadoClass + '" style="display:inline-block;">' + estadoTexto + '</span>' +
-            '</td>' +
-            '<td style="padding:14px 18px;text-align:center;">' +
-            '<div class="td-actions" style="justify-content:center;">' +
-            '<button class="tbl-btn view" onclick="app.verProgresoTrabajador(\'' + t.id + '\')" title="Ver progreso">📊</button>' +
-            '<button class="tbl-btn pdf" onclick="app.editarTrabajador(\'' + t.id + '\')" title="Editar">✏️</button>' +
-            '<button class="tbl-btn" style="background:var(--rose-l);color:var(--rose);" onclick="app.eliminarTrabajador(\'' + t.id + '\')" title="Eliminar">🗑️</button>' +
-            '</div>' +
-            '</td>' +
-            '</tr>';
-    }).join('');
-    this.actualizarEstadisticasTrabajadores();
-    this.actualizarBadgeTrabajadores();
-},
-
-actualizarEstadisticasTrabajadores: function() {
-    if (typeof MultiUsuario === 'undefined') return;
-    var stats = MultiUsuario.getEstadisticas();
-    var el1 = document.getElementById('stat-trabajadores-total');
-    var el2 = document.getElementById('stat-trabajadores-activos');
-    var el3 = document.getElementById('stat-examenes-total');
-    var el4 = document.getElementById('stat-tasa-aprobacion');
-    if (el1) el1.textContent = stats.trabajadores_totales;
-    if (el2) el2.textContent = stats.trabajadores_activos;
-    if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
-    if (el4) el4.textContent = stats.tasa_aprobacion + '%';
-},
-
-mostrarModalTrabajador: function() {
-    document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
-    document.getElementById('trabajador-id').value = '';
-    document.getElementById('trabajador-nombre').value = '';
-    document.getElementById('trabajador-curp').value = '';
-    document.getElementById('trabajador-puesto').value = '';
-    document.getElementById('trabajador-area').value = '';
-    document.getElementById('trabajador-email').value = '';
-    document.getElementById('trabajador-telefono').value = '';
-    document.getElementById('trabajador-notas').value = '';
-    document.getElementById('modal-trabajador').classList.add('active');
-},
-
-cerrarModalTrabajador: function() {
-    document.getElementById('modal-trabajador').classList.remove('active');
-},
-
-guardarTrabajador: function() {
-    if (typeof MultiUsuario === 'undefined') {
-        alert('❌ Error: Sistema Multi-Usuario no cargado');
-        return;
-    }
-    var id = document.getElementById('trabajador-id').value;
-    var nombre = document.getElementById('trabajador-nombre').value.trim();
-    var curp = document.getElementById('trabajador-curp').value.trim().toUpperCase();
-    var puesto = document.getElementById('trabajador-puesto').value.trim();
-    var area = document.getElementById('trabajador-area').value.trim();
-    var email = document.getElementById('trabajador-email').value.trim();
-    var telefono = document.getElementById('trabajador-telefono').value.trim();
-    var notas = document.getElementById('trabajador-notas').value.trim();
-    if (!nombre || !curp || !puesto) {
-        alert('⚠️ Nombre, CURP y Puesto son obligatorios');
-        return;
-    }
-    var data = { nombre, curp, puesto, area, email, telefono, notas };
-    if (id) {
-        MultiUsuario.updateTrabajador(id, data);
-        alert('✅ Trabajador actualizado correctamente');
-    } else {
-        MultiUsuario.addTrabajador(data);
-        alert('✅ Trabajador registrado correctamente');
-    }
-    this.cerrarModalTrabajador();
-    this.renderTrabajadores();
-},
-
-editarTrabajador: function(id) {
-    if (typeof MultiUsuario === 'undefined') return;
-    var t = MultiUsuario.getTrabajadorById(id);
-    if (!t) return;
-    document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
-    document.getElementById('trabajador-id').value = t.id;
-    document.getElementById('trabajador-nombre').value = t.nombre;
-    document.getElementById('trabajador-curp').value = t.curp;
-    document.getElementById('trabajador-puesto').value = t.puesto || '';
-    document.getElementById('trabajador-area').value = t.area || '';
-    document.getElementById('trabajador-email').value = t.email || '';
-    document.getElementById('trabajador-telefono').value = t.telefono || '';
-    document.getElementById('trabajador-notas').value = t.notas || '';
-    document.getElementById('modal-trabajador').classList.add('active');
-},
-
-eliminarTrabajador: function(id) {
-    if (typeof MultiUsuario === 'undefined') return;
-    if (!confirm('⚠️ ¿Estás seguro de eliminar este trabajador?\nSe eliminarán también todos sus resultados de exámenes y casos.')) {
-        return;
-    }
-    MultiUsuario.deleteTrabajador(id);
-    alert('✅ Trabajador eliminado correctamente');
-    this.renderTrabajadores();
-    this.actualizarBadgeTrabajadores();
-},
-
-verProgresoTrabajador: function(id) {
-    if (typeof MultiUsuario === 'undefined') return;
-    var t = MultiUsuario.getTrabajadorById(id);
-    var progreso = MultiUsuario.getProgresoByTrabajador(id);
-    var resultados = MultiUsuario.getResultadosByTrabajador(id);
-    if (!t) return;
-    var infoEl = document.getElementById('progreso-info');
-    var historialEl = document.getElementById('progreso-historial');
-    if (infoEl) {
-        infoEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">' +
-            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-            '<div style="font-size:10px;color:var(--ink4);">Nombre</div>' +
-            '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + t.nombre + '</div>' +
-            '</div>' +
-            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-            '<div style="font-size:10px;color:var(--ink4);">Puesto</div>' +
-            '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
-            '</div>' +
-            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-            '<div style="font-size:10px;color:var(--ink4);">Exámenes</div>' +
-            '<div style="font-size:16px;font-weight:700;color:var(--blue);">' + progreso.total_examenes + '</div>' +
-            '</div>' +
-            '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
-            '<div style="font-size:10px;color:var(--ink4);">Promedio</div>' +
-            '<div style="font-size:16px;font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
-            '</div>' +
-            '</div>';
-    }
-    if (historialEl) {
-        if (resultados.length === 0) {
-            historialEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink4);">Sin resultados registrados</div>';
-        } else {
-            historialEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
-                '<thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Fecha</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Tipo</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Actividad</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:600;color:var(--ink4);">Puntaje</th><th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);">Estado</th></tr></thead>' +
-                '<tbody>' +
-                resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(function(r) {
-                    var estadoClass = r.aprobado ? 'status-ok' : 'status-pend';
-                    var estadoTexto = r.aprobado ? '✅ Aprobado' : '❌ Reprobado';
-                    return '<tr style="border-bottom:1px solid var(--border);">' +
-                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + new Date(r.fecha).toLocaleDateString('es-MX') + '</td>' +
-                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + (r.tipo === 'examen' ? '📝 Examen' : '⚠️ Caso') + '</td>' +
-                        '<td style="padding:10px 14px;font-size:12px;color:var(--ink);">' + r.actividad + '</td>' +
-                        '<td style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--ink);text-align:right;">' + r.puntaje + '%</td>' +
-                        '<td style="padding:10px 14px;text-align:center;"><span class="activity-status ' + estadoClass + '">' + estadoTexto + '</span></td>' +
-                        '</tr>';
-                }).join('') +
-                '</tbody></table>';
+    
+    mostrarTrabajadores: function() {
+        if (!this.verificarAccesoAdmin('mostrarTrabajadores')) return;
+        this.renderTrabajadores();
+        this.mostrarPantalla('trabajadores-screen');
+    },
+    
+    renderTrabajadores: function() {
+        if (typeof MultiUsuario === 'undefined') {
+            console.error('❌ MultiUsuario no está definido');
+            return;
         }
-    }
-    document.getElementById('modal-progreso-trabajador').classList.add('active');
-},
-
-mostrarSeleccionarTrabajador: function() {
-    if (typeof MultiUsuario === 'undefined') return;
-    var trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
-    var lista = document.getElementById('kiosco-lista');
-    if (!lista) return;
-    lista.innerHTML = trabajadores.map(function(t) {
-        return '<div onclick="app.seleccionarTrabajadorKiosco(\'' + t.id + '\')" style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.background=\'var(--blue-l)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--bg)\'">' +
-            '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
-            '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">' + t.curp + ' • ' + (t.puesto || 'N/A') + '</div>' +
-            '</div>';
-    }).join('');
-    document.getElementById('modal-seleccionar-trabajador').classList.add('active');
-},
-
-cerrarModalSeleccionarTrabajador: function() {
-    document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
-},
-
-filtrarKioscoTrabajadores: function() {
-    var busqueda = document.getElementById('kiosco-buscar').value.toLowerCase();
-    var items = document.querySelectorAll('#kiosco-lista > div');
-    items.forEach(function(item) {
-        var texto = item.textContent.toLowerCase();
-        item.style.display = texto.includes(busqueda) ? 'block' : 'none';
-    });
-},
-
-seleccionarTrabajadorKiosco: function(id) {
-    if (typeof MultiUsuario === 'undefined') return;
+        var trabajadores = MultiUsuario.getTrabajadores();
+        var filtro = document.getElementById('filtro-estado') ? document.getElementById('filtro-estado').value : 'todos';
+        var busqueda = document.getElementById('buscar-trabajador') ? document.getElementById('buscar-trabajador').value.toLowerCase() : '';
+        if (filtro !== 'todos') {
+            trabajadores = trabajadores.filter(t => t.estado === filtro);
+        }
+        if (busqueda) {
+            trabajadores = trabajadores.filter(t =>
+                t.nombre.toLowerCase().includes(busqueda) ||
+                t.curp.toLowerCase().includes(busqueda) ||
+                (t.puesto && t.puesto.toLowerCase().includes(busqueda))
+            );
+        }
+        var tbody = document.getElementById('trabajadores-tabla');
+        var vacio = document.getElementById('trabajadores-vacio');
+        if (!tbody) return;
+        if (trabajadores.length === 0) {
+            tbody.innerHTML = '';
+            if (vacio) vacio.style.display = 'block';
+            return;
+        }
+        if (vacio) vacio.style.display = 'none';
+        tbody.innerHTML = trabajadores.map(function(t) {
+            var progreso = MultiUsuario.getProgresoByTrabajador(t.id);
+            var estadoClass = t.estado === 'activo' ? 'status-ok' : 'status-pend';
+            var estadoTexto = t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo';
+            return '<tr style="border-bottom:1px solid var(--border);">' +
+                '<td style="padding:14px 18px;">' +
+                '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
+                '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);margin-top:4px;">' + t.curp + '</div>' +
+                '</td>' +
+                '<td style="padding:14px 18px;">' +
+                '<div style="color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
+                '<div style="font-size:11px;color:var(--ink4);">' + (t.area || '') + '</div>' +
+                '</td>' +
+                '<td style="padding:14px 18px;">' +
+                '<div style="color:var(--ink);">' + progreso.total_examenes + ' exámenes</div>' +
+                '<div style="font-size:11px;color:var(--ink4);">' + progreso.total_casos + ' casos</div>' +
+                '</td>' +
+                '<td style="padding:14px 18px;">' +
+                '<div style="font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
+                '</td>' +
+                '<td style="padding:14px 18px;">' +
+                '<span class="activity-status ' + estadoClass + '" style="display:inline-block;">' + estadoTexto + '</span>' +
+                '</td>' +
+                '<td style="padding:14px 18px;text-align:center;">' +
+                '<div class="td-actions" style="justify-content:center;">' +
+                '<button class="tbl-btn view" onclick="app.verProgresoTrabajador(\'' + t.id + '\')" title="Ver progreso">📊</button>' +
+                '<button class="tbl-btn pdf" onclick="app.editarTrabajador(\'' + t.id + '\')" title="Editar">✏️</button>' +
+                '<button class="tbl-btn" style="background:var(--rose-l);color:var(--rose);" onclick="app.eliminarTrabajador(\'' + t.id + '\')" title="Eliminar">🗑️</button>' +
+                '</div>' +
+                '</td>' +
+                '</tr>';
+        }).join('');
+        this.actualizarEstadisticasTrabajadores();
+        this.actualizarBadgeTrabajadores();
+    },
     
-    var t = MultiUsuario.getTrabajadorById(id);
-    if (!t) return;
+    actualizarEstadisticasTrabajadores: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        var stats = MultiUsuario.getEstadisticas();
+        var el1 = document.getElementById('stat-trabajadores-total');
+        var el2 = document.getElementById('stat-trabajadores-activos');
+        var el3 = document.getElementById('stat-examenes-total');
+        var el4 = document.getElementById('stat-tasa-aprobacion');
+        if (el1) el1.textContent = stats.trabajadores_totales;
+        if (el2) el2.textContent = stats.trabajadores_activos;
+        if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
+        if (el4) el4.textContent = stats.tasa_aprobacion + '%';
+    },
     
-    // ✅ MENSAJE DE CONFIRMACIÓN
-    var confirmar = confirm('👷 Cambiar a modo trabajador\n\n' +
-        'Trabajador: ' + t.nombre + '\n' +
-        'Puesto: ' + (t.puesto || 'N/A') + '\n\n' +
-        '⚠️ Los próximos exámenes se guardarán a nombre de este trabajador.\n\n' +
-        '¿Continuar?');
+    mostrarModalTrabajador: function() {
+        document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
+        document.getElementById('trabajador-id').value = '';
+        document.getElementById('trabajador-nombre').value = '';
+        document.getElementById('trabajador-curp').value = '';
+        document.getElementById('trabajador-puesto').value = '';
+        document.getElementById('trabajador-area').value = '';
+        document.getElementById('trabajador-email').value = '';
+        document.getElementById('trabajador-telefono').value = '';
+        document.getElementById('trabajador-notas').value = '';
+        document.getElementById('modal-trabajador').classList.add('active');
+    },
     
-    if (!confirmar) return;
+    cerrarModalTrabajador: function() {
+        document.getElementById('modal-trabajador').classList.remove('active');
+    },
     
-    // ✅ CAMBIAR MODO A TRABAJADOR
-    this.modoActual = 'trabajador';    
-    MultiUsuario.setTrabajadorActual(id);
+    guardarTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') {
+            alert('❌ Error: Sistema Multi-Usuario no cargado');
+            return;
+        }
+        var id = document.getElementById('trabajador-id').value;
+        var nombre = document.getElementById('trabajador-nombre').value.trim();
+        var curp = document.getElementById('trabajador-curp').value.trim().toUpperCase();
+        var puesto = document.getElementById('trabajador-puesto').value.trim();
+        var area = document.getElementById('trabajador-area').value.trim();
+        var email = document.getElementById('trabajador-email').value.trim();
+        var telefono = document.getElementById('trabajador-telefono').value.trim();
+        var notas = document.getElementById('trabajador-notas').value.trim();
+        if (!nombre || !curp || !puesto) {
+            alert('⚠️ Nombre, CURP y Puesto son obligatorios');
+            return;
+        }
+        var data = { nombre, curp, puesto, area, email, telefono, notas };
+        if (id) {
+            MultiUsuario.updateTrabajador(id, data);
+            alert('✅ Trabajador actualizado correctamente');
+        } else {
+            MultiUsuario.addTrabajador(data);
+            alert('✅ Trabajador registrado correctamente');
+        }
+        this.cerrarModalTrabajador();
+        this.renderTrabajadores();
+    },
     
-    this.cerrarModalSeleccionarTrabajador();
-    this.actualizarTrabajadorActualUI();
-    this.actualizarSidebarModoIndicador();
-    this.actualizarUIMenuPorRol();
+    editarTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        var t = MultiUsuario.getTrabajadorById(id);
+        if (!t) return;
+        document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
+        document.getElementById('trabajador-id').value = t.id;
+        document.getElementById('trabajador-nombre').value = t.nombre;
+        document.getElementById('trabajador-curp').value = t.curp;
+        document.getElementById('trabajador-puesto').value = t.puesto || '';
+        document.getElementById('trabajador-area').value = t.area || '';
+        document.getElementById('trabajador-email').value = t.email || '';
+        document.getElementById('trabajador-telefono').value = t.telefono || '';
+        document.getElementById('trabajador-notas').value = t.notas || '';
+        document.getElementById('modal-trabajador').classList.add('active');
+    },
     
-    alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
-},    
-// ─────────────────────────────────────────────────────────────────────
-// ACTUALIZAR BADGE DE TRABAJADORES
-// ─────────────────────────────────────────────────────────────────────
-actualizarBadgeTrabajadores: function() {
-    var badge = document.getElementById('nav-badge-trabajadores');
-    if (!badge) return;
+    eliminarTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        if (!confirm('⚠️ ¿Estás seguro de eliminar este trabajador?\nSe eliminarán también todos sus resultados de exámenes y casos.')) {
+            return;
+        }
+        MultiUsuario.deleteTrabajador(id);
+        alert('✅ Trabajador eliminado correctamente');
+        this.renderTrabajadores();
+        this.actualizarBadgeTrabajadores();
+    },
     
-    if (typeof MultiUsuario === 'undefined') {
-        badge.textContent = '0';
-        return;
-    }
+    verProgresoTrabajador: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        var t = MultiUsuario.getTrabajadorById(id);
+        var progreso = MultiUsuario.getProgresoByTrabajador(id);
+        var resultados = MultiUsuario.getResultadosByTrabajador(id);
+        if (!t) return;
+        var infoEl = document.getElementById('progreso-info');
+        var historialEl = document.getElementById('progreso-historial');
+        if (infoEl) {
+            infoEl.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;">' +
+                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+                '<div style="font-size:10px;color:var(--ink4);">Nombre</div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + t.nombre + '</div>' +
+                '</div>' +
+                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+                '<div style="font-size:10px;color:var(--ink4);">Puesto</div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--ink);">' + (t.puesto || 'N/A') + '</div>' +
+                '</div>' +
+                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+                '<div style="font-size:10px;color:var(--ink4);">Exámenes</div>' +
+                '<div style="font-size:16px;font-weight:700;color:var(--blue);">' + progreso.total_examenes + '</div>' +
+                '</div>' +
+                '<div style="background:var(--bg);padding:15px;border-radius:var(--radius-sm);text-align:center;">' +
+                '<div style="font-size:10px;color:var(--ink4);">Promedio</div>' +
+                '<div style="font-size:16px;font-weight:700;color:' + (progreso.promedio >= 80 ? 'var(--green)' : 'var(--amber)') + ';">' + progreso.promedio + '%</div>' +
+                '</div>' +
+                '</div>';
+        }
+        if (historialEl) {
+            if (resultados.length === 0) {
+                historialEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--ink4);">Sin resultados registrados</div>';
+            } else {
+                historialEl.innerHTML = '<table style="width:100%;border-collapse:collapse;">' +
+                    '<thead><tr style="background:var(--bg);"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Fecha</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Tipo</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--ink4);">Actividad</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:600;color:var(--ink4);">Puntaje</th><th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:600;color:var(--ink4);">Estado</th></tr></thead>' +
+                    '<tbody>' +
+                    resultados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(function(r) {
+                        var estadoClass = r.aprobado ? 'status-ok' : 'status-pend';
+                        var estadoTexto = r.aprobado ? '✅ Aprobado' : '❌ Reprobado';
+                        return '<tr style="border-bottom:1px solid var(--border);">' +
+                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + new Date(r.fecha).toLocaleDateString('es-MX') + '</td>' +
+                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink3);">' + (r.tipo === 'examen' ? '📝 Examen' : '⚠️ Caso') + '</td>' +
+                            '<td style="padding:10px 14px;font-size:12px;color:var(--ink);">' + r.actividad + '</td>' +
+                            '<td style="padding:10px 14px;font-size:12px;font-weight:700;color:var(--ink);text-align:right;">' + r.puntaje + '%</td>' +
+                            '<td style="padding:10px 14px;text-align:center;"><span class="activity-status ' + estadoClass + '">' + estadoTexto + '</span></td>' +
+                            '</tr>';
+                    }).join('') +
+                    '</tbody></table>';
+            }
+        }
+        document.getElementById('modal-progreso-trabajador').classList.add('active');
+    },
     
-    var trabajadores = MultiUsuario.getTrabajadores();
-    var count = trabajadores ? trabajadores.length : 0;
+    mostrarSeleccionarTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        var trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
+        var lista = document.getElementById('kiosco-lista');
+        if (!lista) return;
+        lista.innerHTML = trabajadores.map(function(t) {
+            return '<div onclick="app.seleccionarTrabajadorKiosco(\'' + t.id + '\')" style="padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.borderColor=\'var(--blue)\';this.style.background=\'var(--blue-l)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'var(--bg)\'">' +
+                '<div style="font-weight:600;color:var(--ink);">' + t.nombre + '</div>' +
+                '<div style="font-size:11px;color:var(--ink4);font-family:var(--mono);">' + t.curp + ' • ' + (t.puesto || 'N/A') + '</div>' +
+                '</div>';
+        }).join('');
+        document.getElementById('modal-seleccionar-trabajador').classList.add('active');
+    },
     
-    badge.textContent = count;
+    cerrarModalSeleccionarTrabajador: function() {
+        document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
+    },
     
-    // Mostrar/ocultar badge según cantidad
-    if (count > 0) {
-        badge.style.display = 'inline-block';
-        badge.style.background = count > 10 ? 'var(--rose)' : 'var(--blue)';
-    } else {
-        badge.style.display = 'none';
-    }
-},
-actualizarTrabajadorActualUI: function() {
-    if (typeof MultiUsuario === 'undefined') return;
-    var t = MultiUsuario.getTrabajadorActual();
-    var topbarSub = document.getElementById('topbar-sub');
-    if (t && topbarSub) {
-        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
-        topbarSub.style.color = 'var(--green)';
-    }
-},
-
-// ─────────────────────────────────────────────────────────────────────
-// VOLVER A MODO ADMIN
-// ─────────────────────────────────────────────────────────────────────
-volverAModoAdmin: function() {
-    // Limpiar trabajador actual
-    MultiUsuario.clearTrabajadorActual();
+    filtrarKioscoTrabajadores: function() {
+        var busqueda = document.getElementById('kiosco-buscar').value.toLowerCase();
+        var items = document.querySelectorAll('#kiosco-lista > div');
+        items.forEach(function(item) {
+            var texto = item.textContent.toLowerCase();
+            item.style.display = texto.includes(busqueda) ? 'block' : 'none';
+        });
+    },
     
-    // Actualizar UI
-    this.actualizarTrabajadorActualUI();
+    seleccionarTrabajadorKiosco: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
+        var t = MultiUsuario.getTrabajadorById(id);
+        if (!t) return;
+        
+        var confirmar = confirm('👷 Cambiar a modo trabajador\n\n' +
+            'Trabajador: ' + t.nombre + '\n' +
+            'Puesto: ' + (t.puesto || 'N/A') + '\n\n' +
+            '⚠️ Los próximos exámenes se guardarán a nombre de este trabajador.\n\n' +
+            '¿Continuar?');
+        
+        if (!confirmar) return;
+        
+        this.modoActual = 'trabajador';    
+        MultiUsuario.setTrabajadorActual(id);
+        
+        this.cerrarModalSeleccionarTrabajador();
+        this.actualizarTrabajadorActualUI();
+        this.actualizarSidebarModoIndicador();
+        this.actualizarUIMenuPorRol();
+        this.actualizarUIPorRol();
+        
+        alert('✅ Trabajador seleccionado: ' + t.nombre + '\n\nAhora puede realizar exámenes y casos.');
+    },
     
-    // Actualizar indicador del sidebar
-    this.actualizarSidebarModoIndicador();
+    actualizarBadgeTrabajadores: function() {
+        var badge = document.getElementById('nav-badge-trabajadores');
+        if (!badge) return;
+        
+        if (typeof MultiUsuario === 'undefined') {
+            badge.textContent = '0';
+            return;
+        }
+        
+        var trabajadores = MultiUsuario.getTrabajadores();
+        var count = trabajadores ? trabajadores.length : 0;
+        
+        badge.textContent = count;
+        
+        if (count > 0) {
+            badge.style.display = 'inline-block';
+            badge.style.background = count > 10 ? 'var(--rose)' : 'var(--blue)';
+        } else {
+            badge.style.display = 'none';
+        }
+    },
     
-    // Mensaje de confirmación
-    alert('✅ Modo Admin activado\n\nLos próximos exámenes se guardarán a nombre del administrador:\n' + this.userData.nombre);
+    actualizarTrabajadorActualUI: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        var t = MultiUsuario.getTrabajadorActual();
+        var topbarSub = document.getElementById('topbar-sub');
+        if (t && topbarSub) {
+            topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
+            topbarSub.style.color = 'var(--amber)';
+        } else if (topbarSub) {
+            topbarSub.textContent = 'Plataforma de certificación';
+            topbarSub.style.color = 'var(--ink4)';
+        }
+    },
     
-    // Cerrar modal si está abierto
-    this.cerrarModalSeleccionarTrabajador();
-},
-
-// ─────────────────────────────────────────────────────────────────────
-// ACTUALIZAR INDICADOR DEL SIDEBAR
-// ─────────────────────────────────────────────────────────────────────
-actualizarSidebarModoIndicador: function() {
-    var indicador = document.getElementById('sidebar-modo-indicador');
-    var nombre = document.getElementById('sidebar-modo-nombre');
-    var btnVolverAdmin = document.getElementById('btn-volver-admin');
+    // ✅ MODIFICADA - REQUIERE CONTRASEÑA
+    volverAModoAdmin: function() {
+        if (!this.verificarPasswordAdmin()) {
+            return;
+        }
+        
+        if (typeof MultiUsuario !== 'undefined') {
+            MultiUsuario.clearTrabajadorActual();
+        }
+        this.modoActual = 'admin';
+        
+        this.actualizarTrabajadorActualUI();
+        this.actualizarSidebarModoIndicador();
+        this.actualizarUIMenuPorRol();
+        this.actualizarUIPorRol();
+        
+        alert('✅ Modo administrador activado\n\nAcceso completo restaurado');
+    },
     
-    if (!indicador || !nombre) return;
+    actualizarSidebarModoIndicador: function() {
+        var indicador = document.getElementById('sidebar-modo-indicador');
+        var nombre = document.getElementById('sidebar-modo-nombre');
+        var btnVolverAdmin = document.getElementById('btn-volver-admin');
+        
+        if (!indicador || !nombre) return;
+        
+        var t = MultiUsuario.getTrabajadorActual();
+        
+        if (t) {
+            if (indicador) indicador.style.display = 'block';
+            if (nombre) nombre.textContent = '👷 ' + t.nombre;
+            if (btnVolverAdmin) btnVolverAdmin.style.display = 'block';
+        } else {
+            if (indicador) indicador.style.display = 'none';
+            if (nombre) nombre.textContent = '👤 Admin';
+            if (btnVolverAdmin) btnVolverAdmin.style.display = 'none';
+        }
+    },
     
-    var t = MultiUsuario.getTrabajadorActual();
+    cerrarSesionTrabajador: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        MultiUsuario.clearTrabajadorActual();
+        var topbarSub = document.getElementById('topbar-sub');
+        if (topbarSub) {
+            topbarSub.textContent = 'Plataforma de certificación';
+            topbarSub.style.color = 'var(--ink4)';
+        }
+        alert('👋 Sesión de trabajador cerrada');
+    },
     
-    if (t) {
-        // MODO TRABAJADOR ACTIVO
-        if (indicador) indicador.style.display = 'block';
-        if (nombre) nombre.textContent = '👷 ' + t.nombre;
-        if (btnVolverAdmin) btnVolverAdmin.style.display = 'block';
-    } else {
-        // MODO ADMIN
-        if (indicador) indicador.style.display = 'none';
-        if (nombre) nombre.textContent = '👤 Admin';
-        if (btnVolverAdmin) btnVolverAdmin.style.display = 'none';
-    }
-},
-
-
-// ─────────────────────────────────────────────────────────────────────
-// ACTUALIZAR TRABAJADOR ACTUAL UI (ACTUALIZADA)
-// ─────────────────────────────────────────────────────────────────────
-actualizarTrabajadorActualUI: function() {
-    var t = MultiUsuario.getTrabajadorActual();
-    var topbarSub = document.getElementById('topbar-sub');
-    var btnVolverAdmin = document.getElementById('btn-volver-admin');
+    toggleTema: function() {
+        document.body.classList.toggle('tema-claro');
+        var esClaro = document.body.classList.contains('tema-claro');
+        localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
+    },
     
-    if (t && topbarSub) {
-        topbarSub.textContent = '👷 ' + t.nombre + ' • ' + t.puesto;
-        topbarSub.style.color = 'var(--amber)';
-        if (btnVolverAdmin) btnVolverAdmin.style.display = 'block';
-    } else {
-        topbarSub.textContent = 'Plataforma de certificación';
-        topbarSub.style.color = 'var(--ink4)';
-        if (btnVolverAdmin) btnVolverAdmin.style.display = 'none';
-    }
-    
-    // Actualizar sidebar
-    this.actualizarSidebarModoIndicador();
-},
-cerrarSesionTrabajador: function() {
-    if (typeof MultiUsuario === 'undefined') return;
-    MultiUsuario.clearTrabajadorActual();
-    var topbarSub = document.getElementById('topbar-sub');
-    if (topbarSub) {
-        topbarSub.textContent = 'Plataforma de certificación';
-        topbarSub.style.color = 'var(--ink4)';
-    }
-    alert('👋 Sesión de trabajador cerrada');
-},
-
-toggleTema: function() {
-    document.body.classList.toggle('tema-claro');
-    var esClaro = document.body.classList.contains('tema-claro');
-    localStorage.setItem('rayoshield_tema', esClaro ? 'claro' : 'oscuro');
-},
-    
-    // ─────────────────────────────────────────────────────────────────────
-    // PWA INSTALL
-    // ─────────────────────────────────────────────────────────────────────
     initPWAInstall: function() {
         var self = this;
         window.addEventListener('beforeinstallprompt', function(e) {
@@ -2554,22 +2171,15 @@ toggleTema: function() {
             if (c) c.style.display = 'none';
         });
     },
-
-    // ─────────────────────────────────────────────────────────────────────
-    // SISTEMA DE ROLES Y SEGURIDAD
-    // ─────────────────────────────────────────────────────────────────────
-
-    // Verificar si es administrador
+    
     esAdmin: function() {
         return this.modoActual === 'admin' || !MultiUsuario.getTrabajadorActual();
     },
     
-    // Verificar si es trabajador
     esTrabajador: function() {
         return this.modoActual === 'trabajador' && MultiUsuario.getTrabajadorActual() !== null;
     },
     
-    // Verificar acceso a función administrativa
     verificarAccesoAdmin: function(funcionNombre, mostrarAlerta = true) {
         if (this.esTrabajador()) {
             if (mostrarAlerta) {
@@ -2581,66 +2191,9 @@ toggleTema: function() {
         return true;
     },
     
-    // Verificar contraseña de admin
-    verificarPasswordAdmin: function() {
-        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
-        var password = prompt('🔐 Contraseña de administrador:');
-        
-        if (!password) return false;
-        if (password !== passwordGuardada) {
-            alert('❌ Contraseña incorrecta');
-            console.warn('🔐 Intento fallido de acceso admin');
-            return false;
-        }
-        return true;
-    },
-    
-    // Cambiar contraseña de admin
-    cambiarPasswordAdmin: function() {
-        if (!this.verificarAccesoAdmin('cambiarPasswordAdmin')) return;
-        
-        var passwordActual = prompt('🔐 Contraseña actual:');
-        var passwordGuardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
-        
-        if (passwordActual !== passwordGuardada) {
-            alert('❌ Contraseña actual incorrecta');
-            return;
-        }
-        
-        var passwordNueva = prompt('🔐 Nueva contraseña (mínimo 6 caracteres):');
-        if (!passwordNueva || passwordNueva.length < 6) {
-            alert('⚠️ La contraseña debe tener al menos 6 caracteres');
-            return;
-        }
-        
-        localStorage.setItem('rayoshield_admin_password', passwordNueva);
-        alert('✅ Contraseña de administrador actualizada correctamente');
-    },
-    
-    // Volver a modo admin CON CONTRASEÑA
-    volverAModoAdmin: function() {
-        // ✅ REQUERIR CONTRASEÑA PARA VOLVER A ADMIN
-        if (!this.verificarPasswordAdmin()) {
-            return;
-        }
-        
-        // Limpiar trabajador actual
-        this.modoActual = 'admin';
-        MultiUsuario.clearTrabajadorActual();
-        
-        // Actualizar UI
-        this.actualizarTrabajadorActualUI();
-        this.actualizarSidebarModoIndicador();
-        this.actualizarUIMenuPorRol();
-        
-        alert('✅ Modo administrador activado\n\nAcceso completo restaurado');
-    },
-    
-    // Actualizar menú según rol (OCULTAR elementos para trabajadores)
     actualizarUIMenuPorRol: function() {
         var esTrabajador = this.esTrabajador();
         
-        // Elementos del sidebar que deben ocultarse para trabajadores
         var elementosRestringidos = [
             { selector: '#nav-badge-trabajadores', accion: 'display' },
             { selector: '.nav-item[onclick*="mostrarTrabajadores"]', accion: 'display' },
@@ -2648,16 +2201,13 @@ toggleTema: function() {
             { selector: '.nav-item[onclick*="mostrarInfo"]', accion: 'display' }
         ];
         
-        // Bottom nav (móvil)
         var bnItems = [
             { selector: '#bn-licencia', accion: 'display' }
         ];
         
-        // Botón de volver a admin
         var btnAdmin = document.getElementById('btn-volver-admin');
         
         if (esTrabajador) {
-            // OCULTAR elementos restringidos
             elementosRestringidos.forEach(function(item) {
                 var el = document.querySelector(item.selector);
                 if (el) el.style.display = 'none';
@@ -2668,12 +2218,10 @@ toggleTema: function() {
                 if (el) el.style.display = 'none';
             });
             
-            // MOSTRAR botón de volver a admin
             if (btnAdmin) btnAdmin.style.display = 'block';
             
             console.log('🔐 Modo trabajador: Menú restringido activado');
         } else {
-            // MOSTRAR todos los elementos
             elementosRestringidos.forEach(function(item) {
                 var el = document.querySelector(item.selector);
                 if (el) el.style.display = '';
@@ -2684,40 +2232,20 @@ toggleTema: function() {
                 if (el) el.style.display = '';
             });
             
-            // OCULTAR botón de volver a admin
             if (btnAdmin) btnAdmin.style.display = 'none';
             
             console.log('🔓 Modo admin: Menú completo activado');
         }
     },
     
-    // Sobrescribir funciones sensibles con validación
-    mostrarLicencia: function() {
-        if (!this.verificarAccesoAdmin('mostrarLicencia')) return;
-        this.mostrarPantalla('license-screen');
-    },
-    
-    mostrarTrabajadores: function() {
-        if (!this.verificarAccesoAdmin('mostrarTrabajadores')) return;
-        this.renderTrabajadores();
-        this.mostrarPantalla('trabajadores-screen');
-    },
-    
-    mostrarInfo: function() {
-        if (!this.verificarAccesoAdmin('mostrarInfo')) return;
-        this.mostrarPantalla('info-screen');
-    },
-    
     exportarDatos: function() {
         if (!this.verificarAccesoAdmin('exportarDatos')) return;
         
-        // ✅ BLOQUEAR PARA DEMO
         if (this.licencia.tipo === 'DEMO') {
             alert('⚠️ La función de respaldo no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
             return;
         }
         try {
-            // Recolectar datos
             var respaldo = {
                 version: '2.4.1',
                 fecha: new Date().toISOString(),
@@ -2732,14 +2260,12 @@ toggleTema: function() {
                 tema: localStorage.getItem('rayoshield_tema')
             };
             
-            // Validar que haya datos
             var tieneDatos = Object.values(respaldo).some(v => v && v !== 'null' && v !== 'undefined');
             if (!tieneDatos) {
                 alert('⚠️ No hay datos para exportar. Configura primero tu cuenta.');
                 return;
             }
             
-            // ✅ ENCRIPTAR EL JSON
             var json = JSON.stringify(respaldo);
             var encrypted = this._encrypt(json);
             
@@ -2747,7 +2273,6 @@ toggleTema: function() {
                 throw new Error('Error al encriptar');
             }
             
-            // Descargar archivo encriptado
             var blob = new Blob([encrypted], { type: 'application/octet-stream' });
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
@@ -2767,11 +2292,7 @@ toggleTema: function() {
         }
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // IMPORTAR DATOS CON DESENCRIPTACIÓN (BLOQUEADO PARA DEMO)
-    // ─────────────────────────────────────────────────────────────────────
     importarDatos: function(input) {
-        // ✅ BLOQUEAR PARA DEMO
         if (this.licencia.tipo === 'DEMO') {
             alert('⚠️ La función de respaldo no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
             input.value = '';
@@ -2781,7 +2302,6 @@ toggleTema: function() {
         var file = input.files[0];
         if (!file) return;
         
-        // Validar extensión
         if (!file.name.endsWith('.rsb')) {
             alert('❌ Archivo inválido. Solo se aceptan archivos .rsb de RayoShield.');
             input.value = '';
@@ -2795,7 +2315,6 @@ toggleTema: function() {
             try {
                 var encryptedText = e.target.result;
                 
-                // ✅ DESENCRIPTAR
                 var decrypted = self._decrypt(encryptedText);
                 if (!decrypted) {
                     throw new Error('No se pudo desencriptar el archivo. Verifica que sea un respaldo válido de RayoShield Exam.');
@@ -2803,12 +2322,10 @@ toggleTema: function() {
                 
                 var respaldo = JSON.parse(decrypted);
                 
-                // Validar estructura
                 if (!respaldo.version || !respaldo.licencia) {
                     throw new Error('Estructura de respaldo inválida');
                 }
                 
-                // Confirmar antes de sobrescribir
                 var confirmar = confirm(
                     '⚠️ ¿Restaurar datos desde respaldo encriptado?\n\n' +
                     'Esto reemplazará:\n' +
@@ -2826,7 +2343,6 @@ toggleTema: function() {
                     return;
                 }
                 
-                // Restaurar datos
                 if (respaldo.licencia) localStorage.setItem('rayoshield_licencia', respaldo.licencia);
                 if (respaldo.usuario) localStorage.setItem('rayoshield_usuario', respaldo.usuario);
                 if (respaldo.empresa) localStorage.setItem('rayoshield_empresa', respaldo.empresa);
@@ -2840,7 +2356,6 @@ toggleTema: function() {
                 console.log('✅ Datos importados y desencriptados');
                 alert('✅ Datos restaurados correctamente desde respaldo encriptado\n\nLa página se recargará para aplicar los cambios.');
                 
-                // Recargar para aplicar cambios
                 location.reload();
                 
             } catch(err) {
@@ -2859,14 +2374,14 @@ toggleTema: function() {
         reader.readAsText(file);
     },
     
-    // ─────────────────────────────────────────────────────────────────────
-    // LIMPIAR DATOS (CON CONFIRMACIÓN) - PERMITIDO PARA DEMO
-    // ─────────────────────────────────────────────────────────────────────
+    // ✅ MODIFICADA - BLOQUEADA PARA DEMO
     limpiarDatosConfirmar: function() {
         if (!this.verificarAccesoAdmin('limpiarDatosConfirmar')) return;
-        // ✅ PERMITIR PARA DEMO (deben poder borrar sus propios datos)
-        // Pero mostrar advertencia si es DEMO
-        var esDemo = this.licencia.tipo === 'DEMO';
+        
+        if (this.licencia.tipo === 'DEMO') {
+            alert('⚠️ La función de limpieza de datos no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
+            return;
+        }
         
         var confirmar = confirm(
             '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
@@ -2875,21 +2390,18 @@ toggleTema: function() {
             '• Datos de usuario y trabajadores\n' +
             '• Historial de exámenes y resultados\n' +
             '• Configuraciones personalizadas\n\n' +
-            (esDemo ? '⚠️ Estás en plan DEMO - Perderás tu progreso actual.\n\n' : '') +
             '⚠️ Esta acción NO se puede deshacer.\n\n' +
             '¿Deseas continuar?'
         );
         
         if (!confirmar) return;
         
-        // Segunda confirmación por seguridad
         var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
         if (confirmar2 !== 'BORRAR') {
             alert('Operación cancelada');
             return;
         }
         
-        // Limpiar localStorage
         localStorage.removeItem('rayoshield_licencia');
         localStorage.removeItem('rayoshield_usuario');
         localStorage.removeItem('rayoshield_empresa');
@@ -2904,32 +2416,24 @@ toggleTema: function() {
         alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
         location.reload();
     },
-    // ─────────────────────────────────────────────────────────────────────
-    // ENCRIPTACIÓN INTERMEDIA (XOR + Base64 + Salt)
-    // ─────────────────────────────────────────────────────────────────────
     
-    // Clave base para encriptación (puedes cambiarla)
     _encryptKey: 'RayoShield_v2.4.1_2026',
     
-    // Generar salt basado en fecha + clave
     _generateSalt: function() {
-        var date = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+        var date = new Date().toISOString().slice(0,10);
         return btoa(this._encryptKey + date).slice(0, 16);
     },
     
-    // Encriptar texto con XOR + Base64
     _encrypt: function(text) {
         try {
             var salt = this._generateSalt();
             var result = '';
             
-            // XOR character by character
             for (var i = 0; i < text.length; i++) {
                 var charCode = text.charCodeAt(i) ^ salt.charCodeAt(i % salt.length);
                 result += String.fromCharCode(charCode);
             }
             
-            // Base64 encode + add salt header
             var encrypted = btoa(unescape(encodeURIComponent(result)));
             return 'RS:' + salt + ':' + encrypted;
             
@@ -2939,10 +2443,8 @@ toggleTema: function() {
         }
     },
     
-    // Desencriptar texto con XOR + Base64
     _decrypt: function(encryptedText) {
         try {
-            // Validar formato
             if (!encryptedText || !encryptedText.startsWith('RS:')) {
                 throw new Error('Formato inválido');
             }
@@ -2955,10 +2457,8 @@ toggleTema: function() {
             var salt = parts[1];
             var data = parts[2];
             
-            // Base64 decode
             var decoded = decodeURIComponent(escape(atob(data)));
             
-            // XOR decrypt
             var result = '';
             for (var i = 0; i < decoded.length; i++) {
                 var charCode = decoded.charCodeAt(i) ^ salt.charCodeAt(i % salt.length);
@@ -2971,53 +2471,11 @@ toggleTema: function() {
             console.error('Error desencriptando:', e);
             return null;
         }
-    },
-    // ─────────────────────────────────────────────────────────────────────
-    // LIMPIAR DATOS (CON CONFIRMACIÓN)
-    // ─────────────────────────────────────────────────────────────────────
-    limpiarDatosConfirmar: function() {
-        var confirmar = confirm(
-            '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
-            'Esto eliminará PERMANENTEMENTE:\n' +
-            '• Configuración de licencia\n' +
-            '• Datos de usuario y trabajadores\n' +
-            '• Historial de exámenes y resultados\n' +
-            '• Configuraciones personalizadas\n\n' +
-            '⚠️ Esta acción NO se puede deshacer.\n\n' +
-            '¿Deseas continuar?'
-        );
-        
-        if (!confirmar) return;
-        
-        // Segunda confirmación por seguridad
-        var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
-        if (confirmar2 !== 'BORRAR') {
-            alert('Operación cancelada');
-            return;
-        }
-        
-        // Limpiar localStorage
-        localStorage.removeItem('rayoshield_licencia');
-        localStorage.removeItem('rayoshield_usuario');
-        localStorage.removeItem('rayoshield_empresa');
-        localStorage.removeItem('rayoshield_trabajadores');
-        localStorage.removeItem('rayoshield_resultados');
-        localStorage.removeItem('rayoshield_historial');
-        localStorage.removeItem('rayoshield_progreso');
-        localStorage.removeItem('rayoshield_wl_config');
-        localStorage.removeItem('rayoshield_tema');
-        
-        console.log('🗑️ Datos limpiados');
-        alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
-        location.reload();
-    },    
+    }
 };
 
-
-
-
 // ═══════════════════════════════════════════════════════════════
-// OBJETO MULTI-USUARIO (FUERA DEL OBJETO APP)
+// OBJETO MULTI-USUARIO
 // ═══════════════════════════════════════════════════════════════
 const MultiUsuario = {
     init: function() {
@@ -3129,13 +2587,11 @@ const MultiUsuario = {
         var resultados = this.getResultadosByTrabajador(trabajadorId);
         var examenes = resultados.filter(r => r.tipo === 'examen');
         var casos = resultados.filter(r => r.tipo === 'caso');
-        var aprobados = examenes.filter(r => r.aprobado).length;
-        var casosCompletados = casos.filter(r => r.aprobado).length;
         return {
             total_examenes: examenes.length,
-            examenes_aprobados: aprobados,
+            examenes_aprobados: examenes.filter(r => r.aprobado).length,
             total_casos: casos.length,
-            casos_completados: casosCompletados,
+            casos_completados: casos.filter(r => r.aprobado).length,
             promedio: examenes.length > 0 ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0
         };
     },
@@ -3155,14 +2611,9 @@ const MultiUsuario = {
             tasa_aprobacion: resultados.length > 0 ? Math.round((aprobados / resultados.length) * 100) : 0
         };
     }
-};  // ← ✅ CIERRA OBJETO MULTI-USUARIO
+};
 
-// Inicializar MultiUsuario
 MultiUsuario.init();
-
-// ═══════════════════════════════════════════════════════════════
-// INTEGRAR RESULTADOS CON MULTI-USUARIO (FUERA DE APP)
-// ═══════════════════════════════════════════════════════════════
 
 // Sobrescribir mostrarResultado para guardar con trabajador
 const originalMostrarResultado = app.mostrarResultado;
@@ -3181,7 +2632,7 @@ app.mostrarResultado = function() {
         });
         console.log('✅ Resultado guardado para', t.nombre);
     }
-};  // ← ✅ PUNTO Y COMA
+};
 
 // Sobrescribir mostrarResultadoCaso para guardar con trabajador
 const originalMostrarResultadoCaso = app.mostrarResultadoCaso;
@@ -3200,11 +2651,9 @@ app.mostrarResultadoCaso = function(resultado) {
         });
         console.log('✅ Resultado de caso guardado para', t.nombre);
     }
-};  // ← ✅ PUNTO Y COMA (NO COMA)
+};
 
-// ─────────────────────────────────────────────────────────────────────
-// INICIAR CUANDO DOM ESTÉ LISTO
-// ─────────────────────────────────────────────────────────────────────
+// INICIAR
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM listo');
     app.init();
