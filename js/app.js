@@ -10,6 +10,9 @@ const app = {
     preguntaActual: 0,
     resultadoActual: null,
     respuestaTemporal: null,
+    // Sistema de roles
+    modoActual: 'admin', // 'admin' o 'trabajador'
+    trabajadorActual: null,
     
     // Usuario
     userData: { empresa: '', nombre: '', curp: '', puesto: '' },
@@ -256,6 +259,7 @@ const app = {
         if (typeof this.actualizarBadgeTrabajadores === 'function') {
             this.actualizarBadgeTrabajadores();
             this.actualizarSidebarModoIndicador();
+            this.actualizarUIPorRol();
         }
     },
     
@@ -2477,9 +2481,161 @@ toggleTema: function() {
         });
     },
     // ─────────────────────────────────────────────────────────────────────
+    // CONTROL DE ACCESO POR ROL
+    // ─────────────────────────────────────────────────────────────────────
+    
+    // Verificar si es administrador
+    esAdmin: function() {
+        return this.modoActual === 'admin' || !MultiUsuario.getTrabajadorActual();
+    },
+    
+    // Verificar si es trabajador
+    esTrabajador: function() {
+        return this.modoActual === 'trabajador' && MultiUsuario.getTrabajadorActual() !== null;
+    },
+    
+    // Actualizar UI según rol
+    actualizarUIPorRol: function() {
+        var esTrabajador = this.esTrabajador();
+        
+        // Ocultar/mostrar elementos según rol
+        var elementosAdmin = [
+            'nav-badge-trabajadores',
+            'btn-volver-admin',
+            'sidebar-license-pill'
+        ];
+        
+        var elementosTrabajador = [
+            // Elementos que SOLO ve el trabajador
+        ];
+        
+        // Ocultar secciones completas para trabajadores
+        var seccionesRestringidas = [
+            'trabajadores-screen',
+            'license-screen'
+        ];
+        
+        // Navegación del sidebar
+        var navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(function(item) {
+            var texto = item.textContent.toLowerCase();
+            
+            // Ocultar "Trabajadores" y "Licencia" para trabajadores
+            if (esTrabajador) {
+                if (texto.includes('trabajadores') || texto.includes('licencia') || texto.includes('empresa')) {
+                    item.style.display = 'none';
+                }
+            } else {
+                item.style.display = 'flex';
+            }
+        });
+        
+        // Bottom nav (móvil)
+        var bnItems = document.querySelectorAll('.bn-item');
+        bnItems.forEach(function(item) {
+            var texto = item.textContent.toLowerCase();
+            if (esTrabajador) {
+                if (texto.includes('licencia')) {
+                    item.style.display = 'none';
+                }
+            } else {
+                item.style.display = 'flex';
+            }
+        });
+        
+        // Botón de volver a admin
+        var btnAdmin = document.getElementById('btn-volver-admin');
+        if (btnAdmin) {
+            btnAdmin.style.display = esTrabajador ? 'block' : 'none';
+        }
+        
+        console.log('🔐 Modo actual:', this.modoActual, '| ¿Es admin?:', this.esAdmin());
+    },
+    
+    // Seleccionar trabajador con validaciones
+    seleccionarTrabajadorKiosco: function(id) {
+        if (typeof MultiUsuario === 'undefined') return;
+        
+        var t = MultiUsuario.getTrabajadorById(id);
+        if (!t) return;
+        
+        // ✅ MENSAJE DE CONFIRMACIÓN CON ADVERTENCIA
+        var confirmar = confirm(
+            '👷 Cambiar a modo trabajador\n\n' +
+            'Trabajador: ' + t.nombre + '\n' +
+            'Puesto: ' + (t.puesto || 'N/A') + '\n\n' +
+            '⚠️ MODO RESTRINGIDO:\n' +
+            '• Solo podrás ver TU progreso\n' +
+            '• No podrás acceder a Licencia\n' +
+            '• No podrás ver otros trabajadores\n' +
+            '• No podrás exportar datos\n\n' +
+            '¿Continuar?'
+        );
+        
+        if (!confirmar) return;
+        
+        // ✅ CAMBIAR MODO A TRABAJADOR
+        this.modoActual = 'trabajador';
+        MultiUsuario.setTrabajadorActual(id);
+        
+        this.cerrarModalSeleccionarTrabajador();
+        this.actualizarTrabajadorActualUI();
+        this.actualizarSidebarModoIndicador();
+        this.actualizarUIPorRol(); // ✅ OCULTAR ELEMENTOS RESTRINGIDOS
+        
+        alert('✅ Modo trabajador activado\n\n' + t.nombre + '\n\nSolo tienes acceso a:\n• Exámenes\n• Casos\n• TU historial personal');
+    },
+    
+    // Volver a modo admin con validación
+    volverAModoAdmin: function() {
+        // ✅ PEDIR CONTRASEÑA PARA VOLVER A ADMIN (OPCIONAL)
+        // var password = prompt('🔐 Contraseña de administrador:');
+        // if (password !== 'admin123') {
+        //     alert('❌ Contraseña incorrecta');
+        //     return;
+        // }
+        
+        // Limpiar trabajador actual
+        this.modoActual = 'admin';
+        MultiUsuario.clearTrabajadorActual();
+        
+        // Actualizar UI
+        this.actualizarTrabajadorActualUI();
+        this.actualizarSidebarModoIndicador();
+        this.actualizarUIPorRol(); // ✅ MOSTRAR ELEMENTOS DE ADMIN
+        
+        alert('✅ Modo administrador activado\n\nAcceso completo restaurado');
+    },
+    
+    // Bloquear funciones sensibles para trabajadores
+    verificarAccesoAdmin: function(funcionNombre) {
+        if (this.esTrabajador()) {
+            console.warn('🔐 Acceso denegado:', funcionNombre, '- Solo para administradores');
+            alert('⚠️ Esta función solo está disponible para administradores.\n\nContacta a tu supervisor.');
+            return false;
+        }
+        return true;
+    },
+    
+    // Sobrescribir mostrarLicencia con validación
+    mostrarLicencia: function() {
+        if (!this.verificarAccesoAdmin('mostrarLicencia')) return;
+        this.mostrarPantalla('license-screen');
+    },
+    
+    // Sobrescribir mostrarTrabajadores con validación
+    mostrarTrabajadores: function() {
+        if (!this.verificarAccesoAdmin('mostrarTrabajadores')) return;
+        this.renderTrabajadores();
+        this.mostrarPantalla('trabajadores-screen');
+    },
+    
+    // ─────────────────────────────────────────────────────────────────────
     // EXPORTAR DATOS CON ENCRIPTACIÓN
     // ─────────────────────────────────────────────────────────────────────
     exportarDatos: function() {
+        if (!this.verificarAccesoAdmin('exportarDatos')) return;
+        
         // ✅ BLOQUEAR PARA DEMO
         if (this.licencia.tipo === 'DEMO') {
             alert('⚠️ La función de respaldo no está disponible en el plan DEMO.\n\nActualiza a PROFESIONAL, CONSULTOR o EMPRESARIAL para usar esta función.');
@@ -2734,49 +2890,50 @@ toggleTema: function() {
             console.error('Error desencriptando:', e);
             return null;
         }
+    },
+    // ─────────────────────────────────────────────────────────────────────
+    // LIMPIAR DATOS (CON CONFIRMACIÓN)
+    // ─────────────────────────────────────────────────────────────────────
+    limpiarDatosConfirmar: function() {
+        var confirmar = confirm(
+            '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
+            'Esto eliminará PERMANENTEMENTE:\n' +
+            '• Configuración de licencia\n' +
+            '• Datos de usuario y trabajadores\n' +
+            '• Historial de exámenes y resultados\n' +
+            '• Configuraciones personalizadas\n\n' +
+            '⚠️ Esta acción NO se puede deshacer.\n\n' +
+            '¿Deseas continuar?'
+        );
+        
+        if (!confirmar) return;
+        
+        // Segunda confirmación por seguridad
+        var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
+        if (confirmar2 !== 'BORRAR') {
+            alert('Operación cancelada');
+            return;
+        }
+        
+        // Limpiar localStorage
+        localStorage.removeItem('rayoshield_licencia');
+        localStorage.removeItem('rayoshield_usuario');
+        localStorage.removeItem('rayoshield_empresa');
+        localStorage.removeItem('rayoshield_trabajadores');
+        localStorage.removeItem('rayoshield_resultados');
+        localStorage.removeItem('rayoshield_historial');
+        localStorage.removeItem('rayoshield_progreso');
+        localStorage.removeItem('rayoshield_wl_config');
+        localStorage.removeItem('rayoshield_tema');
+        
+        console.log('🗑️ Datos limpiados');
+        alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
+        location.reload();
     },    
 };
 
 
-// ─────────────────────────────────────────────────────────────────────
-// LIMPIAR DATOS (CON CONFIRMACIÓN)
-// ─────────────────────────────────────────────────────────────────────
-limpiarDatosConfirmar: function() {
-    var confirmar = confirm(
-        '⚠️ ¿Estás seguro de LIMPIAR TODOS LOS DATOS?\n\n' +
-        'Esto eliminará PERMANENTEMENTE:\n' +
-        '• Configuración de licencia\n' +
-        '• Datos de usuario y trabajadores\n' +
-        '• Historial de exámenes y resultados\n' +
-        '• Configuraciones personalizadas\n\n' +
-        '⚠️ Esta acción NO se puede deshacer.\n\n' +
-        '¿Deseas continuar?'
-    );
-    
-    if (!confirmar) return;
-    
-    // Segunda confirmación por seguridad
-    var confirmar2 = prompt('Escribe "BORRAR" para confirmar la eliminación permanente:');
-    if (confirmar2 !== 'BORRAR') {
-        alert('Operación cancelada');
-        return;
-    }
-    
-    // Limpiar localStorage
-    localStorage.removeItem('rayoshield_licencia');
-    localStorage.removeItem('rayoshield_usuario');
-    localStorage.removeItem('rayoshield_empresa');
-    localStorage.removeItem('rayoshield_trabajadores');
-    localStorage.removeItem('rayoshield_resultados');
-    localStorage.removeItem('rayoshield_historial');
-    localStorage.removeItem('rayoshield_progreso');
-    localStorage.removeItem('rayoshield_wl_config');
-    localStorage.removeItem('rayoshield_tema');
-    
-    console.log('🗑️ Datos limpiados');
-    alert('✅ Todos los datos han sido eliminados\n\nLa página se recargará.');
-    location.reload();
-},
+
 
 // ═══════════════════════════════════════════════════════════════
 // OBJETO MULTI-USUARIO (FUERA DEL OBJETO APP)
