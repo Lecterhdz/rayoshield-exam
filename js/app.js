@@ -322,7 +322,7 @@ const app = {
                 location.reload();
             });
         },
-    };    
+    },    
     mostrarPantalla: function(id) {
         var pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
         
