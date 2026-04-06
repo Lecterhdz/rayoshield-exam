@@ -630,4 +630,4 @@ if (typeof window !== 'undefined') {
     console.log('   • Evaluación de respuestas mejorada');
 }
 
-export default SmartEvaluationV2;   // Si usas módulos
+
