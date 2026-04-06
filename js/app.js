@@ -1141,16 +1141,273 @@ const app = {
         this.mostrarPantalla('casos-master-screen');
     },
     
-    cargarCasoMaster: async function(casoId) {
-        if (typeof cargarCasoInvestigacion !== 'function') {
-            alert('Error: cargarCasoInvestigacion no definida');
-            return;
-        }
+// ─────────────────────────────────────────────────────────────────────
+// CARGAR CASO MASTER - VERSIÓN CORREGIDA
+// ─────────────────────────────────────────────────────────────────────
+cargarCasoMaster: async function(casoId) {
+    console.log('📋 Cargando caso:', casoId);
+    
+    try {
+        // Ocultar lista y mostrar detalle
+        const casosList = document.getElementById('casos-list');
+        const casoDetalle = document.getElementById('caso-detalle');
+        
+        if (casosList) casosList.style.display = 'none';
+        if (casoDetalle) casoDetalle.style.display = 'block';
+        
+        // Cargar el caso
         const caso = await cargarCasoInvestigacion(casoId);
+        
         if (!caso) {
-            alert('Error cargando caso');
+            console.error('❌ Caso no encontrado:', casoId);
+            alert('Error: No se pudo cargar el caso. Intenta de nuevo.');
+            this.volverAListaCasos();
             return;
         }
+        
+        console.log('✅ Caso cargado:', caso.titulo);
+        console.log('📝 Preguntas:', caso.preguntas?.length || 0);
+        
+        // Guardar caso actual
+        this.casoActual = caso;
+        this.respuestasCaso = {};
+        
+        // Llenar datos básicos del caso
+        const elId = document.getElementById('caso-id');
+        const elFecha = document.getElementById('caso-fecha');
+        const elIndustria = document.getElementById('caso-industria');
+        const elTiempo = document.getElementById('caso-tiempo');
+        
+        if (elId) elId.textContent = caso.id || 'N/A';
+        if (elFecha) elFecha.textContent = caso.fecha_evento || 'No especificada';
+        if (elIndustria) elIndustria.textContent = caso.industria || 'No especificada';
+        if (elTiempo) elTiempo.textContent = caso.tiempo_estimado || '15 min';
+        
+        // Renderizar descripción del evento
+        const descripcionEl = document.getElementById('caso-descripcion');
+        if (descripcionEl && caso.descripcion_evento) {
+            descripcionEl.innerHTML = `
+                <div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;">
+                    <strong>📋 Descripción del Evento:</strong>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px;">
+                        <div><strong>Actividad:</strong> ${caso.descripcion_evento.actividad || 'N/A'}</div>
+                        <div><strong>Equipo:</strong> ${caso.descripcion_evento.equipo || 'N/A'}</div>
+                        <div><strong>Evento:</strong> ${caso.descripcion_evento.evento || 'N/A'}</div>
+                        <div><strong>Resultado:</strong> ${caso.descripcion_evento.resultado || 'N/A'}</div>
+                        <div><strong>Clasificación:</strong> <span style="color:var(--rose);">${caso.descripcion_evento.clasificacion || 'N/A'}</span></div>
+                    </div>
+                </div>
+            `;
+        } else if (descripcionEl) {
+            descripcionEl.innerHTML = `<div style="background:var(--bg);padding:15px;border-radius:10px;margin:15px 0;">${caso.descripcion || 'Sin descripción detallada'}</div>`;
+        }
+        
+        // Renderizar línea de tiempo
+        const timelineEl = document.getElementById('caso-timeline');
+        if (timelineEl && caso.linea_tiempo && Array.isArray(caso.linea_tiempo)) {
+            timelineEl.innerHTML = `
+                <div class="timeline">
+                    <strong>📅 Línea de Tiempo:</strong>
+                    ${caso.linea_tiempo.map(evento => `
+                        <div class="timeline-item ${evento.toLowerCase().includes('accidente') || evento.toLowerCase().includes('incidente') ? 'evento-critico' : ''}">
+                            ${evento}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        } else if (timelineEl) {
+            timelineEl.innerHTML = '<div class="timeline"><strong>📅 Línea de Tiempo:</strong><div class="timeline-item">No disponible</div></div>';
+        }
+        
+        // Renderizar energías identificadas
+        const energiasEl = document.getElementById('caso-energias');
+        if (energiasEl && caso.energias_identificadas) {
+            energiasEl.innerHTML = `
+                <div class="energia-grid">
+                    <strong style="grid-column:1/-1;">⚡ Energías Identificadas:</strong>
+                    ${Object.keys(caso.energias_identificadas).map(tipo => {
+                        const estado = caso.energias_identificadas[tipo];
+                        const esPeligro = estado.includes('ENERGIZADO') || estado.includes('LIBERADA');
+                        return `
+                            <div class="energia-item ${esPeligro ? 'no-aislada' : 'aislada'}">
+                                <strong>${tipo}</strong><br>
+                                <small>${estado}</small>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } else if (energiasEl) {
+            energiasEl.innerHTML = '<div class="energia-grid"><strong>⚡ Energías:</strong><div>No disponible</div></div>';
+        }
+        
+        // ✅ RENDERIZAR PREGUNTAS - PARTE CRÍTICA
+        const preguntasEl = document.getElementById('caso-preguntas');
+        if (!preguntasEl) {
+            console.error('❌ Elemento caso-preguntas no encontrado');
+            return;
+        }
+        
+        if (!caso.preguntas || caso.preguntas.length === 0) {
+            preguntasEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--rose);">❌ Este caso no tiene preguntas definidas</div>';
+            console.warn('⚠️ Caso sin preguntas:', casoId);
+        } else {
+            preguntasEl.innerHTML = '';
+            console.log('📝 Renderizando', caso.preguntas.length, 'preguntas');
+            
+            for (let idx = 0; idx < caso.preguntas.length; idx++) {
+                const pregunta = caso.preguntas[idx];
+                const preguntaDiv = document.createElement('div');
+                preguntaDiv.className = 'pregunta-master';
+                preguntaDiv.style.cssText = 'background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px;';
+                
+                // Título de la pregunta
+                const pesoTexto = pregunta.peso ? ` - ${pregunta.peso} pts` : '';
+                preguntaDiv.innerHTML = `
+                    <h4 style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;">
+                        🔍 Pregunta ${idx + 1}${pesoTexto}
+                    </h4>
+                    <p style="font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:15px;">
+                        ${pregunta.pregunta}
+                    </p>
+                `;
+                
+                // Renderizar según tipo de pregunta
+                if (pregunta.tipo === 'analisis_multiple' || pregunta.tipo === 'analisis_normativo') {
+                    const opcionesContainer = document.createElement('div');
+                    opcionesContainer.className = 'opciones-container';
+                    opcionesContainer.id = `pregunta-${pregunta.id || idx}-opciones`;
+                    
+                    pregunta.opciones.forEach((opt, optIdx) => {
+                        const textoOpt = typeof opt === 'string' ? opt : opt.texto || opt;
+                        const label = document.createElement('label');
+                        label.className = 'opcion-sistemica';
+                        label.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;transition:all 0.15s;';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = `pregunta-${pregunta.id || idx}`;
+                        checkbox.value = optIdx;
+                        checkbox.style.marginTop = '4px';
+                        checkbox.style.width = '18px';
+                        checkbox.style.height = '18px';
+                        checkbox.style.cursor = 'pointer';
+                        
+                        const textoSpan = document.createElement('span');
+                        textoSpan.className = 'texto-opcion';
+                        textoSpan.style.cssText = 'font-size:13px;line-height:1.5;color:var(--ink2);flex:1;';
+                        textoSpan.textContent = textoOpt;
+                        
+                        label.appendChild(checkbox);
+                        label.appendChild(textoSpan);
+                        
+                        label.onclick = function(e) {
+                            if (e.target !== checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                            }
+                            if (checkbox.checked) {
+                                label.style.borderColor = 'var(--blue)';
+                                label.style.background = 'var(--blue-l)';
+                            } else {
+                                label.style.borderColor = 'var(--border)';
+                                label.style.background = 'var(--bg)';
+                            }
+                        };
+                        
+                        opcionesContainer.appendChild(label);
+                    });
+                    preguntaDiv.appendChild(opcionesContainer);
+                    
+                } else if (pregunta.tipo === 'respuesta_abierta_guiada') {
+                    const textarea = document.createElement('textarea');
+                    textarea.className = 'respuesta-abierta';
+                    textarea.id = `respuesta-${pregunta.id || idx}`;
+                    textarea.placeholder = pregunta.placeholder || 'Escribe tu análisis aquí... (mínimo 80 caracteres)';
+                    textarea.style.cssText = 'width:100%;min-height:120px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font);font-size:14px;resize:vertical;margin-bottom:10px;';
+                    preguntaDiv.appendChild(textarea);
+                    
+                    if (pregunta.feedback_guiado) {
+                        const pista = document.createElement('div');
+                        pista.className = 'pista-experto';
+                        pista.style.cssText = 'background:var(--blue-l);padding:12px 14px;border-radius:var(--radius-sm);font-size:12px;color:var(--blue);border-left:3px solid var(--blue);';
+                        pista.innerHTML = `💡 ${pregunta.feedback_guiado}`;
+                        preguntaDiv.appendChild(pista);
+                    }
+                    
+                } else if (pregunta.tipo === 'plan_accion') {
+                    const opcionesContainer = document.createElement('div');
+                    opcionesContainer.className = 'opciones-container';
+                    
+                    pregunta.opciones.forEach((opt, optIdx) => {
+                        const textoOpt = typeof opt === 'string' ? opt : opt.texto || opt.accion || opt;
+                        const jerarquia = opt.jerarquia || opt.clasificacion || 'administrativo';
+                        
+                        const label = document.createElement('label');
+                        label.className = 'accion-item';
+                        label.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--bg);border:2px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.name = `plan-${pregunta.id || idx}`;
+                        checkbox.value = optIdx;
+                        checkbox.style.marginTop = '4px';
+                        checkbox.style.width = '18px';
+                        checkbox.style.height = '18px';
+                        checkbox.style.cursor = 'pointer';
+                        
+                        const textoDiv = document.createElement('div');
+                        textoDiv.style.cssText = 'flex:1;';
+                        textoDiv.innerHTML = `
+                            <strong style="font-size:13px;color:var(--ink);">${textoOpt}</strong>
+                            <div style="margin-top:5px;">
+                                <span class="accion-jerarquia ${jerarquia}" style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;background:${jerarquia === 'ingenieria' ? 'var(--blue-l)' : jerarquia === 'administrativo' ? 'var(--amber-l)' : 'var(--green-l)'};color:${jerarquia === 'ingenieria' ? 'var(--blue)' : jerarquia === 'administrativo' ? 'var(--amber)' : 'var(--green)'};">${jerarquia}</span>
+                            </div>
+                        `;
+                        
+                        label.appendChild(checkbox);
+                        label.appendChild(textoDiv);
+                        
+                        label.onclick = function(e) {
+                            if (e.target !== checkbox) {
+                                checkbox.checked = !checkbox.checked;
+                            }
+                            if (checkbox.checked) {
+                                label.style.borderColor = 'var(--blue)';
+                                label.style.background = 'var(--blue-l)';
+                            } else {
+                                label.style.borderColor = 'var(--border)';
+                                label.style.background = 'var(--bg)';
+                            }
+                        };
+                        
+                        opcionesContainer.appendChild(label);
+                    });
+                    preguntaDiv.appendChild(opcionesContainer);
+                }
+                
+                preguntasEl.appendChild(preguntaDiv);
+            }
+        }
+        
+        // Mostrar botón de enviar
+        const btnEnviar = document.getElementById('btn-enviar-caso');
+        if (btnEnviar) btnEnviar.style.display = 'inline-block';
+        
+        // Ocultar resultado anterior si existe
+        const casoResultado = document.getElementById('caso-resultado');
+        if (casoResultado) casoResultado.style.display = 'none';
+        
+        // Iniciar timer
+        this.iniciarTimerCaso();
+        
+        console.log('✅ Caso renderizado correctamente');
+        
+    } catch (error) {
+        console.error('❌ Error cargando caso:', error);
+        alert('Error al cargar el caso: ' + error.message);
+        this.volverAListaCasos();
+    }
+},
         this.casoActual = caso;
         document.getElementById('casos-list').style.display = 'none';
         document.getElementById('caso-detalle').style.display = 'block';
@@ -1196,11 +1453,31 @@ const app = {
     },
     
     volverAListaCasos: function() {
+        console.log('🔙 Volviendo a lista de casos');
+        
         this.detenerTimerCaso();
-        document.getElementById('casos-list').style.display = 'block';
-        document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('caso-resultado').style.display = 'none';
+        
+        const casosList = document.getElementById('casos-list');
+        const casoDetalle = document.getElementById('caso-detalle');
+        const casosMainButtons = document.getElementById('casos-main-buttons');
+        const casoResultado = document.getElementById('caso-resultado');
+        const btnEnviar = document.getElementById('btn-enviar-caso');
+        
+        if (casosList) {
+            casosList.style.display = 'block';
+            // Recargar la lista de casos para que aparezca de nuevo
+            this.irACasosMaster();
+        }
+        if (casoDetalle) casoDetalle.style.display = 'none';
+        if (casosMainButtons) casosMainButtons.style.display = 'block';
+        if (casoResultado) casoResultado.style.display = 'none';
+        if (btnEnviar) btnEnviar.style.display = 'none';
+        
         this.casoActual = null;
+        this.respuestasCaso = {};
+        this.resultadoCaso = null;
+        
+        console.log('✅ Volviendo a lista de casos');
     },
 
     // =================================================================
