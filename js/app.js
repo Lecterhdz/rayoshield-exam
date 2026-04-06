@@ -1045,7 +1045,17 @@ const app = {
         }, 1000);
         
         console.log('⏱️ Timer de caso iniciado');
-    },  
+    },
+    // ─────────────────────────────────────────────────────────────────────
+    // DETENER TIMER DE CASO
+    // ─────────────────────────────────────────────────────────────────────
+    detenerTimerCaso: function() {
+        if (this.timerCaso) {
+            clearInterval(this.timerCaso);
+            this.timerCaso = null;
+            console.log('⏹️ Timer de caso detenido');
+        }
+    },
     iniciarTimerExamen: function() {
         this.tiempoInicio = Date.now();
         this.tiempoRestante = this.tiempoLimite;
