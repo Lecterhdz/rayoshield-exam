@@ -1975,7 +1975,7 @@
                                 <div class="card-title">📋 Historial de Exámenes</div>
                                 <div class="card-sub">Exámenes completados</div>
                             </div>
-                            <button class="btn btn-secondary" onclick="app.exportarHistorialPDF()">📄 Exportar PDF</button>
+                            <button class="btn btn-secondary" onclick="exportarHistorialPDF()">📄 Exportar PDF</button>
                         </div>
                         <div class="card-body">
                             <div id="history-list" class="history-list"></div>
@@ -1983,142 +1983,59 @@
                     </div>
                 </section>
 
-            <!-- ══════════════ LICENCIA SCREEN ══════════════ -->
+                <!-- ══════════════ LICENCIA SCREEN ══════════════ -->
                 <section id="license-screen" class="screen">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
-                        <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
-                        <span style="font-size:14px;font-weight:700;color:var(--ink);">🔑 Licencia y Planes</span>
+                        <button onclick="app.volverHome()" class="topbar-btn ghost">← Volver</button>
+                        <span style="font-size:14px;font-weight:700;">🔑 Centro de Control</span>
                     </div>
-                    <!-- ══════════════ LOGIN DE ADMINISTRADOR ══════════════ -->
-                    <div style="margin-top:28px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);">
-                        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:15px;display:flex;align-items:center;gap:8px;">
-                            🔐 Acceso Administrativo
-                        </div>
-                        
-                        <!-- Mensaje de estado -->
-                        <div id="auth-status" style="font-size:12px;color:var(--ink4);margin-bottom:15px;">
-                            Estado: <span id="auth-email">No autenticado</span>
-                        </div>
-                        
-                        <div style="display:grid;gap:15px;max-width:400px;">
-                            <div>
-                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;">Email</label>
-                                <input type="email" id="admin-email" placeholder="admin@tuempresa.com" 
-                                    style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);">
+                
+                    <!-- PANEL DE AUTENTICACIÓN -->
+                    <div class="card" style="margin-bottom:24px;">
+                        <div class="card-body">
+                            <h3 style="margin-bottom:15px;">🔐 Acceso Administrativo</h3>
+                            <div id="auth-status" style="margin-bottom:15px;padding:10px;background:var(--bg);border-radius:8px;">
+                                Estado: <span id="auth-email">No autenticado</span>
                             </div>
-                            <div>
-                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;">Contraseña</label>
-                                <input type="password" id="admin-password" placeholder="••••••••" 
-                                    style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);">
+                            <div style="display:grid;gap:15px;max-width:400px;">
+                                <input type="email" id="admin-email" placeholder="admin@empresa.com" class="df-input">
+                                <input type="password" id="admin-password" placeholder="Contraseña" class="df-input">
+                                <button onclick="loginAdmin()" class="btn btn-primary" id="btn-login-admin">🔓 Iniciar Sesión</button>
+                                <button onclick="logoutAdmin()" class="btn btn-secondary" id="btn-logout-admin" style="display:none;">🚪 Cerrar Sesión</button>
                             </div>
-                            
-                            <!-- Botón Login -->
-                            <button onclick="loginAdmin()" 
-                                style="padding:12px 24px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;">
-                                🔓 Iniciar Sesión
-                            </button>
-                            
-                            <!-- Botón Logout (oculto por defecto) -->
-                            <button id="btn-logout" onclick="logoutAdmin()" 
-                                style="display:none;padding:12px 24px;background:var(--rose-l);color:var(--rose);border:1px solid var(--rose);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;">
-                                🚪 Cerrar Sesión
-                            </button>
-                        </div>
-                        
-                        <div style="margin-top:15px;padding:12px 14px;background:var(--blue-l);border-radius:var(--radius-sm);font-size:11px;color:var(--blue);">
-                            <strong>💡 Nota:</strong> Usa las credenciales que creaste en Firebase Console.
+                            <div class="pista-experto" style="margin-top:15px;">
+                                💡 Si no tienes cuenta, créala en <strong>Firebase Console → Authentication</strong>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Script para login -->
-                    <script>
-                    // Escuchar cambios de autenticación
-                    if (typeof auth !== 'undefined') {
-                        auth.onAuthStateChanged(function(user) {
-                            var statusEl = document.getElementById('auth-email');
-                            var btnLogout = document.getElementById('btn-logout');
-                            var btnLogin = document.querySelector('#license-screen button[onclick*="loginAdmin"]');
-                            
-                            if (user) {
-                                // Usuario autenticado
-                                if (statusEl) statusEl.textContent = user.email + ' ✓';
-                                if (btnLogout) btnLogout.style.display = 'inline-block';
-                                if (btnLogin) btnLogin.style.display = 'none';
-                                
-                                // Verificar si es admin
-                                if (typeof db !== 'undefined') {
-                                    db.collection('admins').doc(user.uid).get().then(function(doc) {
-                                        if (doc.exists) {
-                                            console.log('👑 Usuario es ADMIN');
-                                            app.isAdmin = true;
-                                            app.actualizarUIMenuPorRol();
-                                        }
-                                    });
-                                }
-                            } else {
-                                // Sin autenticación
-                                if (statusEl) statusEl.textContent = 'No autenticado';
-                                if (btnLogout) btnLogout.style.display = 'none';
-                                if (btnLogin) btnLogin.style.display = 'inline-block';
-                                app.isAdmin = false;
-                                app.actualizarUIMenuPorRol();
-                            }
-                        });
-                    }
-                    
-                    // Función de login
-                    function loginAdmin() {
-                        var email = document.getElementById('admin-email').value;
-                        var password = document.getElementById('admin-password').value;
-                        
-                        if (!email || !password) {
-                            alert('⚠️ Ingresa email y contraseña');
-                            return;
-                        }
-                        
-                        if (typeof auth === 'undefined') {
-                            alert('❌ Firebase Auth no está disponible');
-                            return;
-                        }
-                        
-                        // Mostrar loading
-                        var btn = event.target;
-                        var originalText = btn.textContent;
-                        btn.disabled = true;
-                        btn.textContent = '⏳ Conectando...';
-                        
-                        auth.signInWithEmailAndPassword(email, password)
-                            .then(function(userCredential) {
-                                console.log('✅ Login exitoso:', userCredential.user.email);
-                                alert('✅ Sesión iniciada correctamente');
-                                document.getElementById('admin-password').value = '';
-                            })
-                            .catch(function(error) {
-                                console.error('❌ Error:', error.code);
-                                var mensaje = 'Error de autenticación';
-                                if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
-                                else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
-                                else if (error.code === 'auth/invalid-email') mensaje = 'Email inválido';
-                                else if (error.code === 'auth/configuration-not-found') mensaje = 'Firebase Auth no está habilitado. Habilita Email/Password en Firebase Console.';
-                                alert('❌ ' + mensaje);
-                            })
-                            .finally(function() {
-                                btn.disabled = false;
-                                btn.textContent = originalText;
-                            });
-                    }
-                    
-                    // Función de logout
-                    function logoutAdmin() {
-                        if (typeof auth === 'undefined') return;
-                        
-                        auth.signOut().then(function() {
-                            console.log('✅ Sesión cerrada');
-                            alert('✅ Sesión cerrada correctamente');
-                            location.reload();
-                        });
-                    }
-                    </script>               
+                
+                    <!-- GESTIÓN DE TRABAJADORES (SOLO ADMIN) -->
+                    <div id="admin-worker-panel" class="card" style="display:none;">
+                        <div class="card-body">
+                            <h3>👷 Gestión de Accesos</h3>
+                            <p>Genera un enlace único para que el trabajador acceda sin contraseña (válido 7 días).</p>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+                                <div style="flex:1">
+                                    <label>Nombre del Trabajador</label>
+                                    <input type="text" id="invite-nombre" class="df-input" placeholder="Ej: Juan Pérez">
+                                </div>
+                                <div style="flex:1">
+                                    <label>CURP</label>
+                                    <input type="text" id="invite-curp" class="df-input" placeholder="CURP">
+                                </div>
+                                <div style="flex:1">
+                                    <label>Puesto</label>
+                                    <input type="text" id="invite-puesto" class="df-input" placeholder="Técnico">
+                                </div>
+                                <button onclick="generarEnlaceTrabajador()" class="btn btn-primary">🔗 Generar Enlace</button>
+                            </div>
+                            <div id="enlace-generado" style="margin-top:15px;display:none;background:var(--green-l);padding:12px;border-radius:8px;">
+                                <strong>✅ Enlace generado (copia y envía por WhatsApp):</strong><br>
+                                <code id="link-code" style="word-break:break-all;"></code>
+                                <button onclick="copiarEnlace()" class="btn btn-secondary" style="margin-top:8px;">📋 Copiar</button>
+                            </div>
+                        </div>
+                    </div>              
                     <!-- PLAN ACTUAL -->
                     <div class="card" style="margin-bottom:24px;">
                         <div class="card-body" style="padding:24px;">
@@ -2345,7 +2262,66 @@
                         </div>
                     </div>
                 </section>
-
+                <script>
+                // Funciones de autenticación UI
+                function loginAdmin() {
+                    const email = document.getElementById('admin-email').value;
+                    const pwd = document.getElementById('admin-password').value;
+                    if (!email || !pwd) { alert('Completa los datos'); return; }
+                    auth.signInWithEmailAndPassword(email, pwd)
+                        .then(() => { alert('Sesión iniciada'); location.reload(); })
+                        .catch(e => alert('Error: ' + e.message));
+                }
+                function logoutAdmin() {
+                    auth.signOut().then(() => location.reload());
+                }
+                
+                // Generar enlace para trabajador (usa la nueva función de app.js)
+                async function generarEnlaceTrabajador() {
+                    if (!app.isAdmin) { alert('No autorizado'); return; }
+                    const nombre = document.getElementById('invite-nombre').value;
+                    const curp = document.getElementById('invite-curp').value;
+                    const puesto = document.getElementById('invite-puesto').value;
+                    if (!nombre || !curp || !puesto) { alert('Completa todos los datos'); return; }
+                    const result = await app.crearTrabajadorConEnlace({ nombre, curp, puesto });
+                    if (result) {
+                        document.getElementById('link-code').textContent = result.enlace;
+                        document.getElementById('enlace-generado').style.display = 'block';
+                    }
+                }
+                function copiarEnlace() {
+                    const text = document.getElementById('link-code').textContent;
+                    navigator.clipboard.writeText(text);
+                    alert('Enlace copiado');
+                }
+                
+                // Escuchar cambios de auth para mostrar/ocultar panel admin
+                if (typeof auth !== 'undefined') {
+                    auth.onAuthStateChanged(async (user) => {
+                        const panel = document.getElementById('admin-worker-panel');
+                        const btnLogin = document.getElementById('btn-login-admin');
+                        const btnLogout = document.getElementById('btn-logout-admin');
+                        const emailSpan = document.getElementById('auth-email');
+                        if (user) {
+                            emailSpan.textContent = user.email + ' ✓';
+                            btnLogin.style.display = 'none';
+                            btnLogout.style.display = 'inline-block';
+                            // Verificar si es admin
+                            const doc = await db.collection('admins').doc(user.uid).get();
+                            if (doc.exists) {
+                                panel.style.display = 'block';
+                            } else {
+                                panel.style.display = 'none';
+                            }
+                        } else {
+                            emailSpan.textContent = 'No autenticado';
+                            btnLogin.style.display = 'inline-block';
+                            btnLogout.style.display = 'none';
+                            panel.style.display = 'none';
+                        }
+                    });
+                }
+                </script>
                 <!-- ══════════════ INFO SCREEN ══════════════ -->
                 <section id="info-screen" class="screen">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
