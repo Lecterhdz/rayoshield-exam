@@ -1,10 +1,12 @@
 // ─────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - app.js (v5.0 COMPLETA)
+// RAYOSHIELD EXAM - app.js (v5.0 COMPLETA Y FUNCIONAL)
 // Guardar con codificación UTF-8
 // ─────────────────────────────────────────────────────────────────────
 
 const app = {
-    // Estado General
+    // =================================================================
+    // ESTADO GENERAL
+    // =================================================================
     examenActual: null,
     respuestasUsuario: [],
     preguntaActual: 0,
@@ -13,7 +15,24 @@ const app = {
     modoActual: 'admin',
     trabajadorActual: null,
     userData: { empresa: '', nombre: '', curp: '', puesto: '' },
-    licencia: { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} },
+    licencia: { 
+        tipo: 'DEMO', 
+        clave: '', 
+        clienteId: 'DEMO_USER', 
+        expiracion: null, 
+        examenesRestantes: 3, 
+        features: {
+            casosBasicos: true,
+            casosMaster: false,
+            casosElite: false,
+            casosPericial: false,
+            whiteLabel: false,
+            predictivo: false,
+            insignias: false,
+            dashboard: false,
+            multiUsuario: 0
+        } 
+    },
 
     // Firebase
     db: null,
@@ -40,21 +59,30 @@ const app = {
     // INICIALIZACIÓN
     // =================================================================
     init: function() {
-        console.log('RayoShield v5.0 iniciado');
+        console.log('🚀 RayoShield v5.0 iniciado');
         
+        // Inicializar contraseña admin local
         if (!localStorage.getItem('rayoshield_admin_password')) {
             localStorage.setItem('rayoshield_admin_password', 'admin123');
         }
         
         this.modoActual = 'admin';
+        
+        // CARGAR LICENCIA PRIMERO
         this.cargarLicencia();
+        console.log('📋 Licencia cargada:', this.licencia.tipo, 'Expira:', this.licencia.expiracion);
+        
+        // Cargar demás datos
         this.cargarDatosUsuario();
         this.cargarHistorial();
         this.cargarExamenGuardado();
         
-        if (typeof MultiUsuario !== 'undefined') MultiUsuario.init();
+        // Inicializar MultiUsuario
+        if (typeof MultiUsuario !== 'undefined') {
+            MultiUsuario.init();
+        }
         
-        // Inicializar Firebase
+        // Inicializar Firebase si está disponible
         if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
             this.db = db;
             this.auth = auth;
@@ -69,8 +97,13 @@ const app = {
                         try {
                             const adminDoc = await this.db.collection('admins').doc(user.uid).get();
                             this.isAdmin = adminDoc.exists;
-                            if (this.isAdmin) await this.cargarEmpresaFirebase();
-                        } catch(e) { this.isAdmin = false; }
+                            if (this.isAdmin) {
+                                await this.cargarEmpresaFirebase();
+                            }
+                        } catch(e) { 
+                            console.warn('Error verificando admin:', e);
+                            this.isAdmin = false;
+                        }
                         this.verificarEnlaceAcceso();
                     } else {
                         this.isAdmin = false;
@@ -81,13 +114,336 @@ const app = {
             }
         }
         
+        // Verificar enlace en URL
         this.verificarEnlaceAcceso();
+        
+        // Inicializar PWA
         this.initPWAInstall();
+        
+        // Actualizar UI y mostrar pantalla
         this.actualizarUI();
         this.mostrarPantalla('home-screen');
         this.verificarExpiracionLicencia();
         this.actualizarBadgeTrabajadores();
         this.actualizarUIMenuPorRol();
+        
+        console.log('✅ Inicialización completa');
+    },
+
+    // =================================================================
+    // LICENCIA - FUNCIONES COMPLETAS
+    // =================================================================
+    cargarLicencia: function() {
+        try {
+            const s = localStorage.getItem('rayoshield_licencia');
+            if (s) {
+                const parsed = JSON.parse(s);
+                if (parsed.tipo) {
+                    this.licencia = parsed;
+                    // Asegurar que features exista
+                    if (!this.licencia.features) {
+                        this.licencia.features = this.obtenerFeaturesPorTipo(this.licencia.tipo);
+                    }
+                    console.log('📋 Licencia cargada desde localStorage:', this.licencia.tipo);
+                }
+            }
+        } catch(e) { 
+            console.warn('Error cargando licencia:', e);
+        }
+        
+        // Si no hay licencia o es DEMO, asegurar features correctos
+        if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
+            this.licencia.features = this.obtenerFeaturesPorTipo(this.licencia.tipo);
+        }
+    },
+    
+    obtenerFeaturesPorTipo: function(tipo) {
+        const featuresMap = {
+            'DEMO': {
+                casosBasicos: true,
+                casosMaster: false,
+                casosElite: false,
+                casosPericial: false,
+                whiteLabel: false,
+                predictivo: false,
+                insignias: false,
+                dashboard: false,
+                multiUsuario: 0
+            },
+            'PROFESIONAL': {
+                casosBasicos: true,
+                casosMaster: true,
+                casosElite: false,
+                casosPericial: false,
+                whiteLabel: false,
+                predictivo: false,
+                insignias: false,
+                dashboard: false,
+                multiUsuario: 0
+            },
+            'CONSULTOR': {
+                casosBasicos: true,
+                casosMaster: true,
+                casosElite: true,
+                casosPericial: false,
+                whiteLabel: false,
+                predictivo: false,
+                insignias: true,
+                dashboard: 'basico',
+                multiUsuario: 0
+            },
+            'EMPRESARIAL': {
+                casosBasicos: true,
+                casosMaster: true,
+                casosElite: true,
+                casosPericial: true,
+                whiteLabel: true,
+                predictivo: true,
+                insignias: true,
+                dashboard: 'predictivo',
+                multiUsuario: 50
+            }
+        };
+        return featuresMap[tipo] || featuresMap['DEMO'];
+    },
+    
+    guardarLicencia: function() {
+        localStorage.setItem('rayoshield_licencia', JSON.stringify(this.licencia));
+        this.actualizarUI();
+        console.log('💾 Licencia guardada:', this.licencia.tipo);
+    },
+    
+    verificarExpiracionLicencia: function() {
+        if (this.licencia.expiracion && this.licencia.tipo !== 'DEMO') {
+            const ahora = new Date();
+            const expiracion = new Date(this.licencia.expiracion);
+            if (ahora > expiracion) {
+                console.log('⚠️ Licencia expirada, cambiando a DEMO');
+                this.licencia = {
+                    tipo: 'DEMO',
+                    clave: '',
+                    clienteId: 'DEMO_USER',
+                    expiracion: null,
+                    examenesRestantes: 3,
+                    features: this.obtenerFeaturesPorTipo('DEMO')
+                };
+                this.guardarLicencia();
+                alert('⚠️ Tu licencia ha expirado. Has vuelto a la versión DEMO.');
+            } else {
+                const diasRestantes = Math.ceil((expiracion - ahora) / (1000 * 60 * 60 * 24));
+                if (diasRestantes <= 7) {
+                    console.log(`⚠️ Licencia expira en ${diasRestantes} días`);
+                }
+            }
+        }
+    },
+    
+    validarLicencia: function(clienteId, clave) {
+        return new Promise((resolve) => {
+            // Validar formato
+            if (!/^RS-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/i.test(clave)) {
+                resolve({ valido: false, error: 'Formato: RS-XXXX-YYYY-ZZZZ' });
+                return;
+            }
+            if (!/^[A-Z0-9_-]{5,}$/i.test(clienteId)) {
+                resolve({ valido: false, error: 'ID: mínimo 5 caracteres' });
+                return;
+            }
+            
+            const licenciasValidas = {
+                'RS-DEMO-2026-DEMO': {
+                    clienteId: 'DEMO_USER',
+                    tipo: 'DEMO',
+                    duracion: 1,
+                    features: this.obtenerFeaturesPorTipo('DEMO')
+                },
+                'RS-PKDF-9826-A1B2': {
+                    clienteId: 'PROFESIONAL_001',
+                    tipo: 'PROFESIONAL',
+                    duracion: 365,
+                    features: this.obtenerFeaturesPorTipo('PROFESIONAL')
+                },
+                'RS-COZS-2XT6-C3D4': {
+                    clienteId: 'CONSULTOR_001',
+                    tipo: 'CONSULTOR',
+                    duracion: 365,
+                    features: this.obtenerFeaturesPorTipo('CONSULTOR')
+                },
+                'RS-EVP4-Y02I-E5F6': {
+                    clienteId: 'EMPRESARIAL_001',
+                    tipo: 'EMPRESARIAL',
+                    duracion: 365,
+                    features: this.obtenerFeaturesPorTipo('EMPRESARIAL')
+                }
+            };
+            
+            const licenciaData = licenciasValidas[clave.toUpperCase()];
+            if (!licenciaData) {
+                resolve({ valido: false, error: 'Clave inválida' });
+                return;
+            }
+            if (licenciaData.clienteId.toUpperCase() !== clienteId.toUpperCase()) {
+                resolve({ valido: false, error: 'ID no coincide con esta clave' });
+                return;
+            }
+            
+            const expiracion = new Date();
+            expiracion.setDate(expiracion.getDate() + licenciaData.duracion);
+            
+            resolve({
+                valido: true,
+                tipo: licenciaData.tipo,
+                clienteId: licenciaData.clienteId,
+                expiracion: expiracion.toISOString(),
+                features: licenciaData.features
+            });
+        });
+    },
+    
+    activarLicencia: function() {
+        const idEl = document.getElementById('license-id');
+        const keyEl = document.getElementById('license-key');
+        const clienteId = idEl ? idEl.value.trim().toUpperCase() : '';
+        const clave = keyEl ? keyEl.value.trim().toUpperCase() : '';
+        
+        if (!clienteId || !clave) {
+            alert('⚠️ Ingresa ID y clave');
+            return;
+        }
+        
+        // Verificar si ya tiene licencia activa
+        if (this.licencia.tipo !== 'DEMO' && this.licencia.expiracion) {
+            const hoy = new Date();
+            const vence = new Date(this.licencia.expiracion);
+            if (hoy < vence) {
+                if (this.licencia.clave === clave) {
+                    alert(`✅ Esta licencia ya está activa.\nVence: ${vence.toLocaleDateString('es-MX')}`);
+                    return;
+                } else {
+                    if (!confirm(`⚠️ Ya tienes una licencia activa hasta ${vence.toLocaleDateString('es-MX')}.\n¿Deseas reemplazarla?`)) {
+                        return;
+                    }
+                }
+            }
+        }
+        
+        const btn = event ? event.target : null;
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⏳ Validando...';
+        }
+        
+        this.validarLicencia(clienteId, clave).then((res) => {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '🔓 Activar Licencia';
+            }
+            
+            if (res.valido) {
+                this.licencia = {
+                    tipo: res.tipo,
+                    clave: clave,
+                    clienteId: res.clienteId,
+                    expiracion: res.expiracion,
+                    examenesRestantes: 9999,
+                    features: res.features
+                };
+                this.guardarLicencia();
+                
+                const fecha = new Date(res.expiracion).toLocaleDateString('es-MX');
+                alert(`✅ Licencia ${res.tipo} activada\nCliente: ${res.clienteId}\nVálida hasta: ${fecha}`);
+                
+                if (idEl) idEl.value = '';
+                if (keyEl) keyEl.value = '';
+                this.actualizarUI();
+                location.reload();
+            } else {
+                alert('❌ ' + res.error);
+            }
+        });
+    },
+    
+    activarLicenciaConPlan: function(plan) {
+        const datos = {
+            'PROFESIONAL': { id: 'PROFESIONAL_001', clave: 'RS-PKDF-9826-A1B2' },
+            'CONSULTOR': { id: 'CONSULTOR_001', clave: 'RS-COZS-2XT6-C3D4' },
+            'EMPRESARIAL': { id: 'EMPRESARIAL_001', clave: 'RS-EVP4-Y02I-E5F6' }
+        };
+        
+        if (!datos[plan]) {
+            alert('❌ Plan no válido');
+            return;
+        }
+        
+        const idEl = document.getElementById('license-id');
+        const keyEl = document.getElementById('license-key');
+        if (idEl) idEl.value = datos[plan].id;
+        if (keyEl) keyEl.value = datos[plan].clave;
+        
+        // Resaltar campos
+        if (idEl) idEl.style.borderColor = 'var(--blue)';
+        if (keyEl) keyEl.style.borderColor = 'var(--blue)';
+        setTimeout(() => {
+            if (idEl) idEl.style.borderColor = 'var(--border)';
+            if (keyEl) keyEl.style.borderColor = 'var(--border)';
+        }, 2000);
+        
+        document.getElementById('activar-licencia-section')?.scrollIntoView({ behavior: 'smooth' });
+    },
+    
+    actualizarLicenciaUI: function() {
+        // Pantalla de licencia
+        const planEl = document.getElementById('licencia-screen-plan');
+        if (planEl) planEl.textContent = this.licencia.tipo;
+        
+        const clienteEl = document.getElementById('licencia-screen-cliente');
+        if (clienteEl) clienteEl.textContent = this.licencia.clienteId || 'N/A';
+        
+        const expiryEl = document.getElementById('licencia-screen-expiry');
+        const daysEl = document.getElementById('licencia-screen-days');
+        
+        if (expiryEl) {
+            if (this.licencia.expiracion) {
+                const exp = new Date(this.licencia.expiracion);
+                expiryEl.textContent = exp.toLocaleDateString('es-MX');
+                
+                const ahora = new Date();
+                const dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
+                if (daysEl) {
+                    if (dias > 0) {
+                        daysEl.textContent = `${dias} días restantes`;
+                        daysEl.style.color = dias > 7 ? 'var(--green)' : 'var(--amber)';
+                    } else {
+                        daysEl.textContent = 'Expirada';
+                        daysEl.style.color = 'var(--rose)';
+                    }
+                }
+            } else {
+                expiryEl.textContent = 'Sin expiración';
+                if (daysEl) {
+                    daysEl.textContent = 'Licencia permanente';
+                    daysEl.style.color = 'var(--green)';
+                }
+            }
+        }
+        
+        // Características
+        const featuresEl = document.getElementById('licencia-features');
+        if (featuresEl) {
+            const features = this.licencia.features || {};
+            let html = '';
+            if (features.casosBasicos) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos BÁSICOS</div>';
+            if (features.casosMaster) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos MASTER</div>';
+            if (features.casosElite) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos ELITE</div>';
+            if (features.casosPericial) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Casos PERICIAL</div>';
+            if (features.insignias) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Insignias PNG</div>';
+            if (features.dashboard) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Dashboard ' + features.dashboard + '</div>';
+            if (features.predictivo) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> Riesgo Predictivo</div>';
+            if (features.whiteLabel) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> White Label</div>';
+            if (features.multiUsuario) html += '<div style="font-size:12px;color:var(--green);display:flex;gap:6px;align-items:center;"><span>✓</span> ' + features.multiUsuario + ' Trabajadores</div>';
+            if (html === '') html = '<div style="font-size:12px;color:var(--ink4);">Plan DEMO - Características básicas</div>';
+            featuresEl.innerHTML = html;
+        }
     },
 
     // =================================================================
@@ -102,8 +458,9 @@ const app = {
                 .get();
             if (!querySnapshot.empty) {
                 this.empresaActual = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
+                console.log('✅ Empresa cargada:', this.empresaActual.nombre);
             }
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error('Error cargando empresa:', e); }
     },
 
     // =================================================================
@@ -155,6 +512,7 @@ const app = {
             });
             localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
             
+            console.log('✅ Enlace generado:', enlace);
             return {
                 success: true,
                 enlace: enlace,
@@ -163,7 +521,7 @@ const app = {
                 expira: fechaExpiracion.toLocaleDateString('es-MX')
             };
         } catch(error) {
-            console.error(error);
+            console.error('❌ Error:', error);
             alert('Error: ' + error.message);
             return null;
         }
@@ -252,13 +610,13 @@ const app = {
     copiarEnlace: function() {
         if (this._ultimoEnlace) {
             navigator.clipboard.writeText(this._ultimoEnlace);
-            alert('✅ Enlace copiado');
+            alert('✅ Enlace copiado al portapapeles');
         }
     },
     
     enviarPorWhatsApp: function() {
         if (this._ultimoEnlace) {
-            const texto = `📋 *RayoShield Exam* - Acceso a plataforma\n\nHaz clic en el siguiente enlace:\n\n${this._ultimoEnlace}\n\nVálido por 7 días.`;
+            const texto = `📋 *RayoShield Exam* - Acceso a plataforma\n\nHaz clic en el siguiente enlace para realizar tus exámenes:\n\n${this._ultimoEnlace}\n\nEste enlace es personal e intransferible. Válido por 7 días.`;
             window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
         }
     },
@@ -270,6 +628,7 @@ const app = {
         
         if (!trabajadorId || !codigo) return false;
         
+        console.log('🔍 Verificando enlace de acceso...');
         window.history.replaceState({}, document.title, window.location.pathname);
         
         if (!this.firebaseListo) {
@@ -279,69 +638,58 @@ const app = {
         
         try {
             const doc = await this.db.collection('trabajadores').doc(trabajadorId).get();
-            if (!doc.exists) { alert('Enlace inválido'); return false; }
+            if (!doc.exists) {
+                alert('❌ Enlace inválido: Trabajador no encontrado.');
+                return false;
+            }
             
             const data = doc.data();
-            if (data.codigoAcceso !== codigo) { alert('Código incorrecto'); return false; }
-            if (data.fechaExpiracionCodigo?.toDate() < new Date()) { alert('Enlace expirado'); return false; }
-            if (data.estado !== 'activo') { alert('Cuenta inactiva'); return false; }
+            if (data.codigoAcceso !== codigo) {
+                alert('❌ Enlace inválido: Código de acceso incorrecto.');
+                return false;
+            }
+            if (data.fechaExpiracionCodigo?.toDate() < new Date()) {
+                alert('❌ Enlace expirado. Solicita uno nuevo al administrador.');
+                return false;
+            }
+            if (data.estado !== 'activo') {
+                alert('❌ Cuenta inactiva. Contacta al administrador.');
+                return false;
+            }
             
-            if (!this.currentUser) await this.auth.signInAnonymously();
+            if (!this.currentUser) {
+                await this.auth.signInAnonymously();
+                console.log('✅ Autenticación anónima exitosa');
+            }
             
             localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify({
                 id: trabajadorId,
                 uid: this.currentUser?.uid,
                 nombre: data.nombre,
                 curp: data.curp,
-                puesto: data.puesto
+                puesto: data.puesto,
+                empresaId: data.empresaId
             }));
             
             this.modoActual = 'trabajador';
-            this.userData = { empresa: '', nombre: data.nombre, curp: data.curp, puesto: data.puesto };
+            this.userData = {
+                empresa: data.empresaId || '',
+                nombre: data.nombre,
+                curp: data.curp,
+                puesto: data.puesto
+            };
             this.guardarDatosUsuario();
             
-            alert(`✅ Bienvenido ${data.nombre}`);
+            alert(`✅ Bienvenido ${data.nombre}\n\nHas accedido correctamente a la plataforma.`);
             this.actualizarUI();
             this.actualizarUIMenuPorRol();
             this.mostrarPantalla('home-screen');
             return true;
         } catch(error) {
-            console.error(error);
-            alert('Error al validar acceso');
+            console.error('❌ Error:', error);
+            alert('Error al validar el acceso');
             return false;
         }
-    },
-
-    // =================================================================
-    // 📊 GUARDAR EN FIREBASE
-    // =================================================================
-    guardarResultadoFirebase: async function(resultado) {
-        if (!this.firebaseListo) return;
-        const t = this.obtenerTrabajadorActual();
-        if (!t) return;
-        
-        try {
-            await this.db.collection('resultados').add({
-                trabajadorId: t.id,
-                trabajadorNombre: t.nombre,
-                trabajadorCurp: t.curp,
-                tipo: resultado.tipo || 'examen',
-                actividad: resultado.actividad || 'Examen',
-                puntaje: resultado.puntaje || 0,
-                aprobado: resultado.aprobado || false,
-                fecha: new Date().toISOString(),
-                fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            console.log('✅ Sincronizado');
-        } catch(e) {
-            console.warn('⚠️ Offline, guardando en cola');
-            this.colaSincronizacion.push(resultado);
-            localStorage.setItem('rayoshield_cola_sync', JSON.stringify(this.colaSincronizacion));
-        }
-    },
-    
-    obtenerTrabajadorActual: function() {
-        return JSON.parse(localStorage.getItem('rayoshield_trabajador_actual') || 'null');
     },
 
     // =================================================================
@@ -374,7 +722,10 @@ const app = {
         this.volverHome();
     },
     
-    cargarHistorial: function() { console.log('Historial cargado'); },
+    cargarHistorial: function() {
+        console.log('Historial:', this.obtenerHistorial().length, 'registros');
+    },
+    
     cargarExamenGuardado: function() {
         try {
             const s = localStorage.getItem('rayoshield_progreso');
@@ -387,6 +738,61 @@ const app = {
             const h = localStorage.getItem('rayoshield_historial');
             return h ? JSON.parse(h) : [];
         } catch(e) { return []; }
+    },
+    
+    guardarEnHistorial: function() {
+        const hist = this.obtenerHistorial();
+        const t = this.obtenerTrabajadorActual();
+        hist.push({
+            examen: this.examenActual?.titulo || 'Desconocido',
+            norma: this.examenActual?.norma || '',
+            score: this.resultadoActual?.score || 0,
+            estado: this.resultadoActual?.estado || '',
+            fecha: new Date().toISOString(),
+            usuario: t ? t.nombre : this.userData.nombre,
+            tipoUsuario: t ? 'trabajador' : 'admin',
+            trabajadorId: t?.id || null
+        });
+        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
+        
+        // Guardar en Firebase si es posible
+        if (this.resultadoActual) {
+            this.guardarResultadoFirebase({
+                tipo: 'examen',
+                actividad: this.examenActual?.titulo,
+                puntaje: this.resultadoActual.score,
+                aprobado: this.resultadoActual.estado === 'Aprobado'
+            });
+        }
+    },
+    
+    guardarResultadoFirebase: async function(resultado) {
+        if (!this.firebaseListo) return;
+        const t = this.obtenerTrabajadorActual();
+        if (!t) return;
+        
+        try {
+            await this.db.collection('resultados').add({
+                trabajadorId: t.id,
+                trabajadorNombre: t.nombre,
+                trabajadorCurp: t.curp,
+                tipo: resultado.tipo || 'examen',
+                actividad: resultado.actividad || 'Examen',
+                puntaje: resultado.puntaje || 0,
+                aprobado: resultado.aprobado || false,
+                fecha: new Date().toISOString(),
+                fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('✅ Resultado sincronizado con Firebase');
+        } catch(e) {
+            console.warn('⚠️ Offline, guardando en cola');
+            this.colaSincronizacion.push(resultado);
+            localStorage.setItem('rayoshield_cola_sync', JSON.stringify(this.colaSincronizacion));
+        }
+    },
+    
+    obtenerTrabajadorActual: function() {
+        return JSON.parse(localStorage.getItem('rayoshield_trabajador_actual') || 'null');
     },
 
     // =================================================================
@@ -416,6 +822,7 @@ const app = {
     
     mostrarLicencia: function() {
         if (!this.verificarAccesoAdmin('mostrarLicencia')) return;
+        this.actualizarLicenciaUI();
         this.mostrarPantalla('license-screen');
     },
     
@@ -457,7 +864,9 @@ const app = {
         this.mostrarPantalla('user-data-screen');
     },
     
-    editarPerfil: function() { this.mostrarDatosUsuario(); },
+    editarPerfil: function() {
+        this.mostrarDatosUsuario();
+    },
 
     // =================================================================
     // EXÁMENES
@@ -670,30 +1079,6 @@ const app = {
         }
     },
     
-    guardarEnHistorial: function() {
-        const hist = this.obtenerHistorial();
-        const t = this.obtenerTrabajadorActual();
-        hist.push({
-            examen: this.examenActual?.titulo || 'Desconocido',
-            score: this.resultadoActual?.score || 0,
-            estado: this.resultadoActual?.estado || '',
-            fecha: new Date().toISOString(),
-            usuario: t ? t.nombre : this.userData.nombre,
-            tipoUsuario: t ? 'trabajador' : 'admin',
-            trabajadorId: t?.id || null
-        });
-        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
-        
-        if (this.resultadoActual) {
-            this.guardarResultadoFirebase({
-                tipo: 'examen',
-                actividad: this.examenActual?.titulo,
-                puntaje: this.resultadoActual.score,
-                aprobado: this.resultadoActual.estado === 'Aprobado'
-            });
-        }
-    },
-    
     descargarCertificado: function() {
         if (!this.resultadoActual || this.resultadoActual.estado !== 'Aprobado') {
             alert('Solo para aprobados');
@@ -819,125 +1204,51 @@ const app = {
     },
 
     // =================================================================
-    // LICENCIA
-    // =================================================================
-    cargarLicencia: function() {
-        try {
-            const s = localStorage.getItem('rayoshield_licencia');
-            if (s) {
-                const parsed = JSON.parse(s);
-                if (parsed.tipo) this.licencia = parsed;
-            }
-        } catch(e) {}
-        if (!this.licencia.features) this.licencia.features = {};
-    },
-    
-    guardarLicencia: function() {
-        localStorage.setItem('rayoshield_licencia', JSON.stringify(this.licencia));
-        this.actualizarUI();
-    },
-    
-    verificarExpiracionLicencia: function() {
-        if (this.licencia.expiracion && this.licencia.tipo !== 'DEMO') {
-            if (new Date() > new Date(this.licencia.expiracion)) {
-                this.licencia = { tipo: 'DEMO', clave: '', clienteId: '', expiracion: null, examenesRestantes: 3, features: {} };
-                this.guardarLicencia();
-                alert('Licencia expirada. Modo DEMO.');
-            }
-        }
-    },
-    
-    activarLicencia: function() {
-        const idEl = document.getElementById('license-id');
-        const keyEl = document.getElementById('license-key');
-        const clienteId = idEl?.value.trim().toUpperCase() || '';
-        const clave = keyEl?.value.trim().toUpperCase() || '';
-        if (!clienteId || !clave) { alert('Ingresa ID y clave'); return; }
-        
-        const licencias = {
-            'RS-PKDF-9826-A1B2': { tipo: 'PROFESIONAL', duracion: 365, features: { casosBasicos: true, casosMaster: true } },
-            'RS-COZS-2XT6-C3D4': { tipo: 'CONSULTOR', duracion: 365, features: { casosBasicos: true, casosMaster: true, casosElite: true, insignias: true } },
-            'RS-EVP4-Y02I-E5F6': { tipo: 'EMPRESARIAL', duracion: 365, features: { whiteLabel: true, predictivo: true, multiUsuario: 50 } }
-        };
-        const data = licencias[clave];
-        if (!data) { alert('Clave inválida'); return; }
-        
-        const expiracion = new Date();
-        expiracion.setDate(expiracion.getDate() + data.duracion);
-        this.licencia = {
-            tipo: data.tipo,
-            clave: clave,
-            clienteId: clienteId,
-            expiracion: expiracion.toISOString(),
-            examenesRestantes: 9999,
-            features: data.features
-        };
-        this.guardarLicencia();
-        alert(`✅ Licencia ${data.tipo} activada`);
-        location.reload();
-    },
-    
-    activarLicenciaConPlan: function(plan) {
-        const datos = {
-            'PROFESIONAL': { id: 'PROFESIONAL_001', clave: 'RS-PKDF-9826-A1B2' },
-            'CONSULTOR': { id: 'CONSULTOR_001', clave: 'RS-COZS-2XT6-C3D4' },
-            'EMPRESARIAL': { id: 'EMPRESARIAL_001', clave: 'RS-EVP4-Y02I-E5F6' }
-        };
-        if (datos[plan]) {
-            const idEl = document.getElementById('license-id');
-            const keyEl = document.getElementById('license-key');
-            if (idEl) idEl.value = datos[plan].id;
-            if (keyEl) keyEl.value = datos[plan].clave;
-            document.getElementById('activar-licencia-section')?.scrollIntoView({ behavior: 'smooth' });
-        }
-    },
-    
-    actualizarLicenciaUI: function() {
-        const planEl = document.getElementById('licencia-screen-plan');
-        if (planEl) planEl.textContent = this.licencia.tipo;
-        const clienteEl = document.getElementById('licencia-screen-cliente');
-        if (clienteEl) clienteEl.textContent = this.licencia.clienteId || 'N/A';
-        
-        const features = this.licencia.features || {};
-        const container = document.getElementById('licencia-features');
-        if (container) {
-            let html = '';
-            if (features.casosBasicos) html += '<div>✓ Casos BÁSICOS</div>';
-            if (features.casosMaster) html += '<div>✓ Casos MASTER</div>';
-            if (features.casosElite) html += '<div>✓ Casos ELITE</div>';
-            if (features.casosPericial) html += '<div>✓ Casos PERICIAL</div>';
-            if (features.insignias) html += '<div>✓ Insignias PNG</div>';
-            if (features.whiteLabel) html += '<div>✓ White Label</div>';
-            if (features.predictivo) html += '<div>✓ Dashboard Predictivo</div>';
-            if (features.multiUsuario) html += `<div>✓ ${features.multiUsuario} Trabajadores</div>`;
-            if (!html) html = '<div>Plan DEMO - Características básicas</div>';
-            container.innerHTML = html;
-        }
-    },
-
-    // =================================================================
-    // UI Y RENDERIZADO (MÉTODOS FALTANTES)
+    // UI Y RENDERIZADO
     // =================================================================
     actualizarUI: function() {
+        // Info de licencia en home
         const infoLic = document.getElementById('licencia-info');
         if (infoLic) {
             if (this.licencia.tipo === 'DEMO') {
                 infoLic.textContent = `📋 DEMO: ${this.licencia.examenesRestantes}/3 hoy`;
                 infoLic.className = 'licencia-info-card demo';
             } else {
-                infoLic.textContent = `✅ ${this.licencia.tipo}: ${this.licencia.clienteId}`;
+                let texto = `✅ ${this.licencia.tipo}: ${this.licencia.clienteId}`;
+                if (this.licencia.expiracion) {
+                    const exp = new Date(this.licencia.expiracion);
+                    texto += ` (exp: ${exp.toLocaleDateString('es-MX')})`;
+                }
+                infoLic.textContent = texto;
                 infoLic.className = 'licencia-info-card activo';
             }
         }
         
+        // Info de usuario
         const userInfo = document.getElementById('usuario-info');
         if (userInfo && this.userData.nombre) {
             userInfo.innerHTML = `<strong>👤 ${this.userData.nombre}</strong><br>${this.userData.empresa || ''} • ${this.userData.puesto || ''}`;
         }
         
+        // Sidebar
         const sidebarPlan = document.getElementById('sidebar-license-plan');
         if (sidebarPlan) sidebarPlan.textContent = this.licencia.tipo;
         
+        const sidebarExpiry = document.getElementById('sidebar-license-expiry');
+        if (sidebarExpiry) {
+            if (this.licencia.expiracion && this.licencia.tipo !== 'DEMO') {
+                const exp = new Date(this.licencia.expiracion);
+                const ahora = new Date();
+                const dias = Math.ceil((exp - ahora) / (1000 * 60 * 60 * 24));
+                sidebarExpiry.textContent = `${dias} días restantes`;
+                sidebarExpiry.style.color = dias <= 7 ? 'var(--rose)' : 'var(--ink4)';
+            } else {
+                sidebarExpiry.textContent = 'DEMO - 3/día';
+                sidebarExpiry.style.color = 'var(--ink4)';
+            }
+        }
+        
+        // Botón de examen
         const btnExamen = document.getElementById('btn-comenzar');
         if (btnExamen) {
             const datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
@@ -962,14 +1273,24 @@ const app = {
         const curpInput = document.getElementById('perfil-curp-input');
         if (curpInput) curpInput.value = this.userData.curp || '';
         
+        const perfilPlan = document.getElementById('perfil-plan');
+        if (perfilPlan) perfilPlan.textContent = this.licencia.tipo;
+        
         const hist = this.obtenerHistorial();
-        const promedio = hist.length ? Math.round(hist.reduce((a,b) => a + b.score, 0) / hist.length) : 0;
+        const aprobados = hist.filter(h => h.estado === 'Aprobado').length;
+        const promedio = hist.length > 0 ? Math.round(hist.reduce((a,b) => a + b.score, 0) / hist.length) : 0;
+        
         const perfPromedio = document.getElementById('perf-promedio');
         if (perfPromedio) perfPromedio.textContent = promedio + '%';
         const perfExamenes = document.getElementById('perf-examenes');
         if (perfExamenes) perfExamenes.textContent = hist.length;
-        const perfilPlan = document.getElementById('perfil-plan');
-        if (perfilPlan) perfilPlan.textContent = this.licencia.tipo;
+        const perfAprobados = document.getElementById('perf-aprobados');
+        if (perfAprobados) perfAprobados.textContent = aprobados;
+        const perfilExamenes = document.getElementById('perfil-examenes');
+        if (perfilExamenes) perfilExamenes.textContent = hist.length + ' Exámenes';
+        
+        const logroExamen = document.getElementById('logro-examen');
+        if (logroExamen && hist.length >= 1) logroExamen.textContent = '✅';
     },
     
     actualizarUIMenuPorRol: function() {
@@ -1038,7 +1359,7 @@ const app = {
                 <td style="padding:12px;"><strong>${t.nombre}</strong><br><small>${t.curp}</small></td>
                 <td style="padding:12px;">${t.puesto || '-'}<br><small>${t.area || ''}</small></td>
                 <td style="padding:12px;">${prog.total_examenes} exámenes<br><small>${prog.total_casos} casos</small></td>
-                <td style="padding:12px;font-weight:700;color:${prog.promedio >= 80 ? 'var(--green)' : 'var(--amber)'};">${prog.promedio}%</td>
+                <td style="padding:12px;font-weight:700;color:${prog.promedio >= 80 ? 'var(--green)' : 'var(--amber)'};">${prog.promedio}%</span></td>
                 <td style="padding:12px;"><span class="${t.estado === 'activo' ? 'status-ok' : 'status-pend'}">${t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo'}</span></td>
                 <td style="padding:12px;text-align:center;">
                     <button class="tbl-btn view" onclick="app.verProgresoTrabajador('${t.id}')">📊</button>
@@ -1197,10 +1518,29 @@ const app = {
         if (!container) return;
         const hist = this.obtenerHistorial();
         if (hist.length === 0) {
-            container.innerHTML = '<p>Sin registros</p>';
+            container.innerHTML = '<p style="text-align:center;padding:40px;">📭 Sin exámenes registrados</p>';
             return;
         }
-        container.innerHTML = `<table style="width:100%;border-collapse:collapse;">${hist.slice(-20).reverse().map(h => `<tr><td style="padding:8px;">${new Date(h.fecha).toLocaleDateString()}</td><td>${h.usuario}</td><td>${h.examen}</td><td>${h.score}%</td><td>${h.estado}</td></tr>`).join('')}</table>`;
+        container.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:var(--bg);">
+                <th style="padding:12px;text-align:left;">Fecha</th>
+                <th style="padding:12px;text-align:left;">Usuario</th>
+                <th style="padding:12px;text-align:left;">Examen</th>
+                <th style="padding:12px;text-align:right;">Puntaje</th>
+                <th style="padding:12px;text-align:center;">Estado</th>
+            </table></thead>
+            <tbody>
+            ${hist.slice(-20).reverse().map(item => `
+                <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px;">${new Date(item.fecha).toLocaleDateString('es-MX')}</td>
+                    <td style="padding:12px;font-weight:600;">${item.usuario || 'N/A'}</td>
+                    <td style="padding:12px;">${item.examen}</td>
+                    <td style="padding:12px;text-align:right;font-weight:700;">${item.score}%</td>
+                    <td style="padding:12px;text-align:center;"><span class="${item.estado === 'Aprobado' ? 'status-ok' : 'status-pend'}">${item.estado === 'Aprobado' ? '✅ Aprobado' : '❌ Reprobado'}</span></td>
+                </tr>
+            `).join('')}
+            </tbody>
+        </table>`;
     },
     
     llenarFiltroTrabajadoresHistorial: function() {
@@ -1220,9 +1560,9 @@ const app = {
     exportarHistorialPDF: function() {
         const hist = this.obtenerHistorial();
         if (hist.length === 0) { alert('No hay datos'); return; }
-        let html = `<html><head><title>Historial</title></head><body><h1>Historial</h1><table border="1"><tr><th>Fecha</th><th>Usuario</th><th>Examen</th><th>Puntaje</th><th>Estado</th></tr>`;
+        let html = `<html><head><title>Historial RayoShield</title><style>body{font-family:Arial;} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:8px}</style></head><body><h1>Historial de Exámenes</h1><table border="1"><tr><th>Fecha</th><th>Usuario</th><th>Examen</th><th>Puntaje</th><th>Estado</th></tr>`;
         hist.forEach(h => { html += `<tr><td>${new Date(h.fecha).toLocaleDateString()}</td><td>${h.usuario}</td><td>${h.examen}</td><td>${h.score}%</td><td>${h.estado}</td></tr>`; });
-        html += `</table></body></html>`;
+        html += `</table><p>Generado: ${new Date().toLocaleString()}</p></body></html>`;
         const win = window.open();
         win.document.write(html);
         win.print();
@@ -1300,15 +1640,15 @@ const app = {
     },
     
     cerrarSesion: function() {
-        if (confirm('¿Cerrar sesión?')) {
+        if (confirm('¿Cerrar sesión? Se borrarán los datos locales.')) {
             if (this.firebaseListo && this.auth) this.auth.signOut();
             localStorage.clear();
             location.reload();
         }
     },
     
-    exportarDatos: function() { alert('Disponible en planes PRO'); },
-    importarDatos: function() { alert('Disponible en planes PRO'); },
+    exportarDatos: function() { alert('Disponible en planes PROFESIONAL+'); },
+    importarDatos: function() { alert('Disponible en planes PROFESIONAL+'); },
     limpiarDatosConfirmar: function() {
         if (confirm('⚠️ ¿Borrar todos los datos?') && prompt('Escribe "BORRAR"') === 'BORRAR') {
             localStorage.clear();
@@ -1332,8 +1672,13 @@ const MultiUsuario = {
         if (!localStorage.getItem('rayoshield_trabajadores')) localStorage.setItem('rayoshield_trabajadores', JSON.stringify([]));
         if (!localStorage.getItem('rayoshield_resultados')) localStorage.setItem('rayoshield_resultados', JSON.stringify([]));
         if (!localStorage.getItem('rayoshield_trabajador_actual')) localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
+        console.log('✅ MultiUsuario inicializado');
     },
-    getTrabajadores: function() { return JSON.parse(localStorage.getItem('rayoshield_trabajadores') || '[]'); },
+    
+    getTrabajadores: function() { 
+        return JSON.parse(localStorage.getItem('rayoshield_trabajadores') || '[]'); 
+    },
+    
     addTrabajador: function(t) {
         const arr = this.getTrabajadores();
         t.id = 'TRAB-' + Date.now().toString(36).toUpperCase();
@@ -1343,11 +1688,13 @@ const MultiUsuario = {
         localStorage.setItem('rayoshield_trabajadores', JSON.stringify(arr));
         return t;
     },
+    
     updateTrabajador: function(id, data) {
         let arr = this.getTrabajadores();
         arr = arr.map(t => t.id === id ? { ...t, ...data } : t);
         localStorage.setItem('rayoshield_trabajadores', JSON.stringify(arr));
     },
+    
     deleteTrabajador: function(id) {
         let arr = this.getTrabajadores();
         arr = arr.filter(t => t.id !== id);
@@ -1356,11 +1703,28 @@ const MultiUsuario = {
         resultados = resultados.filter(r => r.trabajador_id !== id);
         localStorage.setItem('rayoshield_resultados', JSON.stringify(resultados));
     },
-    getTrabajadorById: function(id) { return this.getTrabajadores().find(t => t.id === id); },
-    setTrabajadorActual: function(id) { localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(id)); },
-    getTrabajadorActual: function() { const id = JSON.parse(localStorage.getItem('rayoshield_trabajador_actual')); return id ? this.getTrabajadorById(id) : null; },
-    clearTrabajadorActual: function() { localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null)); },
-    getResultados: function() { return JSON.parse(localStorage.getItem('rayoshield_resultados') || '[]'); },
+    
+    getTrabajadorById: function(id) { 
+        return this.getTrabajadores().find(t => t.id === id); 
+    },
+    
+    setTrabajadorActual: function(id) { 
+        localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(id)); 
+    },
+    
+    getTrabajadorActual: function() { 
+        const id = JSON.parse(localStorage.getItem('rayoshield_trabajador_actual')); 
+        return id ? this.getTrabajadorById(id) : null; 
+    },
+    
+    clearTrabajadorActual: function() { 
+        localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null)); 
+    },
+    
+    getResultados: function() { 
+        return JSON.parse(localStorage.getItem('rayoshield_resultados') || '[]'); 
+    },
+    
     addResultado: function(r) {
         const arr = this.getResultados();
         r.id = 'RES-' + Date.now().toString(36).toUpperCase();
@@ -1368,25 +1732,37 @@ const MultiUsuario = {
         arr.push(r);
         localStorage.setItem('rayoshield_resultados', JSON.stringify(arr));
     },
-    getResultadosByTrabajador: function(id) { return this.getResultados().filter(r => r.trabajador_id === id); },
+    
+    getResultadosByTrabajador: function(id) { 
+        return this.getResultados().filter(r => r.trabajador_id === id); 
+    },
+    
     getProgresoByTrabajador: function(id) {
         const resultados = this.getResultadosByTrabajador(id);
         const examenes = resultados.filter(r => r.tipo === 'examen');
+        const casos = resultados.filter(r => r.tipo === 'caso');
         return {
             total_examenes: examenes.length,
-            promedio: examenes.length ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0,
-            total_casos: resultados.filter(r => r.tipo === 'caso').length
+            examenes_aprobados: examenes.filter(r => r.aprobado).length,
+            total_casos: casos.length,
+            casos_completados: casos.filter(r => r.aprobado).length,
+            promedio: examenes.length ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0
         };
     },
+    
     getEstadisticas: function() {
         const trabajadores = this.getTrabajadores();
         const resultados = this.getResultados();
+        const activos = trabajadores.filter(t => t.estado === 'activo').length;
+        const examenesTotales = resultados.filter(r => r.tipo === 'examen').length;
+        const casosTotales = resultados.filter(r => r.tipo === 'caso').length;
+        const aprobados = resultados.filter(r => r.aprobado).length;
         return {
             trabajadores_totales: trabajadores.length,
-            trabajadores_activos: trabajadores.filter(t => t.estado === 'activo').length,
-            examenes_totales: resultados.filter(r => r.tipo === 'examen').length,
-            casos_totales: resultados.filter(r => r.tipo === 'caso').length,
-            tasa_aprobacion: resultados.length ? Math.round((resultados.filter(r => r.aprobado).length / resultados.length) * 100) : 0
+            trabajadores_activos: activos,
+            examenes_totales: examenesTotales,
+            casos_totales: casosTotales,
+            tasa_aprobacion: resultados.length ? Math.round((aprobados / resultados.length) * 100) : 0
         };
     }
 };
