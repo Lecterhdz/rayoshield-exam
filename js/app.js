@@ -69,7 +69,20 @@ const app = {
         if (typeof MultiUsuario !== 'undefined') {
             MultiUsuario.init();
         }
-        
+        // ═══════════════════════════════════════════════════════════════
+        // ✅ INICIALIZAR FIREBASE
+        // ═══════════════════════════════════════════════════════════════
+        if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
+            this.db = db;
+            this.firebaseListo = true;
+            console.log('✅ Firebase conectado:', db.app.name);
+            
+            // Escuchar cambios en trabajadores (tiempo real)
+            this.escucharCambiosTrabajadores();
+        } else {
+            console.log('⚠️ Firebase no disponible - Usando localStorage');
+            this.firebaseListo = false;
+        }       
         if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
             if (this.licencia.tipo === 'DEMO') {
                 this.licencia.features = {
@@ -1919,8 +1932,13 @@ const app = {
             MultiUsuario.updateTrabajador(id, data);
             alert('✅ Trabajador actualizado correctamente');
         } else {
-            MultiUsuario.addTrabajador(data);
+            var nuevo = MultiUsuario.addTrabajador(data);
             alert('✅ Trabajador registrado correctamente');
+            
+            // ✅ SINCRONIZAR CON FIREBASE
+            if (this.firebaseListo) {
+                this.guardarTrabajadorFirebase(nuevo);
+            }
         }
         this.cerrarModalTrabajador();
         this.renderTrabajadores();
@@ -1949,6 +1967,12 @@ const app = {
         }
         MultiUsuario.deleteTrabajador(id);
         alert('✅ Trabajador eliminado correctamente');
+        
+        // ✅ ELIMINAR DE FIREBASE
+        if (this.firebaseListo) {
+            this.eliminarTrabajadorFirebase(id);
+        }
+        
         this.renderTrabajadores();
         this.actualizarBadgeTrabajadores();
     },
@@ -2478,6 +2502,187 @@ const app = {
             return null;
         }
     }
+    // ═══════════════════════════════════════════════════════════════
+    // FIREBASE - SINCRONIZACIÓN
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Guardar trabajador en Firebase
+    guardarTrabajadorFirebase: function(trabajador) {
+        if (!this.firebaseListo || !this.db) return Promise.resolve();
+        
+        return this.db.collection('trabajadores').doc(trabajador.id).set({
+            id: trabajador.id,
+            nombre: trabajador.nombre,
+            curp: trabajador.curp,
+            puesto: trabajador.puesto || '',
+            area: trabajador.area || '',
+            email: trabajador.email || '',
+            telefono: trabajador.telefono || '',
+            notas: trabajador.notas || '',
+            estado: trabajador.estado || 'activo',
+            fechaRegistro: trabajador.fecha_registro || new Date().toISOString(),
+            fechaActualizacion: new Date().toISOString()
+        }).then(() => {
+            console.log('✅ Trabajador sincronizado:', trabajador.nombre);
+        }).catch((err) => {
+            console.error('❌ Error sincronizando trabajador:', err);
+        });
+    },
+    
+    // Eliminar trabajador de Firebase
+    eliminarTrabajadorFirebase: function(trabajadorId) {
+        if (!this.firebaseListo || !this.db) return Promise.resolve();
+        
+        return this.db.collection('trabajadores').doc(trabajadorId).delete().then(() => {
+            console.log('✅ Trabajador eliminado de Firebase');
+        }).catch((err) => {
+            console.error('❌ Error eliminando trabajador:', err);
+        });
+    },
+    
+    // Guardar resultado en Firebase
+    guardarResultadoFirebase: function(resultado) {
+        if (!this.firebaseListo || !this.db) return Promise.resolve();
+        
+        var t = MultiUsuario.getTrabajadorActual();
+        if (!t) return Promise.resolve();
+        
+        return this.db.collection('resultados').add({
+            trabajadorId: t.id,
+            trabajadorNombre: t.nombre,
+            trabajadorCurp: t.curp,
+            tipo: resultado.tipo || 'examen',
+            actividad: resultado.actividad || 'Examen',
+            puntaje: resultado.puntaje || resultado.score || 0,
+            aprobado: resultado.aprobado || false,
+            fecha: resultado.fecha || new Date().toISOString(),
+            fechaRegistro: new Date().toISOString()
+        }).then(() => {
+            console.log('✅ Resultado sincronizado:', resultado.actividad);
+        }).catch((err) => {
+            console.error('❌ Error sincronizando resultado:', err);
+        });
+    },
+    
+    // Escuchar cambios en trabajadores (tiempo real)
+    escucharCambiosTrabajadores: function() {
+        if (!this.firebaseListo || !this.db) return;
+        
+        if (this.sincronizacionActiva) return; // Ya está escuchando
+        this.sincronizacionActiva = true;
+        
+        this.db.collection('trabajadores').onSnapshot((snapshot) => {
+            console.log('🔄 Cambios en trabajadores detectados:', snapshot.docs.length);
+            
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    console.log('➕ Nuevo trabajador:', change.doc.data().nombre);
+                }
+                if (change.type === 'modified') {
+                    console.log('✏️ Trabajador actualizado:', change.doc.data().nombre);
+                }
+                if (change.type === 'removed') {
+                    console.log('🗑️ Trabajador eliminado');
+                }
+            });
+            
+            // Recargar lista local si hay cambios
+            if (snapshot.docs.length > 0) {
+                // Opcional: Actualizar localStorage desde Firebase
+                // this.sincronizarDesdeFirebase(snapshot.docs);
+            }
+        });
+    },
+    
+    // Sincronizar localStorage con Firebase (opcional)
+    sincronizarDesdeFirebase: function(docs) {
+        var trabajadores = docs.map(doc => doc.data());
+        localStorage.setItem('rayoshield_trabajadores_firebase', JSON.stringify(trabajadores));
+        console.log('🔄 localStorage sincronizado con Firebase');
+    },
+    
+    // Cargar trabajadores desde Firebase
+    cargarTrabajadoresFirebase: function() {
+        if (!this.firebaseListo || !this.db) return Promise.resolve([]);
+        
+        return this.db.collection('trabajadores').orderBy('fechaRegistro', 'desc').get()
+            .then((snapshot) => {
+                var trabajadores = [];
+                snapshot.forEach((doc) => {
+                    trabajadores.push(doc.data());
+                });
+                console.log('✅ Trabajadores cargados desde Firebase:', trabajadores.length);
+                return trabajadores;
+            }).catch((err) => {
+                console.error('❌ Error cargando trabajadores:', err);
+                return [];
+            });
+    },
+    
+    // Cargar resultados desde Firebase
+    cargarResultadosFirebase: function(trabajadorId) {
+        if (!this.firebaseListo || !this.db) return Promise.resolve([]);
+        
+        var query = this.db.collection('resultados');
+        if (trabajadorId) {
+            query = query.where('trabajadorId', '==', trabajadorId);
+        }
+        
+        return query.orderBy('fecha', 'desc').limit(100).get()
+            .then((snapshot) => {
+                var resultados = [];
+                snapshot.forEach((doc) => {
+                    resultados.push(doc.data());
+                });
+                console.log('✅ Resultados cargados desde Firebase:', resultados.length);
+                return resultados;
+            }).catch((err) => {
+                console.error('❌ Error cargando resultados:', err);
+                return [];
+            });
+    },
+    
+    // Exportar todos los datos a Firebase (backup)
+    exportarTodoAFirebase: function() {
+        if (!this.firebaseListo || !this.db) {
+            alert('❌ Firebase no disponible');
+            return;
+        }
+        
+        var self = this;
+        var confirmacion = confirm('📤 ¿Exportar todos los datos a Firebase?\n\nEsto sincronizará:\n• Trabajadores\n• Resultados\n• Empresa\n\n¿Continuar?');
+        if (!confirmacion) return;
+        
+        // Exportar trabajadores
+        var trabajadores = MultiUsuario.getTrabajadores();
+        var promesas = trabajadores.map(function(t) {
+            return self.guardarTrabajadorFirebase(t);
+        });
+        
+        Promise.all(promesas).then(function() {
+            alert('✅ Datos exportados a Firebase correctamente');
+        }).catch(function(err) {
+            alert('❌ Error exportando: ' + err.message);
+        });
+    },
+    
+    // Importar todos los datos desde Firebase
+    importarTodoDeFirebase: function() {
+        if (!this.firebaseListo || !this.db) {
+            alert('❌ Firebase no disponible');
+            return;
+        }
+        
+        var self = this;
+        var confirmacion = confirm('📥 ¿Importar todos los datos desde Firebase?\n\nEsto reemplazará los datos locales.\n\n¿Continuar?');
+        if (!confirmacion) return;
+        
+        this.cargarTrabajadoresFirebase().then(function(trabajadores) {
+            localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
+            alert('✅ Datos importados desde Firebase: ' + trabajadores.length + ' trabajadores');
+            location.reload();
+        });
+    },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -2637,6 +2842,17 @@ app.mostrarResultado = function() {
             fecha: new Date().toISOString()
         });
         console.log('✅ Resultado guardado para', t.nombre);
+        
+        // ✅ GUARDAR EN FIREBASE
+        if (app.firebaseListo) {
+            app.guardarResultadoFirebase({
+                tipo: 'examen',
+                actividad: this.examenActual ? this.examenActual.titulo : 'Examen',
+                puntaje: this.resultadoActual.score,
+                aprobado: this.resultadoActual.estado === 'Aprobado',
+                fecha: new Date().toISOString()
+            });
+        }
     }
 };
 
@@ -2656,9 +2872,19 @@ app.mostrarResultadoCaso = function(resultado) {
             fecha: new Date().toISOString()
         });
         console.log('✅ Resultado de caso guardado para', t.nombre);
+        
+        // ✅ GUARDAR EN FIREBASE
+        if (app.firebaseListo) {
+            app.guardarResultadoFirebase({
+                tipo: 'caso',
+                actividad: this.casoActual ? this.casoActual.titulo : 'Caso',
+                puntaje: resultado.porcentaje,
+                aprobado: resultado.aprobado,
+                fecha: new Date().toISOString()
+            });
+        }
     }
 };
-
 // INICIAR
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM listo');
