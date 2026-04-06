@@ -1002,7 +1002,50 @@ const app = {
             this.eliminarExamenGuardado();
         }
     },
-    
+    iniciarTimerCaso: function() {
+        // Si ya hay un timer activo, detenerlo primero
+        if (this.timerCaso) {
+            clearInterval(this.timerCaso);
+            this.timerCaso = null;
+        }
+        
+        // Duración del caso en milisegundos (40 minutos por defecto)
+        const duracionMs = (this.casoActual?.tiempo_estimado ? 
+            parseInt(this.casoActual.tiempo_estimado) * 60 * 1000 : 
+            40 * 60 * 1000);
+        
+        this.tiempoCasoInicio = Date.now();
+        this.tiempoCasoRestante = duracionMs;
+        
+        const self = this;
+        this.timerCaso = setInterval(function() {
+            self.tiempoCasoRestante = duracionMs - (Date.now() - self.tiempoCasoInicio);
+            
+            if (self.tiempoCasoRestante <= 0) {
+                clearInterval(self.timerCaso);
+                self.timerCaso = null;
+                alert('⏰ Tiempo agotado. Tus respuestas se enviarán automáticamente.');
+                self.enviarRespuestasCaso();
+                return;
+            }
+            
+            // Actualizar UI del timer
+            const timerEl = document.getElementById('caso-timer');
+            if (timerEl) {
+                const minutos = Math.floor(self.tiempoCasoRestante / 60000);
+                const segundos = Math.floor((self.tiempoCasoRestante % 60000) / 1000);
+                timerEl.textContent = `⏱️ ${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
+                
+                if (self.tiempoCasoRestante <= 300000) { // 5 minutos o menos
+                    timerEl.style.color = '#f44336';
+                } else {
+                    timerEl.style.color = 'var(--ink3)';
+                }
+            }
+        }, 1000);
+        
+        console.log('⏱️ Timer de caso iniciado');
+    },  
     iniciarTimerExamen: function() {
         this.tiempoInicio = Date.now();
         this.tiempoRestante = this.tiempoLimite;
@@ -1030,7 +1073,43 @@ const app = {
             this.timerExamen = null;
         }
     },
-    
+    enviarRespuestasCaso: function() {
+        if (!this.casoActual) {
+            console.error('❌ No hay caso actual');
+            return;
+        }
+        
+        console.log('📤 Enviando respuestas del caso...');
+        
+        // Recopilar respuestas
+        const respuestasPorPregunta = {};
+        
+        for (let i = 0; i < this.casoActual.preguntas.length; i++) {
+            const pregunta = this.casoActual.preguntas[i];
+            const preguntaId = pregunta.id || i;
+            
+            // Determinar tipo de pregunta y recopilar respuesta
+            if (pregunta.tipo === 'analisis_multiple' || pregunta.tipo === 'analisis_normativo') {
+                const checks = document.querySelectorAll(`input[name="pregunta-${preguntaId}"]:checked`);
+                respuestasPorPregunta[preguntaId] = Array.from(checks).map(c => parseInt(c.value));
+            } 
+            else if (pregunta.tipo === 'respuesta_abierta_guiada') {
+                const textarea = document.getElementById(`respuesta-${preguntaId}`);
+                respuestasPorPregunta[preguntaId] = [textarea ? textarea.value : ''];
+            }
+            else if (pregunta.tipo === 'plan_accion') {
+                const checks = document.querySelectorAll(`input[name="plan-${preguntaId}"]:checked`);
+                respuestasPorPregunta[preguntaId] = Array.from(checks).map(c => parseInt(c.value));
+            }
+        }
+        
+        // Evaluar usando la función existente
+        const resultado = evaluarCasoInvestigacion(respuestasPorPregunta, this.casoActual);
+        this.resultadoCaso = resultado;
+        this.mostrarResultadoCaso(resultado);
+        
+        console.log('✅ Respuestas enviadas, resultado:', resultado.porcentaje + '%');
+    },    
     guardarExamenProgreso: function() {
         if (this.examenActual) {
             this.examenGuardado = {
@@ -1042,7 +1121,89 @@ const app = {
             localStorage.setItem('rayoshield_progreso', JSON.stringify(this.examenGuardado));
         }
     },
+    mostrarResultadoCaso: function(resultado) {
+        console.log('📊 Mostrando resultado del caso');
+        
+        const resultadoEl = document.getElementById('caso-resultado');
+        if (!resultadoEl) {
+            console.error('❌ Elemento caso-resultado no encontrado');
+            return;
+        }
+        
+        this.detenerTimerCaso();
+        
+        resultadoEl.style.display = 'block';
+        resultadoEl.scrollIntoView({ behavior: 'smooth' });
+        
+        const btnEnviar = document.getElementById('btn-enviar-caso');
+        if (btnEnviar) btnEnviar.style.display = 'none';
+        
+        const nivel = this.casoActual?.nivel || 'basico';
+        const nivelUpper = nivel.toUpperCase();
+        
+        const estadoTexto = resultado.aprobado ? 
+            `✅ APROBADO - Nivel ${nivelUpper}` : 
+            '📚 REQUIERE REPASO';
+        
+        const botonesHTML = resultado.aprobado ? `
+            <div class="button-group" style="margin-top:20px;">
+                <button class="btn btn-primary" onclick="app.descargarCertificadoCaso()">📄 Descargar Certificado</button>
+                <button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>
+                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
+            </div>
+        ` : `
+            <div class="button-group" style="margin-top:20px;">
+                <button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Intentar otro caso</button>
+                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
+            </div>
+        `;
+        
+        resultadoEl.innerHTML = `
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:24px;text-align:center;margin:20px 0;">
+                <h2>${resultado.aprobado ? '✅ APROBADO' : '📚 REQUIERE REPASO'}</h2>
+                <div style="font-size:56px;font-weight:800;font-family:var(--mono);color:var(--ink);margin:20px 0;letter-spacing:-2px;">
+                    ${resultado.porcentaje || 0}%
+                </div>
+                <p><strong>Puntaje:</strong> ${Math.round(resultado.puntajeTotal || 0)} / ${resultado.puntajeMaximo || 0}</p>
+                <p><strong>Estado:</strong> ${estadoTexto}</p>
+                <p><strong>Nivel del Caso:</strong> ${nivelUpper}</p>
+            </div>
+            ${resultado.feedback && resultado.feedback.length ? `
+                <div style="margin:20px 0;padding:20px;background:#FFF3E0;border-radius:10px;border-left:4px solid #FF9800;">
+                    <strong style="color:#E65100;">💡 Retroalimentación:</strong>
+                    <ul style="margin-top:10px;color:#5D4037;">
+                        ${resultado.feedback.map(f => `<li style="padding:5px 0;">${f}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : ''}
+            <div class="leccion-master" style="background:var(--bg);padding:20px;border-radius:10px;margin:20px 0;text-align:left;">
+                <strong style="color:var(--ink);font-size:13px;">🎓 Lección Aprendida:</strong>
+                <p style="margin-top:10px;color:var(--ink2);font-size:14px;line-height:1.6;">${resultado.leccion || 'Continúa practicando para mejorar.'}</p>
+            </div>
+            ${botonesHTML}
+        `;
+        
+        // Guardar en historial si aprobó
+        if (resultado.aprobado) {
+            this.guardarResultadoCasoHistorial();
+        }
+    },
     
+    guardarResultadoCasoHistorial: function() {
+        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
+        const hist = this.obtenerHistorial();
+        hist.push({
+            examen: this.casoActual?.titulo || 'Caso',
+            score: this.resultadoCaso?.porcentaje || 0,
+            estado: 'Aprobado',
+            fecha: new Date().toISOString(),
+            usuario: t ? t.nombre : this.userData.nombre,
+            tipoUsuario: t ? 'trabajador' : 'admin',
+            trabajadorId: t?.id || null
+        });
+        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
+        console.log('✅ Caso guardado en historial');
+    },    
     eliminarExamenGuardado: function() {
         this.examenGuardado = null;
         localStorage.removeItem('rayoshield_progreso');
