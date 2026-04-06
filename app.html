@@ -2616,7 +2616,10 @@
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
                         <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
                         <span style="font-size:14px;font-weight:700;color:var(--ink);">👷 Gestión de Trabajadores</span>
-                        <button onclick="app.mostrarModalTrabajador()" class="topbar-btn primary" style="margin-left:auto;">＋ Nuevo Trabajador</button>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <button onclick="app.mostrarModalTrabajador()" class="topbar-btn primary">＋ Nuevo Trabajador</button>
+                            <button onclick="app.mostrarPanelGenerarEnlace()" class="topbar-btn" style="background:var(--green);color:white;">🔗 Generar Enlace de Acceso</button>
+                        </div>
                     </div>
                     
                     <!-- Estadísticas -->
