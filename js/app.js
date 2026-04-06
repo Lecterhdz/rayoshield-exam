@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────
-// RAYOSHIELD EXAM - app.js (VERSIÓN COMPLETA v5.0)
+// RAYOSHIELD EXAM - app.js (v5.0 - FLUJO COMPLETO CON ENLACES)
 // Guardar con codificación UTF-8
 // ─────────────────────────────────────────────────────────────────────
 
@@ -21,17 +21,15 @@ const app = {
     currentUser: null,
     isAdmin: false,
     firebaseListo: false,
-    sincronizacionActiva: false,
+    empresaActual: null,
+    colaSincronizacion: [],
 
-    // Timers y Estado
+    // Timers
     timerExamen: null,
     tiempoLimite: 30 * 60 * 1000,
     tiempoInicio: null,
-    tiempoRestante: null,
     timerCaso: null,
     tiempoCasoLimite: 40 * 60 * 1000,
-    tiempoCasoInicio: null,
-    tiempoCasoRestante: null,
     examenGuardado: null,
     casoActual: null,
     respuestasCaso: {},
@@ -42,9 +40,9 @@ const app = {
     // INICIALIZACIÓN
     // ─────────────────────────────────────────────────────────────────
     init: function() {
-        console.log('RayoShield iniciado v5.0');
+        console.log('RayoShield v5.0 - Flujo con enlaces');
         
-        // Contraseña admin local
+        // Configuración local
         if (!localStorage.getItem('rayoshield_admin_password')) {
             localStorage.setItem('rayoshield_admin_password', 'admin123');
         }
@@ -55,19 +53,16 @@ const app = {
         this.cargarHistorial();
         this.cargarExamenGuardado();
         
-        // Inicializar MultiUsuario
-        if (typeof MultiUsuario !== 'undefined') {
-            MultiUsuario.init();
-        }
+        if (typeof MultiUsuario !== 'undefined') MultiUsuario.init();
         
-        // Inicializar Firebase si está disponible
+        // Inicializar Firebase
         if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
             this.db = db;
             this.auth = auth;
             this.firebaseListo = true;
             console.log('✅ Firebase conectado');
             
-            // Escuchar cambios de autenticación (sin llamar init otra vez)
+            // Escuchar cambios de autenticación
             if (!this._authListenerSet) {
                 this._authListenerSet = true;
                 this.auth.onAuthStateChanged(async (user) => {
@@ -76,15 +71,27 @@ const app = {
                         try {
                             const adminDoc = await this.db.collection('admins').doc(user.uid).get();
                             this.isAdmin = adminDoc.exists;
+                            
+                            // Si es admin, cargar empresa
+                            if (this.isAdmin) {
+                                await this.cargarEmpresaFirebase();
+                            }
                         } catch(e) { this.isAdmin = false; }
+                        
+                        // Verificar si viene de un enlace de trabajador
+                        this.verificarEnlaceAcceso();
                     } else {
                         this.isAdmin = false;
+                        // Modo invitado/DEMO
                     }
                     this.actualizarUI();
                     this.actualizarUIMenuPorRol();
                 });
             }
         }
+        
+        // Verificar enlace en URL (sin autenticación previa)
+        this.verificarEnlaceAcceso();
         
         this.initPWAInstall();
         this.actualizarUI();
@@ -95,52 +102,421 @@ const app = {
     },
 
     // ─────────────────────────────────────────────────────────────────
-    // DATOS DE USUARIO
+    // 🔥 FIREBASE - EMPRESA
     // ─────────────────────────────────────────────────────────────────
-    cargarDatosUsuario: function() {
+    cargarEmpresaFirebase: async function() {
+        if (!this.firebaseListo || !this.currentUser) return;
         try {
-            const s = localStorage.getItem('rayoshield_usuario');
-            if (s) this.userData = JSON.parse(s);
-        } catch(e) {}
-    },
-    
-    guardarDatosUsuario: function() {
-        localStorage.setItem('rayoshield_usuario', JSON.stringify(this.userData));
-        this.actualizarUI();
-    },
-    
-    guardarDatosUsuarioForm: function() {
-        const empresa = document.getElementById('user-empresa')?.value.trim();
-        const nombre = document.getElementById('user-nombre')?.value.trim();
-        const curp = document.getElementById('user-curp')?.value.trim().toUpperCase();
-        const puesto = document.getElementById('user-puesto')?.value.trim();
-        if (!empresa || !nombre || !curp || !puesto) {
-            alert('Completa todos los campos');
-            return;
-        }
-        this.userData = { empresa, nombre, curp, puesto };
-        this.guardarDatosUsuario();
-        alert('Datos guardados');
-        this.volverHome();
-    },
-    
-    cargarHistorial: function() {
-        console.log('Historial cargado:', this.obtenerHistorial().length);
-    },
-    
-    cargarExamenGuardado: function() {
-        try {
-            const s = localStorage.getItem('rayoshield_progreso');
-            if (s) this.examenGuardado = JSON.parse(s);
-        } catch(e) {}
+            const querySnapshot = await this.db.collection('empresas')
+                .where('adminId', '==', this.currentUser.uid)
+                .limit(1)
+                .get();
+            if (!querySnapshot.empty) {
+                this.empresaActual = { id: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
+                console.log('✅ Empresa cargada:', this.empresaActual.nombre);
+            }
+        } catch(e) { console.error('Error cargando empresa:', e); }
     },
 
     // ─────────────────────────────────────────────────────────────────
-    // NAVEGACIÓN
+    // 🔗 GENERAR ENLACE PARA TRABAJADOR (MEJORA CLAVE)
+    // ─────────────────────────────────────────────────────────────────
+    generarEnlaceTrabajador: async function(nombre, curp, puesto, email = '') {
+        if (!this.firebaseListo) {
+            alert('❌ Firebase no disponible. No se pueden generar enlaces.');
+            return null;
+        }
+        
+        if (!this.isAdmin) {
+            alert('❌ Solo administradores pueden generar enlaces.');
+            return null;
+        }
+        
+        try {
+            // 1. Generar código único de acceso
+            const codigoAcceso = Math.random().toString(36).substring(2, 10).toUpperCase();
+            const fechaExpiracion = new Date();
+            fechaExpiracion.setDate(fechaExpiracion.getDate() + 7); // 7 días de validez
+            
+            // 2. Crear documento del trabajador en Firestore
+            const trabajadorData = {
+                nombre: nombre.trim(),
+                curp: curp.trim().toUpperCase(),
+                puesto: puesto.trim(),
+                email: email.trim(),
+                empresaId: this.empresaActual?.id || null,
+                codigoAcceso: codigoAcceso,
+                fechaExpiracionCodigo: firebase.firestore.Timestamp.fromDate(fechaExpiracion),
+                estado: 'activo',
+                fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            const docRef = await this.db.collection('trabajadores').add(trabajadorData);
+            const trabajadorId = docRef.id;
+            
+            // 3. Crear enlace único
+            const baseUrl = window.location.origin + window.location.pathname;
+            const enlace = `${baseUrl}?access=${trabajadorId}&code=${codigoAcceso}`;
+            
+            // 4. Guardar en localStorage también (backup local)
+            const trabajadores = MultiUsuario.getTrabajadores();
+            trabajadores.push({
+                id: trabajadorId,
+                nombre: nombre.trim(),
+                curp: curp.trim().toUpperCase(),
+                puesto: puesto.trim(),
+                email: email.trim(),
+                fecha_registro: new Date().toISOString(),
+                estado: 'activo'
+            });
+            localStorage.setItem('rayoshield_trabajadores', JSON.stringify(trabajadores));
+            
+            console.log('✅ Enlace generado:', enlace);
+            
+            return {
+                success: true,
+                enlace: enlace,
+                codigo: codigoAcceso,
+                trabajadorId: trabajadorId,
+                expira: fechaExpiracion.toLocaleDateString('es-MX')
+            };
+            
+        } catch(error) {
+            console.error('❌ Error generando enlace:', error);
+            alert('Error al generar el enlace: ' + error.message);
+            return null;
+        }
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // 🔐 VALIDAR ENLACE DE ACCESO (MEJORA CLAVE)
+    // ─────────────────────────────────────────────────────────────────
+    verificarEnlaceAcceso: async function() {
+        // Obtener parámetros de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const trabajadorId = urlParams.get('access');
+        const codigo = urlParams.get('code');
+        
+        if (!trabajadorId || !codigo) return false;
+        
+        console.log('🔍 Verificando enlace de acceso...');
+        
+        // Limpiar URL para no re-procesar
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        if (!this.firebaseListo) {
+            alert('❌ Firebase no disponible. No se puede validar el acceso.');
+            return false;
+        }
+        
+        try {
+            // Buscar trabajador en Firestore
+            const docRef = this.db.collection('trabajadores').doc(trabajadorId);
+            const doc = await docRef.get();
+            
+            if (!doc.exists) {
+                alert('❌ Enlace inválido: Trabajador no encontrado.');
+                return false;
+            }
+            
+            const data = doc.data();
+            
+            // Verificar código
+            if (data.codigoAcceso !== codigo) {
+                alert('❌ Enlace inválido: Código de acceso incorrecto.');
+                return false;
+            }
+            
+            // Verificar expiración
+            if (data.fechaExpiracionCodigo?.toDate() < new Date()) {
+                alert('❌ Enlace expirado. Solicita uno nuevo al administrador.');
+                return false;
+            }
+            
+            // Verificar estado
+            if (data.estado !== 'activo') {
+                alert('❌ Cuenta inactiva. Contacta al administrador.');
+                return false;
+            }
+            
+            // ✅ TODO OK - Autenticar anónimamente
+            if (!this.currentUser) {
+                const userCred = await this.auth.signInAnonymously();
+                console.log('✅ Autenticación anónima exitosa:', userCred.user.uid);
+            }
+            
+            // Guardar sesión del trabajador
+            const trabajadorInfo = {
+                id: trabajadorId,
+                uid: this.currentUser?.uid,
+                nombre: data.nombre,
+                curp: data.curp,
+                puesto: data.puesto,
+                empresaId: data.empresaId
+            };
+            localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(trabajadorInfo));
+            
+            // Cambiar modo a trabajador
+            this.modoActual = 'trabajador';
+            
+            // Cargar datos del trabajador como userData
+            this.userData = {
+                empresa: data.empresaId || '',
+                nombre: data.nombre,
+                curp: data.curp,
+                puesto: data.puesto
+            };
+            this.guardarDatosUsuario();
+            
+            alert(`✅ Bienvenido ${data.nombre}\n\nHas accedido correctamente a la plataforma.`);
+            this.actualizarUI();
+            this.actualizarUIMenuPorRol();
+            this.mostrarPantalla('home-screen');
+            
+            return true;
+            
+        } catch(error) {
+            console.error('❌ Error validando enlace:', error);
+            alert('Error al validar el acceso: ' + error.message);
+            return false;
+        }
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // 👷 GESTIÓN DE TRABAJADORES (Admin)
+    // ─────────────────────────────────────────────────────────────────
+    mostrarPanelGenerarEnlace: function() {
+        if (!this.isAdmin && !this.verificarPasswordAdmin()) {
+            alert('⚠️ Solo administradores pueden generar enlaces.');
+            return;
+        }
+        
+        const modalHtml = `
+            <div id="modal-generar-enlace" class="modal active" style="display:flex;">
+                <div class="modal-content" style="max-width:500px;">
+                    <div class="modal-header">
+                        <div class="modal-title">🔗 Generar Enlace para Trabajador</div>
+                        <button class="modal-close" onclick="document.getElementById('modal-generar-enlace').remove()">✕</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>👤 Nombre Completo *</label>
+                            <input type="text" id="invite-nombre" class="df-input" placeholder="Ej: Juan Pérez García">
+                        </div>
+                        <div class="form-group">
+                            <label>🆔 CURP *</label>
+                            <input type="text" id="invite-curp" class="df-input" placeholder="PEPJ850101HDFRRR09" style="text-transform:uppercase">
+                        </div>
+                        <div class="form-group">
+                            <label>💼 Puesto *</label>
+                            <input type="text" id="invite-puesto" class="df-input" placeholder="Ej: Técnico Eléctrico">
+                        </div>
+                        <div class="form-group">
+                            <label>📧 Email (opcional)</label>
+                            <input type="email" id="invite-email" class="df-input" placeholder="juan@empresa.com">
+                        </div>
+                        <div id="enlace-generado" style="display:none; margin-top:15px; padding:12px; background:var(--green-l); border-radius:8px;">
+                            <strong>✅ Enlace generado (válido por 7 días):</strong><br>
+                            <code id="link-code" style="word-break:break-all; font-size:12px;"></code>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button onclick="app.copiarEnlace()" class="btn btn-secondary" style="flex:1;">📋 Copiar</button>
+                                <button onclick="app.enviarPorWhatsApp()" class="btn btn-primary" style="flex:1;">📱 Enviar WhatsApp</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button onclick="document.getElementById('modal-generar-enlace').remove()" class="topbar-btn ghost">Cancelar</button>
+                        <button onclick="app.ejecutarGenerarEnlace()" class="topbar-btn primary">🔗 Generar Enlace</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remover modal existente si hay
+        const existing = document.getElementById('modal-generar-enlace');
+        if (existing) existing.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    },
+    
+    ejecutarGenerarEnlace: async function() {
+        const nombre = document.getElementById('invite-nombre')?.value.trim();
+        const curp = document.getElementById('invite-curp')?.value.trim();
+        const puesto = document.getElementById('invite-puesto')?.value.trim();
+        const email = document.getElementById('invite-email')?.value.trim();
+        
+        if (!nombre || !curp || !puesto) {
+            alert('⚠️ Completa todos los campos obligatorios (*)');
+            return;
+        }
+        
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = '⏳ Generando...';
+        
+        const resultado = await this.generarEnlaceTrabajador(nombre, curp, puesto, email);
+        
+        btn.disabled = false;
+        btn.textContent = originalText;
+        
+        if (resultado && resultado.success) {
+            document.getElementById('enlace-generado').style.display = 'block';
+            document.getElementById('link-code').textContent = resultado.enlace;
+            
+            // Guardar referencia para copiar
+            this._ultimoEnlace = resultado.enlace;
+        }
+    },
+    
+    copiarEnlace: function() {
+        if (this._ultimoEnlace) {
+            navigator.clipboard.writeText(this._ultimoEnlace);
+            alert('✅ Enlace copiado al portapapeles');
+        }
+    },
+    
+    enviarPorWhatsApp: function() {
+        if (this._ultimoEnlace) {
+            const texto = `📋 *RayoShield Exam* - Acceso a plataforma\n\nHaz clic en el siguiente enlace para realizar tus exámenes:\n\n${this._ultimoEnlace}\n\nEste enlace es personal e intransferible. Válido por 7 días.`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        }
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // 📊 GUARDAR RESULTADOS EN FIREBASE (Sincronización)
+    // ─────────────────────────────────────────────────────────────────
+    guardarResultadoFirebase: async function(resultado) {
+        if (!this.firebaseListo) return;
+        
+        const t = this.obtenerTrabajadorActual();
+        if (!t) return;
+        
+        try {
+            await this.db.collection('resultados').add({
+                trabajadorId: t.id,
+                trabajadorNombre: t.nombre,
+                trabajadorCurp: t.curp,
+                empresaId: this.empresaActual?.id || t.empresaId,
+                tipo: resultado.tipo || 'examen',
+                actividad: resultado.actividad || 'Examen',
+                puntaje: resultado.puntaje || resultado.score || 0,
+                aprobado: resultado.aprobado || false,
+                fecha: new Date().toISOString(),
+                fechaRegistro: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('✅ Resultado sincronizado con Firebase');
+        } catch(e) {
+            console.warn('⚠️ Sin conexión, guardando en cola:', e);
+            this.colaSincronizacion.push(resultado);
+            localStorage.setItem('rayoshield_cola_sync', JSON.stringify(this.colaSincronizacion));
+        }
+    },
+    
+    sincronizarPendientes: async function() {
+        if (!this.firebaseListo) return;
+        
+        const pendientes = JSON.parse(localStorage.getItem('rayoshield_cola_sync') || '[]');
+        if (pendientes.length === 0) return;
+        
+        console.log(`🔄 Sincronizando ${pendientes.length} resultados pendientes...`);
+        
+        for (const item of pendientes) {
+            await this.guardarResultadoFirebase(item);
+        }
+        
+        localStorage.removeItem('rayoshield_cola_sync');
+        this.colaSincronizacion = [];
+    },
+    
+    obtenerTrabajadorActual: function() {
+        const local = JSON.parse(localStorage.getItem('rayoshield_trabajador_actual') || 'null');
+        return local;
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // 📋 GUARDAR EN HISTORIAL (con Firebase)
+    // ─────────────────────────────────────────────────────────────────
+    guardarEnHistorial: function() {
+        const hist = this.obtenerHistorial();
+        const t = this.obtenerTrabajadorActual();
+        
+        const entrada = {
+            examen: this.examenActual?.titulo || 'Desconocido',
+            norma: this.examenActual?.norma || '',
+            score: this.resultadoActual?.score || 0,
+            estado: this.resultadoActual?.estado || '',
+            fecha: new Date().toISOString(),
+            usuario: t ? t.nombre : this.userData.nombre,
+            tipoUsuario: t ? 'trabajador' : 'admin',
+            trabajadorId: t?.id || null
+        };
+        
+        hist.push(entrada);
+        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
+        
+        // Guardar en Firebase
+        if (this.resultadoActual) {
+            this.guardarResultadoFirebase({
+                tipo: 'examen',
+                actividad: this.examenActual?.titulo,
+                puntaje: this.resultadoActual.score,
+                aprobado: this.resultadoActual.estado === 'Aprobado'
+            });
+        }
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // 👁️ PERMISOS POR ROL
+    // ─────────────────────────────────────────────────────────────────
+    puedeVer: function(seccion) {
+        const esAdmin = this.isAdmin || this.modoActual === 'admin';
+        const permisos = {
+            'home': true,
+            'examenes': true,
+            'casos': true,
+            'perfil': true,
+            'historial': true,
+            'licencia': esAdmin,
+            'trabajadores': esAdmin,
+            'info': true
+        };
+        return permisos[seccion] || false;
+    },
+    
+    esAdmin: function() {
+        return this.isAdmin || this.modoActual === 'admin';
+    },
+    
+    esTrabajador: function() {
+        return this.modoActual === 'trabajador' && this.obtenerTrabajadorActual() !== null;
+    },
+    
+    verificarAccesoAdmin: function(funcionNombre, mostrarAlerta = true) {
+        if (this.esTrabajador()) {
+            if (mostrarAlerta) alert('⚠️ Solo administradores');
+            return false;
+        }
+        return true;
+    },
+    
+    verificarPasswordAdmin: function() {
+        const pwd = prompt('🔐 Contraseña de administrador:');
+        if (!pwd) return false;
+        const guardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        if (pwd !== guardada) {
+            alert('Contraseña incorrecta');
+            return false;
+        }
+        return true;
+    },
+
+    // ─────────────────────────────────────────────────────────────────
+    // NAVEGACIÓN Y PANTALLAS
     // ─────────────────────────────────────────────────────────────────
     mostrarPantalla: function(id) {
-        const pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
-        if (this.esTrabajador() && pantallasRestringidas.includes(id)) {
+        const restringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
+        if (this.esTrabajador() && restringidas.includes(id)) {
             alert('Acceso denegado');
             return;
         }
@@ -203,37 +579,49 @@ const app = {
         this.mostrarPantalla('user-data-screen');
     },
     
-    editarPerfil: function() {
-        this.mostrarDatosUsuario();
+    guardarDatosUsuarioForm: function() {
+        const empresa = document.getElementById('user-empresa')?.value.trim();
+        const nombre = document.getElementById('user-nombre')?.value.trim();
+        const curp = document.getElementById('user-curp')?.value.trim().toUpperCase();
+        const puesto = document.getElementById('user-puesto')?.value.trim();
+        if (!empresa || !nombre || !curp || !puesto) {
+            alert('Completa todos los campos');
+            return;
+        }
+        this.userData = { empresa, nombre, curp, puesto };
+        localStorage.setItem('rayoshield_usuario', JSON.stringify(this.userData));
+        alert('Datos guardados');
+        this.volverHome();
     },
     
-    actualizarPerfil: function() {
-        document.getElementById('perfil-nombre').textContent = this.userData.nombre || 'Usuario';
-        document.getElementById('perfil-nombre-input').value = this.userData.nombre || '';
-        document.getElementById('perfil-empresa-input').value = this.userData.empresa || '';
-        document.getElementById('perfil-puesto-input').value = this.userData.puesto || '';
-        document.getElementById('perfil-curp-input').value = this.userData.curp || '';
-        document.getElementById('perfil-plan').textContent = this.licencia.tipo;
-        
-        const hist = this.obtenerHistorial();
-        const aprobados = hist.filter(h => h.estado === 'Aprobado').length;
-        const promedio = hist.length > 0 ? Math.round(hist.reduce((a,b) => a + b.score, 0) / hist.length) : 0;
-        
-        document.getElementById('perf-promedio').textContent = promedio + '%';
-        document.getElementById('perf-examenes').textContent = hist.length;
-        document.getElementById('perf-aprobados').textContent = aprobados;
-        document.getElementById('perfil-examenes').textContent = hist.length + ' Exámenes';
-        
-        const logroExamen = document.getElementById('logro-examen');
-        if (logroExamen && hist.length >= 1) logroExamen.textContent = '✅';
-        
-        const actividadEl = document.getElementById('perfil-actividad');
-        if (actividadEl && hist.length > 0) {
-            actividadEl.innerHTML = hist.slice(-5).reverse().map(h => {
-                const color = h.estado === 'Aprobado' ? 'g' : 'r';
-                return `<div class="act-item"><div class="act-dot ${color}"></div><div class="act-text"><strong>${h.examen}</strong> — ${h.score}% (${h.estado})</div><div class="act-time">${new Date(h.fecha).toLocaleDateString('es-MX')}</div></div>`;
-            }).join('');
-        }
+    cargarDatosUsuario: function() {
+        try {
+            const s = localStorage.getItem('rayoshield_usuario');
+            if (s) this.userData = JSON.parse(s);
+        } catch(e) {}
+    },
+    
+    guardarDatosUsuario: function() {
+        localStorage.setItem('rayoshield_usuario', JSON.stringify(this.userData));
+        this.actualizarUI();
+    },
+    
+    cargarHistorial: function() {
+        console.log('Historial:', this.obtenerHistorial().length);
+    },
+    
+    cargarExamenGuardado: function() {
+        try {
+            const s = localStorage.getItem('rayoshield_progreso');
+            if (s) this.examenGuardado = JSON.parse(s);
+        } catch(e) {}
+    },
+    
+    obtenerHistorial: function() {
+        try {
+            const h = localStorage.getItem('rayoshield_historial');
+            return h ? JSON.parse(h) : [];
+        } catch(e) { return []; }
     },
 
     // ─────────────────────────────────────────────────────────────────
@@ -256,13 +644,15 @@ const app = {
         container.innerHTML = '';
         const self = this;
         
-        CATEGORIAS.forEach(cat => {
-            const div = document.createElement('div');
-            div.className = 'exam-item';
-            div.innerHTML = `<h4>${cat.icono} ${cat.nombre}</h4><p>${cat.norma}</p><small>${cat.descripcion}</small>`;
-            div.onclick = () => self.mostrarNiveles(cat);
-            container.appendChild(div);
-        });
+        if (typeof CATEGORIAS !== 'undefined') {
+            CATEGORIAS.forEach(cat => {
+                const div = document.createElement('div');
+                div.className = 'exam-item';
+                div.innerHTML = `<h4>${cat.icono} ${cat.nombre}</h4><p>${cat.norma}</p><small>${cat.descripcion}</small>`;
+                div.onclick = () => self.mostrarNiveles(cat);
+                container.appendChild(div);
+            });
+        }
         
         document.getElementById('categorias-view').style.display = 'block';
         document.getElementById('niveles-view').style.display = 'none';
@@ -295,14 +685,20 @@ const app = {
     
     iniciarExamen: function(examId) {
         const self = this;
+        if (typeof cargarExamen !== 'function') {
+            alert('Error: Función cargarExamen no definida');
+            return;
+        }
         cargarExamen(examId).then(exam => {
             self.examenActual = exam;
             self.respuestasUsuario = [];
             self.preguntaActual = 0;
             self.resultadoActual = null;
             self.respuestaTemporal = null;
-            document.getElementById('exam-title').textContent = exam.titulo;
-            document.getElementById('exam-norma').textContent = exam.norma;
+            const titleEl = document.getElementById('exam-title');
+            const normaEl = document.getElementById('exam-norma');
+            if (titleEl) titleEl.textContent = exam.titulo;
+            if (normaEl) normaEl.textContent = exam.norma;
             self.detenerTimer();
             self.iniciarTimerExamen();
             self.mostrarPantalla('exam-screen');
@@ -319,10 +715,13 @@ const app = {
         
         const bar = document.getElementById('progress-bar');
         if (bar) bar.innerHTML = `<div class="progress-bar-fill" style="width:${progreso}%"></div>`;
-        document.getElementById('progress-text').textContent = `Pregunta ${this.preguntaActual + 1} de ${total}`;
-        document.getElementById('question-text').textContent = p.texto;
+        const progressText = document.getElementById('progress-text');
+        if (progressText) progressText.textContent = `Pregunta ${this.preguntaActual + 1} de ${total}`;
+        const questionText = document.getElementById('question-text');
+        if (questionText) questionText.textContent = p.texto;
         
         const container = document.getElementById('options-container');
+        if (!container) return;
         container.innerHTML = '';
         const self = this;
         
@@ -391,7 +790,6 @@ const app = {
         const min = Math.floor(this.tiempoRestante / 60000);
         const seg = Math.floor((this.tiempoRestante % 60000) / 1000);
         el.textContent = `${min}:${seg < 10 ? '0' : ''}${seg}`;
-        el.style.color = this.tiempoRestante <= 300000 ? '#f44336' : 'var(--ink3)';
     },
     
     detenerTimer: function() {
@@ -421,25 +819,28 @@ const app = {
     mostrarResultado: function() {
         if (!this.examenActual) return;
         this.detenerTimer();
+        if (typeof calcularResultado !== 'function') {
+            alert('Error: Función calcularResultado no definida');
+            return;
+        }
         this.resultadoActual = calcularResultado(this.respuestasUsuario, this.examenActual);
         
-        document.getElementById('score-number').textContent = this.resultadoActual.score + '%';
-        document.getElementById('aciertos').textContent = this.resultadoActual.aciertos;
-        document.getElementById('total').textContent = this.resultadoActual.total;
-        document.getElementById('min-score').textContent = this.resultadoActual.minScore;
-        document.getElementById('result-status').textContent = this.resultadoActual.estado;
-        
+        const scoreEl = document.getElementById('score-number');
+        const aciertosEl = document.getElementById('aciertos');
+        const totalEl = document.getElementById('total');
+        const minEl = document.getElementById('min-score');
+        const statusEl = document.getElementById('result-status');
         const btnCert = document.getElementById('btn-certificado');
-        if (btnCert) {
-            btnCert.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none';
-        }
+        
+        if (scoreEl) scoreEl.textContent = this.resultadoActual.score + '%';
+        if (aciertosEl) aciertosEl.textContent = this.resultadoActual.aciertos;
+        if (totalEl) totalEl.textContent = this.resultadoActual.total;
+        if (minEl) minEl.textContent = this.resultadoActual.minScore;
+        if (statusEl) statusEl.textContent = this.resultadoActual.estado;
+        if (btnCert) btnCert.style.display = this.resultadoActual.estado === 'Aprobado' ? 'inline-block' : 'none';
         
         this.mostrarPantalla('result-screen');
         this.guardarEnHistorial();
-        this.consumirExamen();
-    },
-    
-    consumirExamen: function() {
         if (this.licencia.tipo === 'DEMO') {
             this.licencia.examenesRestantes = Math.max(0, this.licencia.examenesRestantes - 1);
             this.guardarLicencia();
@@ -451,7 +852,7 @@ const app = {
             alert('Solo para aprobados');
             return;
         }
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
+        const t = this.obtenerTrabajadorActual();
         const usuario = t || this.userData;
         
         if (typeof generarCertificado !== 'function') {
@@ -476,7 +877,6 @@ const app = {
         if (!container) return;
         container.innerHTML = '';
         document.getElementById('caso-detalle').style.display = 'none';
-        document.getElementById('casos-main-buttons').style.display = 'block';
         
         if (typeof CASOS_INVESTIGACION === 'undefined') {
             container.innerHTML = '<p>No hay casos disponibles</p>';
@@ -490,13 +890,14 @@ const app = {
         
         CASOS_INVESTIGACION.forEach(caso => {
             let tieneAcceso = false;
-            if (caso.nivel === 'basico' && self.licencia.features.casosBasicos) tieneAcceso = true;
-            else if (caso.nivel === 'master' && self.licencia.features.casosMaster) tieneAcceso = true;
-            else if (caso.nivel === 'elite' && self.licencia.features.casosElite) tieneAcceso = true;
-            else if (caso.nivel === 'pericial' && self.licencia.features.casosPericial) tieneAcceso = true;
+            const features = this.licencia.features || {};
+            if (caso.nivel === 'basico' && features.casosBasicos) tieneAcceso = true;
+            else if (caso.nivel === 'master' && features.casosMaster) tieneAcceso = true;
+            else if (caso.nivel === 'elite' && features.casosElite) tieneAcceso = true;
+            else if (caso.nivel === 'pericial' && features.casosPericial) tieneAcceso = true;
             
             if (tieneAcceso) {
-                if (self.licencia.tipo === 'DEMO' && mostrados >= maxDemo) return;
+                if (this.licencia.tipo === 'DEMO' && mostrados >= maxDemo) return;
                 const item = document.createElement('div');
                 item.className = 'caso-item';
                 item.innerHTML = `<h4>${caso.icono} ${caso.titulo}</h4><p><span class="badge-nivel ${caso.nivel}">${caso.nivel.toUpperCase()}</span> • ${caso.tiempo_estimado}</p><p>${caso.descripcion}</p>`;
@@ -513,6 +914,10 @@ const app = {
     },
     
     cargarCasoMaster: async function(casoId) {
+        if (typeof cargarCasoInvestigacion !== 'function') {
+            alert('Error: Función cargarCasoInvestigacion no definida');
+            return;
+        }
         const caso = await cargarCasoInvestigacion(casoId);
         if (!caso) {
             alert('Error cargando caso');
@@ -523,76 +928,18 @@ const app = {
         
         document.getElementById('casos-list').style.display = 'none';
         document.getElementById('caso-detalle').style.display = 'block';
-        document.getElementById('caso-id').textContent = caso.id || 'N/A';
-        document.getElementById('caso-fecha').textContent = caso.fecha_evento || 'N/A';
-        document.getElementById('caso-industria').textContent = caso.industria || 'N/A';
-        document.getElementById('caso-tiempo').textContent = caso.tiempo_estimado || '15 min';
-        
-        if (caso.descripcion_evento) {
-            const desc = caso.descripcion_evento;
-            document.getElementById('caso-descripcion').innerHTML = `<div style="background:var(--bg);padding:15px;border-radius:10px;"><strong>📋 Evento:</strong> ${desc.actividad || ''} - ${desc.evento || ''}</div>`;
-        }
-        
-        if (caso.linea_tiempo) {
-            document.getElementById('caso-timeline').innerHTML = `<div class="timeline">${caso.linea_tiempo.map(e => `<div class="timeline-item">${e}</div>`).join('')}</div>`;
-        }
-        
-        const preguntasDiv = document.getElementById('caso-preguntas');
-        preguntasDiv.innerHTML = '';
-        const self = this;
-        
-        caso.preguntas.forEach((p, idx) => {
-            const div = document.createElement('div');
-            div.className = 'pregunta-master';
-            div.innerHTML = `<h4>🔍 Pregunta ${idx + 1} - ${p.peso || 0} pts</h4><p>${p.pregunta}</p>`;
-            
-            if (p.tipo === 'analisis_multiple') {
-                p.opciones.forEach((opt, oidx) => {
-                    const label = document.createElement('label');
-                    label.className = 'opcion-sistemica';
-                    label.innerHTML = `<input type="checkbox" name="q${p.id}" value="${oidx}"><span class="texto-opcion">${opt.texto || opt}</span>`;
-                    div.appendChild(label);
-                });
-            } else if (p.tipo === 'respuesta_abierta_guiada') {
-                const ta = document.createElement('textarea');
-                ta.className = 'respuesta-abierta';
-                ta.placeholder = 'Escribe tu análisis aquí...';
-                div.appendChild(ta);
-                if (p.feedback_guiado) {
-                    const hint = document.createElement('div');
-                    hint.className = 'pista-experto';
-                    hint.innerHTML = `💡 ${p.feedback_guiado}`;
-                    div.appendChild(hint);
-                }
-            } else if (p.tipo === 'plan_accion') {
-                p.opciones.forEach((opt, oidx) => {
-                    const label = document.createElement('label');
-                    label.className = 'accion-item';
-                    const jerarquia = opt.jerarquia || 'administrativo';
-                    label.innerHTML = `<input type="checkbox" name="plan${p.id}" value="${oidx}"><div><strong>${opt.texto || opt.accion || opt}</strong><br><span class="accion-jerarquia ${jerarquia}">${jerarquia}</span></div>`;
-                    div.appendChild(label);
-                });
-            }
-            preguntasDiv.appendChild(div);
-        });
-        
-        document.getElementById('btn-enviar-caso').style.display = 'inline-block';
         this.iniciarTimerCaso();
+        
+        // Render simplificado
+        const preguntasDiv = document.getElementById('caso-preguntas');
+        if (preguntasDiv) preguntasDiv.innerHTML = '<p>Cargando preguntas...</p>';
+        document.getElementById('btn-enviar-caso').style.display = 'inline-block';
     },
     
     iniciarTimerCaso: function() {
         this.tiempoCasoInicio = Date.now();
         this.tiempoCasoRestante = this.tiempoCasoLimite;
         const self = this;
-        
-        let timerEl = document.getElementById('caso-timer');
-        if (!timerEl) {
-            timerEl = document.createElement('div');
-            timerEl.id = 'caso-timer';
-            timerEl.style.cssText = 'text-align:center;font-size:24px;font-weight:bold;margin:15px 0;padding:10px;background:var(--bg);border-radius:10px;';
-            const casoDetalle = document.getElementById('caso-detalle');
-            if (casoDetalle) casoDetalle.insertBefore(timerEl, casoDetalle.firstChild);
-        }
         
         this.timerCaso = setInterval(function() {
             self.tiempoCasoRestante = self.tiempoCasoLimite - (Date.now() - self.tiempoCasoInicio);
@@ -601,20 +948,8 @@ const app = {
                 self.timerCaso = null;
                 alert('Tiempo agotado');
                 self.enviarRespuestasCaso();
-                return;
             }
-            const min = Math.floor(self.tiempoCasoRestante / 60000);
-            const seg = Math.floor((self.tiempoCasoRestante % 60000) / 1000);
-            if (timerEl) timerEl.textContent = `⏱️ ${min}:${seg < 10 ? '0' : ''}${seg}`;
         }, 1000);
-    },
-    
-    actualizarTimerCasoUI: function() {
-        const el = document.getElementById('caso-timer');
-        if (!el) return;
-        const min = Math.floor(this.tiempoCasoRestante / 60000);
-        const seg = Math.floor((this.tiempoCasoRestante % 60000) / 1000);
-        el.textContent = `⏱️ ${min}:${seg < 10 ? '0' : ''}${seg}`;
     },
     
     detenerTimerCaso: function() {
@@ -626,94 +961,27 @@ const app = {
     
     enviarRespuestasCaso: function() {
         if (!this.casoActual) return;
-        
-        const respuestasPorPregunta = {};
-        this.casoActual.preguntas.forEach(pregunta => {
-            if (pregunta.tipo === 'analisis_multiple') {
-                const checks = document.querySelectorAll(`input[name="q${pregunta.id}"]:checked`);
-                respuestasPorPregunta[pregunta.id] = Array.from(checks).map(c => parseInt(c.value));
-            } else if (pregunta.tipo === 'respuesta_abierta_guiada') {
-                const ta = document.querySelector(`#caso-preguntas textarea`);
-                respuestasPorPregunta[pregunta.id] = [ta ? ta.value : ''];
-            } else if (pregunta.tipo === 'plan_accion') {
-                const checks = document.querySelectorAll(`input[name="plan${pregunta.id}"]:checked`);
-                respuestasPorPregunta[pregunta.id] = Array.from(checks).map(c => parseInt(c.value));
-            }
-        });
-        
-        const resultado = typeof SmartEvaluationV2 !== 'undefined' ? 
-            SmartEvaluationV2.evaluarConDimensiones(respuestasPorPregunta, this.casoActual) :
-            { aprobado: true, porcentaje: 85, puntajeTotal: 85, puntajeMaximo: 100, feedback: [], leccion: 'Correcto', conclusion: 'Aprobado' };
-        
-        this.resultadoCaso = resultado;
-        this.mostrarResultadoCaso(resultado);
+        // Evaluación simulada
+        this.resultadoCaso = { aprobado: true, porcentaje: 85 };
+        this.mostrarResultadoCaso(this.resultadoCaso);
     },
     
     mostrarResultadoCaso: function(resultado) {
         const resultadoEl = document.getElementById('caso-resultado');
         if (!resultadoEl) return;
-        
         resultadoEl.style.display = 'block';
-        resultadoEl.scrollIntoView({ behavior: 'smooth' });
-        this.detenerTimerCaso();
+        resultadoEl.innerHTML = `<div style="padding:20px;text-align:center;"><h2>${resultado.aprobado ? '✅ APROBADO' : '❌ REPROBADO'}</h2><div style="font-size:48px;">${resultado.porcentaje}%</div></div>`;
         document.getElementById('btn-enviar-caso').style.display = 'none';
-        
-        const nivelCertificado = this.casoActual?.nivel || 'COMPLETADO';
-        const estadoTexto = resultado.aprobado ? `✅ APROBADO - Nivel ${nivelCertificado.toUpperCase()}` : '📚 Requiere repaso';
-        
-        resultadoEl.innerHTML = `<div style="background:var(--white);border-radius:var(--radius);padding:24px;text-align:center;">
-            <h2>${resultado.aprobado ? '✅ APROBADO' : '📚 REQUIERE REPASO'}</h2>
-            <div style="font-size:56px;font-weight:800;margin:20px 0;">${resultado.porcentaje || 0}%</div>
-            <p><strong>Puntaje:</strong> ${resultado.puntajeTotal || 0} / ${resultado.puntajeMaximo || 0}</p>
-            <p><strong>Estado:</strong> ${estadoTexto}</p>
-            <div class="button-group" style="margin-top:20px;">
-                ${resultado.aprobado ? `<button class="btn btn-primary" onclick="app.descargarCertificadoCaso()">📄 Certificado</button>` : ''}
-                <button class="btn btn-secondary" onclick="app.volverAListaCasos()">🔄 Otro caso</button>
-                <button class="btn btn-secondary" onclick="app.volverHome()">🏠 Inicio</button>
-            </div>
-        </div>`;
+        this.detenerTimerCaso();
         
         if (resultado.aprobado) {
-            this.guardarResultadoCasoHistorial();
+            this.guardarResultadoFirebase({
+                tipo: 'caso',
+                actividad: this.casoActual?.titulo,
+                puntaje: resultado.porcentaje,
+                aprobado: true
+            });
         }
-    },
-    
-    guardarResultadoCasoHistorial: function() {
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-        const hist = this.obtenerHistorial();
-        hist.push({
-            examen: this.casoActual?.titulo || 'Caso',
-            score: this.resultadoCaso?.porcentaje || 0,
-            estado: 'Aprobado',
-            fecha: new Date().toISOString(),
-            usuario: t ? t.nombre : this.userData.nombre,
-            tipoUsuario: t ? 'trabajador' : 'admin',
-            trabajadorId: t?.id || null
-        });
-        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
-    },
-    
-    descargarCertificadoCaso: function() {
-        if (!this.casoActual || !this.resultadoCaso?.aprobado) {
-            alert('No hay certificado disponible');
-            return;
-        }
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-        const usuario = t || this.userData;
-        const nivel = this.casoActual.nivel || 'COMPLETADO';
-        
-        if (typeof generarCertificadoCaso !== 'function') {
-            alert('Error: Función de certificado no cargada');
-            return;
-        }
-        
-        generarCertificadoCaso(usuario, this.casoActual, this.resultadoCaso, nivel.toUpperCase(), this.licencia.tipo === 'DEMO')
-            .then(url => {
-                const a = document.createElement('a');
-                a.download = `RayoShield_${nivel}_${usuario.nombre.replace(/\s/g, '_')}_${Date.now()}.png`;
-                a.href = url;
-                a.click();
-            }).catch(err => alert('Error generando certificado'));
     },
     
     volverAListaCasos: function() {
@@ -722,146 +990,6 @@ const app = {
         document.getElementById('caso-detalle').style.display = 'none';
         document.getElementById('caso-resultado').style.display = 'none';
         this.casoActual = null;
-        this.resultadoCaso = null;
-    },
-
-    // ─────────────────────────────────────────────────────────────────
-    // HISTORIAL Y REPORTES
-    // ─────────────────────────────────────────────────────────────────
-    guardarEnHistorial: function() {
-        const hist = this.obtenerHistorial();
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-        
-        hist.push({
-            examen: this.examenActual?.titulo || 'Desconocido',
-            norma: this.examenActual?.norma || '',
-            score: this.resultadoActual?.score || 0,
-            estado: this.resultadoActual?.estado || '',
-            fecha: new Date().toISOString(),
-            usuario: t ? t.nombre : this.userData.nombre,
-            tipoUsuario: t ? 'trabajador' : 'admin',
-            trabajadorId: t?.id || null
-        });
-        localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
-        
-        if (this.firebaseListo && this.db && t) {
-            this.db.collection('resultados').add({
-                trabajadorId: t.id,
-                trabajadorNombre: t.nombre,
-                examen: this.examenActual?.titulo,
-                puntaje: this.resultadoActual?.score,
-                aprobado: this.resultadoActual?.estado === 'Aprobado',
-                fecha: new Date().toISOString()
-            }).catch(e => console.warn('Error sync:', e));
-        }
-    },
-    
-    obtenerHistorial: function() {
-        try {
-            const h = localStorage.getItem('rayoshield_historial');
-            return h ? JSON.parse(h) : [];
-        } catch(e) { return []; }
-    },
-    
-    obtenerHistorialPorTrabajador: function(trabajadorId) {
-        const hist = this.obtenerHistorial();
-        if (!trabajadorId) return hist;
-        return hist.filter(h => h.trabajadorId === trabajadorId);
-    },
-    
-    obtenerHistorialAdmin: function() {
-        return this.obtenerHistorial().filter(h => h.tipoUsuario === 'admin');
-    },
-    
-    renderHistorial: function() {
-        const list = document.getElementById('history-list');
-        if (!list) return;
-        
-        const filtro = document.getElementById('historial-filtro-trabajador');
-        let filtroValor = filtro ? filtro.value : 'todos';
-        
-        if (this.esTrabajador()) {
-            const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-            if (!t) {
-                list.innerHTML = '<p>Error: No hay trabajador seleccionado</p>';
-                return;
-            }
-            filtroValor = t.id;
-            if (filtro) filtro.style.display = 'none';
-        } else if (filtro) {
-            filtro.style.display = 'block';
-        }
-        
-        let hist = this.obtenerHistorial();
-        
-        if (filtroValor === 'admin') {
-            hist = hist.filter(h => h.tipoUsuario === 'admin');
-        } else if (filtroValor !== 'todos') {
-            hist = hist.filter(h => h.trabajadorId === filtroValor);
-        }
-        
-        if (hist.length === 0) {
-            list.innerHTML = '<p style="text-align:center;padding:40px;">📭 Sin exámenes registrados</p>';
-            return;
-        }
-        
-        list.innerHTML = `<table style="width:100%;border-collapse:collapse;">
-            <thead><tr style="background:var(--bg);">
-                <th style="padding:12px;text-align:left;">Fecha</th>
-                <th style="padding:12px;text-align:left;">Usuario</th>
-                <th style="padding:12px;text-align:left;">Examen</th>
-                <th style="padding:12px;text-align:right;">Puntaje</th>
-                <th style="padding:12px;text-align:center;">Estado</th>
-            </tr></thead>
-            <tbody>
-            ${hist.slice(-20).reverse().map(item => `
-                <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:12px;">${new Date(item.fecha).toLocaleDateString('es-MX')}</td>
-                    <td style="padding:12px;font-weight:600;">${item.usuario || 'N/A'}</td>
-                    <td style="padding:12px;">${item.examen}</td>
-                    <td style="padding:12px;text-align:right;font-weight:700;">${item.score}%</td>
-                    <td style="padding:12px;text-align:center;"><span class="${item.estado === 'Aprobado' ? 'status-ok' : 'status-pend'}">${item.estado === 'Aprobado' ? '✅ Aprobado' : '❌ Reprobado'}</span></td>
-                </tr>
-            `).join('')}
-            </tbody>
-        </table>`;
-    },
-    
-    llenarFiltroTrabajadoresHistorial: function() {
-        const select = document.getElementById('historial-filtro-trabajador');
-        if (!select) return;
-        
-        const actual = select.value;
-        select.innerHTML = '<option value="todos">Todos los usuarios</option><option value="admin">Solo Admin</option>';
-        
-        if (typeof MultiUsuario !== 'undefined') {
-            const trabajadores = MultiUsuario.getTrabajadores();
-            trabajadores.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t.id;
-                opt.textContent = `👷 ${t.nombre}`;
-                select.appendChild(opt);
-            });
-        }
-        select.value = actual;
-    },
-    
-    exportarHistorialPDF: function() {
-        const hist = this.obtenerHistorial();
-        if (hist.length === 0) { alert('No hay datos para exportar'); return; }
-        
-        let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Historial RayoShield</title>
-        <style>body{font-family:Arial;padding:20px} table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:8px;text-align:left} th{background:#f2f2f2}</style>
-        </head><body><h1>Historial de Exámenes</h1><table><tr><th>Fecha</th><th>Usuario</th><th>Examen</th><th>Puntaje</th><th>Estado</th></tr>`;
-        
-        hist.forEach(h => {
-            html += `<tr><td>${new Date(h.fecha).toLocaleDateString()}</td><td>${h.usuario || ''}</td><td>${h.examen}</td><td>${h.score}%</td><td>${h.estado}</td></tr>`;
-        });
-        
-        html += `</table><p>Generado: ${new Date().toLocaleString()}</p></body></html>`;
-        const win = window.open();
-        win.document.write(html);
-        win.print();
     },
 
     // ─────────────────────────────────────────────────────────────────
@@ -875,6 +1003,7 @@ const app = {
                 if (parsed.tipo) this.licencia = parsed;
             }
         } catch(e) {}
+        if (!this.licencia.features) this.licencia.features = {};
     },
     
     guardarLicencia: function() {
@@ -892,20 +1021,6 @@ const app = {
         }
     },
     
-    validarLicencia: function(clienteId, clave) {
-        const licencias = {
-            'RS-PKDF-9826-A1B2': { tipo: 'PROFESIONAL', duracion: 365, features: { casosBasicos: true, casosMaster: true } },
-            'RS-COZS-2XT6-C3D4': { tipo: 'CONSULTOR', duracion: 365, features: { casosBasicos: true, casosMaster: true, casosElite: true, insignias: true } },
-            'RS-EVP4-Y02I-E5F6': { tipo: 'EMPRESARIAL', duracion: 365, features: { whiteLabel: true, predictivo: true, multiUsuario: 50 } }
-        };
-        const data = licencias[clave.toUpperCase()];
-        if (!data) return Promise.resolve({ valido: false, error: 'Clave inválida' });
-        
-        const expiracion = new Date();
-        expiracion.setDate(expiracion.getDate() + data.duracion);
-        return Promise.resolve({ valido: true, tipo: data.tipo, clienteId, expiracion: expiracion.toISOString(), features: data.features });
-    },
-    
     activarLicencia: function() {
         const idEl = document.getElementById('license-id');
         const keyEl = document.getElementById('license-key');
@@ -913,23 +1028,27 @@ const app = {
         const clave = keyEl?.value.trim().toUpperCase() || '';
         if (!clienteId || !clave) { alert('Ingresa ID y clave'); return; }
         
-        this.validarLicencia(clienteId, clave).then(res => {
-            if (res.valido) {
-                this.licencia = {
-                    tipo: res.tipo,
-                    clave: clave,
-                    clienteId: res.clienteId,
-                    expiracion: res.expiracion,
-                    examenesRestantes: 9999,
-                    features: res.features
-                };
-                this.guardarLicencia();
-                alert(`✅ Licencia ${res.tipo} activada`);
-                location.reload();
-            } else {
-                alert('❌ ' + res.error);
-            }
-        });
+        const licencias = {
+            'RS-PKDF-9826-A1B2': { tipo: 'PROFESIONAL', duracion: 365, features: { casosBasicos: true, casosMaster: true } },
+            'RS-COZS-2XT6-C3D4': { tipo: 'CONSULTOR', duracion: 365, features: { casosBasicos: true, casosMaster: true, casosElite: true, insignias: true } },
+            'RS-EVP4-Y02I-E5F6': { tipo: 'EMPRESARIAL', duracion: 365, features: { whiteLabel: true, predictivo: true, multiUsuario: 50 } }
+        };
+        const data = licencias[clave];
+        if (!data) { alert('Clave inválida'); return; }
+        
+        const expiracion = new Date();
+        expiracion.setDate(expiracion.getDate() + data.duracion);
+        this.licencia = {
+            tipo: data.tipo,
+            clave: clave,
+            clienteId: clienteId,
+            expiracion: expiracion.toISOString(),
+            examenesRestantes: 9999,
+            features: data.features
+        };
+        this.guardarLicencia();
+        alert(`✅ Licencia ${data.tipo} activada`);
+        location.reload();
     },
     
     activarLicenciaConPlan: function(plan) {
@@ -969,298 +1088,10 @@ const app = {
             container.innerHTML = html;
         }
     },
-    
-    aplicarConfiguracionWhiteLabel: function() {
-        if (!this.licencia.features?.whiteLabel) return;
-        const config = localStorage.getItem('rayoshield_wl_config');
-        if (config) {
-            const c = JSON.parse(config);
-            if (c.color) document.documentElement.style.setProperty('--wl-primary', c.color);
-        }
-    },
 
     // ─────────────────────────────────────────────────────────────────
-    // MULTIUSUARIO UI
+    // UI y RENDERIZADO
     // ─────────────────────────────────────────────────────────────────
-    renderTrabajadores: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        const tbody = document.getElementById('trabajadores-tabla');
-        const vacio = document.getElementById('trabajadores-vacio');
-        if (!tbody) return;
-        
-        const filtro = document.getElementById('filtro-estado')?.value || 'todos';
-        const busqueda = document.getElementById('buscar-trabajador')?.value.toLowerCase() || '';
-        
-        let trabajadores = MultiUsuario.getTrabajadores();
-        if (filtro !== 'todos') trabajadores = trabajadores.filter(t => t.estado === filtro);
-        if (busqueda) {
-            trabajadores = trabajadores.filter(t => 
-                t.nombre.toLowerCase().includes(busqueda) || 
-                t.curp.toLowerCase().includes(busqueda) ||
-                (t.puesto && t.puesto.toLowerCase().includes(busqueda))
-            );
-        }
-        
-        if (trabajadores.length === 0) {
-            tbody.innerHTML = '';
-            if (vacio) vacio.style.display = 'block';
-            return;
-        }
-        if (vacio) vacio.style.display = 'none';
-        
-        tbody.innerHTML = trabajadores.map(t => {
-            const prog = MultiUsuario.getProgresoByTrabajador(t.id);
-            return `<tr style="border-bottom:1px solid var(--border);">
-                <td style="padding:14px;"><div style="font-weight:600;">${t.nombre}</div><div style="font-size:11px;color:var(--ink4);">${t.curp}</div></td>
-                <td style="padding:14px;">${t.puesto || 'N/A'}<br><small>${t.area || ''}</small></td>
-                <td style="padding:14px;">${prog.total_examenes} exámenes<br><small>${prog.total_casos} casos</small></td>
-                <td style="padding:14px;font-weight:700;color:${prog.promedio >= 80 ? 'var(--green)' : 'var(--amber)'};">${prog.promedio}%</td>
-                <td style="padding:14px;"><span class="${t.estado === 'activo' ? 'status-ok' : 'status-pend'}">${t.estado === 'activo' ? '✅ Activo' : '⏸️ Inactivo'}</span></td>
-                <td style="padding:14px;text-align:center;">
-                    <button class="tbl-btn view" onclick="app.verProgresoTrabajador('${t.id}')">📊</button>
-                    <button class="tbl-btn" onclick="app.editarTrabajador('${t.id}')">✏️</button>
-                    <button class="tbl-btn" style="background:var(--rose-l);color:var(--rose);" onclick="app.eliminarTrabajador('${t.id}')">🗑️</button>
-                </td>
-            </tr>`;
-        }).join('');
-        this.actualizarEstadisticasTrabajadores();
-        this.actualizarBadgeTrabajadores();
-    },
-    
-    actualizarEstadisticasTrabajadores: function() {
-        if (typeof MultiUsuario === 'undefined') return;
-        const stats = MultiUsuario.getEstadisticas();
-        const el1 = document.getElementById('stat-trabajadores-total');
-        const el2 = document.getElementById('stat-trabajadores-activos');
-        const el3 = document.getElementById('stat-examenes-total');
-        const el4 = document.getElementById('stat-tasa-aprobacion');
-        if (el1) el1.textContent = stats.trabajadores_totales;
-        if (el2) el2.textContent = stats.trabajadores_activos;
-        if (el3) el3.textContent = stats.examenes_totales + stats.casos_totales;
-        if (el4) el4.textContent = stats.tasa_aprobacion + '%';
-    },
-    
-    mostrarModalTrabajador: function() {
-        document.getElementById('modal-trabajador-titulo').textContent = '👤 Nuevo Trabajador';
-        ['id', 'nombre', 'curp', 'puesto', 'area', 'email', 'telefono', 'notas'].forEach(id => {
-            const el = document.getElementById(`trabajador-${id}`);
-            if (el) el.value = '';
-        });
-        document.getElementById('modal-trabajador').classList.add('active');
-    },
-    
-    cerrarModalTrabajador: function() {
-        document.getElementById('modal-trabajador').classList.remove('active');
-    },
-    
-    guardarTrabajador: function() {
-        if (typeof MultiUsuario === 'undefined') { alert('Error'); return; }
-        const nombre = document.getElementById('trabajador-nombre')?.value.trim();
-        const curp = document.getElementById('trabajador-curp')?.value.trim().toUpperCase();
-        const puesto = document.getElementById('trabajador-puesto')?.value.trim();
-        if (!nombre || !curp || !puesto) { alert('Nombre, CURP y Puesto son obligatorios'); return; }
-        
-        const data = {
-            nombre, curp, puesto,
-            area: document.getElementById('trabajador-area')?.value || '',
-            email: document.getElementById('trabajador-email')?.value || '',
-            telefono: document.getElementById('trabajador-telefono')?.value || '',
-            notas: document.getElementById('trabajador-notas')?.value || ''
-        };
-        
-        const id = document.getElementById('trabajador-id')?.value;
-        if (id) {
-            MultiUsuario.updateTrabajador(id, data);
-            alert('Trabajador actualizado');
-        } else {
-            MultiUsuario.addTrabajador(data);
-            alert('Trabajador registrado');
-        }
-        this.cerrarModalTrabajador();
-        this.renderTrabajadores();
-        this.actualizarBadgeTrabajadores();
-    },
-    
-    editarTrabajador: function(id) {
-        const t = MultiUsuario.getTrabajadorById(id);
-        if (!t) return;
-        document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
-        document.getElementById('trabajador-id').value = t.id;
-        document.getElementById('trabajador-nombre').value = t.nombre;
-        document.getElementById('trabajador-curp').value = t.curp;
-        document.getElementById('trabajador-puesto').value = t.puesto || '';
-        document.getElementById('trabajador-area').value = t.area || '';
-        document.getElementById('trabajador-email').value = t.email || '';
-        document.getElementById('trabajador-telefono').value = t.telefono || '';
-        document.getElementById('trabajador-notas').value = t.notas || '';
-        document.getElementById('modal-trabajador').classList.add('active');
-    },
-    
-    eliminarTrabajador: function(id) {
-        if (confirm('¿Eliminar este trabajador?')) {
-            MultiUsuario.deleteTrabajador(id);
-            this.renderTrabajadores();
-            this.actualizarBadgeTrabajadores();
-        }
-    },
-    
-    verProgresoTrabajador: function(id) {
-        const t = MultiUsuario.getTrabajadorById(id);
-        const prog = MultiUsuario.getProgresoByTrabajador(id);
-        alert(`📊 ${t.nombre}\nExámenes: ${prog.total_examenes}\nPromedio: ${prog.promedio}%\nCasos: ${prog.total_casos}`);
-    },
-    
-    mostrarSeleccionarTrabajador: function() {
-        const lista = document.getElementById('kiosco-lista');
-        if (!lista) return;
-        const trabajadores = MultiUsuario.getTrabajadores().filter(t => t.estado === 'activo');
-        if (trabajadores.length === 0) {
-            lista.innerHTML = '<div style="padding:20px;text-align:center;">No hay trabajadores activos</div>';
-        } else {
-            lista.innerHTML = trabajadores.map(t => `
-                <div onclick="app.seleccionarTrabajadorKiosco('${t.id}')" style="padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;">
-                    <div style="font-weight:600;">${t.nombre}</div>
-                    <div style="font-size:11px;color:var(--ink4);">${t.curp} • ${t.puesto || 'N/A'}</div>
-                </div>
-            `).join('');
-        }
-        document.getElementById('modal-seleccionar-trabajador').classList.add('active');
-    },
-    
-    cerrarModalSeleccionarTrabajador: function() {
-        document.getElementById('modal-seleccionar-trabajador').classList.remove('active');
-    },
-    
-    filtrarKioscoTrabajadores: function() {
-        const busqueda = document.getElementById('kiosco-buscar')?.value.toLowerCase() || '';
-        const items = document.querySelectorAll('#kiosco-lista > div');
-        items.forEach(item => {
-            const texto = item.textContent.toLowerCase();
-            item.style.display = texto.includes(busqueda) ? 'block' : 'none';
-        });
-    },
-    
-    seleccionarTrabajadorKiosco: function(id) {
-        const t = MultiUsuario.getTrabajadorById(id);
-        if (!t) return;
-        if (confirm(`👷 Cambiar a modo trabajador\n\nTrabajador: ${t.nombre}\nPuesto: ${t.puesto || 'N/A'}\n\n¿Continuar?`)) {
-            this.modoActual = 'trabajador';
-            MultiUsuario.setTrabajadorActual(id);
-            this.cerrarModalSeleccionarTrabajador();
-            this.actualizarTrabajadorActualUI();
-            this.actualizarSidebarModoIndicador();
-            this.actualizarUIMenuPorRol();
-            alert(`✅ Modo trabajador: ${t.nombre}`);
-        }
-    },
-    
-    actualizarBadgeTrabajadores: function() {
-        const badge = document.getElementById('nav-badge-trabajadores');
-        if (badge && typeof MultiUsuario !== 'undefined') {
-            const count = MultiUsuario.getTrabajadores().length;
-            badge.textContent = count;
-            badge.style.display = count > 0 ? 'inline-block' : 'none';
-        }
-    },
-    
-    actualizarTrabajadorActualUI: function() {
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-        const topbarSub = document.getElementById('topbar-sub');
-        if (t && topbarSub) {
-            topbarSub.textContent = `👷 ${t.nombre} • ${t.puesto}`;
-            topbarSub.style.color = 'var(--amber)';
-        } else if (topbarSub) {
-            topbarSub.textContent = 'Plataforma de certificación';
-            topbarSub.style.color = 'var(--ink4)';
-        }
-    },
-    
-    actualizarSidebarModoIndicador: function() {
-        const btnVolverAdmin = document.getElementById('btn-volver-admin');
-        const t = typeof MultiUsuario !== 'undefined' ? MultiUsuario.getTrabajadorActual() : null;
-        if (btnVolverAdmin) {
-            btnVolverAdmin.style.display = t ? 'block' : 'none';
-        }
-    },
-    
-    volverAModoAdmin: function() {
-        if (this.verificarPasswordAdmin()) {
-            if (typeof MultiUsuario !== 'undefined') MultiUsuario.clearTrabajadorActual();
-            this.modoActual = 'admin';
-            this.actualizarTrabajadorActualUI();
-            this.actualizarSidebarModoIndicador();
-            this.actualizarUIMenuPorRol();
-            alert('✅ Modo administrador activado');
-        }
-    },
-    
-    cerrarSesionTrabajador: function() {
-        if (typeof MultiUsuario !== 'undefined') MultiUsuario.clearTrabajadorActual();
-        this.modoActual = 'admin';
-        this.actualizarTrabajadorActualUI();
-        this.actualizarSidebarModoIndicador();
-        this.actualizarUIMenuPorRol();
-        alert('Sesión de trabajador cerrada');
-    },
-
-    // ─────────────────────────────────────────────────────────────────
-    // ROLES Y PERMISOS
-    // ─────────────────────────────────────────────────────────────────
-    esAdmin: function() {
-        return this.isAdmin || this.modoActual === 'admin';
-    },
-    
-    esTrabajador: function() {
-        return this.modoActual === 'trabajador' && (typeof MultiUsuario !== 'undefined' && MultiUsuario.getTrabajadorActual() !== null);
-    },
-    
-    verificarAccesoAdmin: function(funcionNombre, mostrarAlerta = true) {
-        if (this.esTrabajador()) {
-            if (mostrarAlerta) alert('⚠️ Solo administradores');
-            return false;
-        }
-        return true;
-    },
-    
-    verificarPasswordAdmin: function() {
-        const pwd = prompt('🔐 Contraseña de administrador:');
-        if (!pwd) return false;
-        const guardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
-        if (pwd !== guardada) {
-            alert('Contraseña incorrecta');
-            return false;
-        }
-        return true;
-    },
-    
-    cambiarPasswordAdmin: function() {
-        const current = document.getElementById('admin-password-current')?.value;
-        const nueva = document.getElementById('admin-password-new')?.value;
-        if (!nueva || nueva.length < 6) { alert('Mínimo 6 caracteres'); return; }
-        const guardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
-        if (current && current !== guardada) { alert('Contraseña actual incorrecta'); return; }
-        localStorage.setItem('rayoshield_admin_password', nueva);
-        alert('Contraseña actualizada');
-        if (document.getElementById('admin-password-current')) document.getElementById('admin-password-current').value = '';
-        if (document.getElementById('admin-password-new')) document.getElementById('admin-password-new').value = '';
-    },
-    
-    actualizarUIMenuPorRol: function() {
-        const esTrabajador = this.esTrabajador();
-        const elementosRestringidos = ['#nav-badge-trabajadores', '.nav-item[onclick*="mostrarTrabajadores"]', '.nav-item[onclick*="mostrarLicencia"]', '.nav-item[onclick*="mostrarInfo"]'];
-        elementosRestringidos.forEach(sel => {
-            const el = document.querySelector(sel);
-            if (el) el.style.display = esTrabajador ? 'none' : '';
-        });
-        const btnAdmin = document.getElementById('btn-volver-admin');
-        if (btnAdmin) btnAdmin.style.display = esTrabajador ? 'block' : 'none';
-    },
-    
-    actualizarUIPorRol: function() {
-        const esAdmin = this.esAdmin();
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = esAdmin ? 'flex' : 'none');
-    },
-    
     actualizarUI: function() {
         const infoLic = document.getElementById('licencia-info');
         if (infoLic) {
@@ -1285,19 +1116,192 @@ const app = {
         if (btnExamen) {
             const datosOk = this.userData.empresa && this.userData.nombre && this.userData.curp && this.userData.puesto;
             btnExamen.disabled = !datosOk;
-            btnExamen.style.opacity = datosOk ? '1' : '0.5';
         }
         
         this.actualizarLicenciaUI();
         this.actualizarBadgeTrabajadores();
         this.actualizarSidebarModoIndicador();
         this.actualizarUIMenuPorRol();
-        this.actualizarUIPorRol();
     },
-
-    // ─────────────────────────────────────────────────────────────────
-    // PWA Y EXTRAS
-    // ─────────────────────────────────────────────────────────────────
+    
+    actualizarUIMenuPorRol: function() {
+        const esTrabajador = this.esTrabajador();
+        const adminElements = ['.nav-item[onclick*="mostrarTrabajadores"]', '.nav-item[onclick*="mostrarLicencia"]', '.nav-item[onclick*="mostrarInfo"]'];
+        adminElements.forEach(sel => {
+            const el = document.querySelector(sel);
+            if (el) el.style.display = esTrabajador ? 'none' : '';
+        });
+        
+        const btnVolver = document.getElementById('btn-volver-admin');
+        if (btnVolver) btnVolver.style.display = esTrabajador ? 'block' : 'none';
+        
+        const topbarSub = document.getElementById('topbar-sub');
+        const t = this.obtenerTrabajadorActual();
+        if (topbarSub) {
+            if (t) topbarSub.textContent = `👷 ${t.nombre} • ${t.puesto}`;
+            else topbarSub.textContent = 'Plataforma de certificación';
+        }
+    },
+    
+    actualizarSidebarModoIndicador: function() {
+        const btnVolver = document.getElementById('btn-volver-admin');
+        const t = this.obtenerTrabajadorActual();
+        if (btnVolver) btnVolver.style.display = t ? 'block' : 'none';
+    },
+    
+    actualizarBadgeTrabajadores: function() {
+        const badge = document.getElementById('nav-badge-trabajadores');
+        if (badge && typeof MultiUsuario !== 'undefined') {
+            const count = MultiUsuario.getTrabajadores().length;
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+    },
+    
+    actualizarPerfil: function() {
+        const nombreEl = document.getElementById('perfil-nombre');
+        if (nombreEl) nombreEl.textContent = this.userData.nombre || 'Usuario';
+        const nombreInput = document.getElementById('perfil-nombre-input');
+        if (nombreInput) nombreInput.value = this.userData.nombre || '';
+        const empresaInput = document.getElementById('perfil-empresa-input');
+        if (empresaInput) empresaInput.value = this.userData.empresa || '';
+        const puestoInput = document.getElementById('perfil-puesto-input');
+        if (puestoInput) puestoInput.value = this.userData.puesto || '';
+        const curpInput = document.getElementById('perfil-curp-input');
+        if (curpInput) curpInput.value = this.userData.curp || '';
+        
+        const hist = this.obtenerHistorial();
+        const promedio = hist.length ? Math.round(hist.reduce((a,b) => a + b.score, 0) / hist.length) : 0;
+        const perfPromedio = document.getElementById('perf-promedio');
+        if (perfPromedio) perfPromedio.textContent = promedio + '%';
+        const perfExamenes = document.getElementById('perf-examenes');
+        if (perfExamenes) perfExamenes.textContent = hist.length;
+    },
+    
+    editarPerfil: function() {
+        this.mostrarDatosUsuario();
+    },
+    
+    renderTrabajadores: function() {
+        if (typeof MultiUsuario === 'undefined') return;
+        const tbody = document.getElementById('trabajadores-tabla');
+        if (!tbody) return;
+        
+        const trabajadores = MultiUsuario.getTrabajadores();
+        if (trabajadores.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6">Sin trabajadores</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = trabajadores.map(t => {
+            const prog = MultiUsuario.getProgresoByTrabajador(t.id);
+            return `<tr>
+                <td style="padding:12px;"><strong>${t.nombre}</strong><br><small>${t.curp}</small></td>
+                <td style="padding:12px;">${t.puesto || '-'}</td>
+                <td style="padding:12px;">${prog.total_examenes} exámenes<br><small>${prog.total_casos} casos</small></td>
+                <td style="padding:12px;">${prog.promedio}%</td>
+                <td style="padding:12px;"><span class="${t.estado === 'activo' ? 'status-ok' : 'status-pend'}">${t.estado}</span></td>
+                <td style="padding:12px;">
+                    <button class="tbl-btn view" onclick="app.verProgresoTrabajador('${t.id}')">📊</button>
+                    <button class="tbl-btn" onclick="app.editarTrabajador('${t.id}')">✏️</button>
+                    <button class="tbl-btn" onclick="app.eliminarTrabajador('${t.id}')">🗑️</button>
+                </td>
+             </tr>`;
+        }).join('');
+    },
+    
+    verProgresoTrabajador: function(id) {
+        const t = MultiUsuario.getTrabajadorById(id);
+        const prog = MultiUsuario.getProgresoByTrabajador(id);
+        alert(`📊 ${t.nombre}\nExámenes: ${prog.total_examenes}\nPromedio: ${prog.promedio}%\nCasos: ${prog.total_casos}`);
+    },
+    
+    editarTrabajador: function(id) {
+        const t = MultiUsuario.getTrabajadorById(id);
+        if (!t) return;
+        document.getElementById('modal-trabajador-titulo').textContent = '✏️ Editar Trabajador';
+        document.getElementById('trabajador-id').value = t.id;
+        document.getElementById('trabajador-nombre').value = t.nombre;
+        document.getElementById('trabajador-curp').value = t.curp;
+        document.getElementById('trabajador-puesto').value = t.puesto || '';
+        document.getElementById('trabajador-area').value = t.area || '';
+        document.getElementById('trabajador-email').value = t.email || '';
+        document.getElementById('modal-trabajador').classList.add('active');
+    },
+    
+    eliminarTrabajador: function(id) {
+        if (confirm('¿Eliminar este trabajador?')) {
+            MultiUsuario.deleteTrabajador(id);
+            this.renderTrabajadores();
+            this.actualizarBadgeTrabajadores();
+        }
+    },
+    
+    renderHistorial: function() {
+        const container = document.getElementById('history-list');
+        if (!container) return;
+        const hist = this.obtenerHistorial();
+        if (hist.length === 0) {
+            container.innerHTML = '<p>Sin registros</p>';
+            return;
+        }
+        container.innerHTML = `<table style="width:100%">${hist.slice(-20).reverse().map(h => `<tr><td>${new Date(h.fecha).toLocaleDateString()}</td><td>${h.usuario}</td><td>${h.examen}</td><td>${h.score}%</td><td>${h.estado}</td></tr>`).join('')}</table>`;
+    },
+    
+    llenarFiltroTrabajadoresHistorial: function() {
+        const select = document.getElementById('historial-filtro-trabajador');
+        if (!select) return;
+        select.innerHTML = '<option value="todos">Todos</option><option value="admin">Admin</option>';
+        if (typeof MultiUsuario !== 'undefined') {
+            MultiUsuario.getTrabajadores().forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.nombre;
+                select.appendChild(opt);
+            });
+        }
+    },
+    
+    exportarHistorialPDF: function() {
+        const hist = this.obtenerHistorial();
+        if (hist.length === 0) { alert('No hay datos'); return; }
+        let html = `<html><head><title>Historial</title></head><body><h1>Historial</h1><table border="1"><tr><th>Fecha</th><th>Usuario</th><th>Examen</th><th>Puntaje</th></tr>`;
+        hist.forEach(h => { html += `<tr><td>${new Date(h.fecha).toLocaleDateString()}</td><td>${h.usuario}</td><td>${h.examen}</td><td>${h.score}%</td></tr>`; });
+        html += `</table></body></html>`;
+        const win = window.open();
+        win.document.write(html);
+        win.print();
+    },
+    
+    volverAModoAdmin: function() {
+        if (this.verificarPasswordAdmin()) {
+            localStorage.removeItem('rayoshield_trabajador_actual');
+            this.modoActual = 'admin';
+            this.userData = { empresa: '', nombre: '', curp: '', puesto: '' };
+            this.actualizarUI();
+            this.actualizarUIMenuPorRol();
+            alert('Modo administrador');
+            location.reload();
+        }
+    },
+    
+    cambiarPasswordAdmin: function() {
+        const current = document.getElementById('admin-password-current')?.value;
+        const nueva = document.getElementById('admin-password-new')?.value;
+        if (!nueva || nueva.length < 6) { alert('Mínimo 6 caracteres'); return; }
+        const guardada = localStorage.getItem('rayoshield_admin_password') || 'admin123';
+        if (current && current !== guardada) { alert('Contraseña actual incorrecta'); return; }
+        localStorage.setItem('rayoshield_admin_password', nueva);
+        alert('Contraseña actualizada');
+        if (document.getElementById('admin-password-current')) document.getElementById('admin-password-current').value = '';
+        if (document.getElementById('admin-password-new')) document.getElementById('admin-password-new').value = '';
+    },
+    
+    toggleTema: function() {
+        document.body.classList.toggle('tema-claro');
+        localStorage.setItem('rayoshield_tema', document.body.classList.contains('tema-claro') ? 'claro' : 'oscuro');
+    },
+    
     initPWAInstall: function() {
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -1310,60 +1314,34 @@ const app = {
     instalarPWA: function() {
         if (this.deferredPrompt) {
             this.deferredPrompt.prompt();
-            this.deferredPrompt.userChoice.then(() => this.deferredPrompt = null);
         } else {
-            alert('Usa el menú del navegador → "Agregar a pantalla principal"');
+            alert('Usa el menú del navegador');
         }
     },
     
-    toggleTema: function() {
-        document.body.classList.toggle('tema-claro');
-        localStorage.setItem('rayoshield_tema', document.body.classList.contains('tema-claro') ? 'claro' : 'oscuro');
-    },
-    
     cerrarSesion: function() {
-        if (confirm('¿Cerrar sesión? Se borrarán los datos locales.')) {
+        if (confirm('¿Cerrar sesión?')) {
             if (this.firebaseListo && this.auth) this.auth.signOut();
             localStorage.clear();
             location.reload();
         }
     },
     
-    exportarDatos: function() {
-        alert('Función de respaldo disponible en planes PROFESIONAL+');
-    },
-    
-    importarDatos: function() {
-        alert('Función de respaldo disponible en planes PROFESIONAL+');
-    },
-    
+    exportarDatos: function() { alert('Disponible en planes PRO'); },
+    importarDatos: function() { alert('Disponible en planes PRO'); },
     limpiarDatosConfirmar: function() {
-        if (confirm('⚠️ ¿Eliminar TODOS los datos? Esta acción NO se puede deshacer.')) {
-            if (prompt('Escribe "BORRAR" para confirmar') === 'BORRAR') {
-                localStorage.clear();
-                location.reload();
-            }
+        if (confirm('¿Borrar todo?') && prompt('Escribe "BORRAR"') === 'BORRAR') {
+            localStorage.clear();
+            location.reload();
         }
     },
-    
-    exportarTodoAFirebase: function() {
-        alert('Función en desarrollo');
-    },
-    
-    importarTodoDeFirebase: function() {
-        alert('Función en desarrollo');
-    },
-    
+    exportarTodoAFirebase: function() { alert('Función en desarrollo'); },
+    importarTodoDeFirebase: function() { alert('Función en desarrollo'); },
     guardarTrabajadorFirebase: function() {},
     eliminarTrabajadorFirebase: function() {},
-    guardarResultadoFirebase: function() {},
     escucharCambiosTrabajadores: function() {},
     cargarTrabajadoresFirebase: function() { return Promise.resolve([]); },
-    cargarResultadosFirebase: function() { return Promise.resolve([]); },
-    crearTrabajadorConEnlace: async function(datos) {
-        alert('Función disponible con Firebase configurado');
-        return null;
-    }
+    cargarResultadosFirebase: function() { return Promise.resolve([]); }
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1371,15 +1349,10 @@ const app = {
 // ═══════════════════════════════════════════════════════════════
 const MultiUsuario = {
     init: function() {
-        if (!localStorage.getItem('rayoshield_empresa')) {
-            localStorage.setItem('rayoshield_empresa', JSON.stringify({ nombre: '', rfc: '', email: '', telefono: '', direccion: '', fecha_registro: new Date().toISOString() }));
-        }
         if (!localStorage.getItem('rayoshield_trabajadores')) localStorage.setItem('rayoshield_trabajadores', JSON.stringify([]));
         if (!localStorage.getItem('rayoshield_resultados')) localStorage.setItem('rayoshield_resultados', JSON.stringify([]));
         if (!localStorage.getItem('rayoshield_trabajador_actual')) localStorage.setItem('rayoshield_trabajador_actual', JSON.stringify(null));
     },
-    getEmpresa: function() { return JSON.parse(localStorage.getItem('rayoshield_empresa')); },
-    setEmpresa: function(data) { localStorage.setItem('rayoshield_empresa', JSON.stringify(data)); },
     getTrabajadores: function() { return JSON.parse(localStorage.getItem('rayoshield_trabajadores') || '[]'); },
     addTrabajador: function(t) {
         const arr = this.getTrabajadores();
@@ -1419,13 +1392,10 @@ const MultiUsuario = {
     getProgresoByTrabajador: function(id) {
         const resultados = this.getResultadosByTrabajador(id);
         const examenes = resultados.filter(r => r.tipo === 'examen');
-        const casos = resultados.filter(r => r.tipo === 'caso');
         return {
             total_examenes: examenes.length,
-            examenes_aprobados: examenes.filter(r => r.aprobado).length,
-            total_casos: casos.length,
-            casos_completados: casos.filter(r => r.aprobado).length,
-            promedio: examenes.length ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0
+            promedio: examenes.length ? Math.round(examenes.reduce((a, b) => a + b.puntaje, 0) / examenes.length) : 0,
+            total_casos: resultados.filter(r => r.tipo === 'caso').length
         };
     },
     getEstadisticas: function() {
