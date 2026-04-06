@@ -28,6 +28,13 @@ const app = {
     db: null,  // Referencia a Firestore
     firebaseListo: false,  // Indicador de conexión
     sincronizacionActiva: false,  // Control de sincronización
+    // ═══════════════════════════════════════════════════════════════
+    // FIREBASE AUTH - PRODUCCIÓN
+    // ═══════════════════════════════════════════════════════════════
+    auth: null,
+    currentUser: null,
+    isAdmin: false,
+    // ═══════════════════════════════════════════════════════════════
     //     
     // Timer Examen
     timerExamen: null,
@@ -69,19 +76,24 @@ const app = {
         if (typeof MultiUsuario !== 'undefined') {
             MultiUsuario.init();
         }
+       // ═══════════════════════════════════════════════════════════════
+        // INICIALIZAR FIREBASE AUTH
         // ═══════════════════════════════════════════════════════════════
-        // ✅ INICIALIZAR FIREBASE
-        // ═══════════════════════════════════════════════════════════════
-        if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
-            this.db = db;
+        if (typeof firebase !== 'undefined' && typeof auth !== 'undefined') {
+            this.auth = auth;
             this.firebaseListo = true;
-            console.log('✅ Firebase conectado:', db.app.name);
-            
-            // Escuchar cambios en trabajadores (tiempo real)
-            this.escucharCambiosTrabajadores();
+            console.log('✅ Firebase Auth conectado');
         } else {
-            console.log('⚠️ Firebase no disponible - Usando localStorage');
+            console.log('⚠️ Firebase Auth no disponible - Usando localStorage');
             this.firebaseListo = false;
+        }
+        // ═══════════════════════════════════════════════════════════════
+        
+        this.cargarLicencia();
+        
+        // ✅ Inicializar Multi-Usuario (solo si no hay Firebase o es modo offline)
+        if (!this.firebaseListo && typeof MultiUsuario !== 'undefined') {
+            MultiUsuario.init();
         }       
         if (!this.licencia.features || Object.keys(this.licencia.features).length === 0) {
             if (this.licencia.tipo === 'DEMO') {
@@ -140,6 +152,88 @@ const app = {
         this.verificarExpiracionLicencia();
         this.actualizarBadgeTrabajadores();
         this.actualizarUIMenuPorRol();
+    },
+    // ═══════════════════════════════════════════════════════════════
+    // AUTH DE FIREBASE - FUNCIONES
+    // ═══════════════════════════════════════════════════════════════
+    
+    // Iniciar sesión
+    iniciarSesion: function(email, password) {
+        if (!this.firebaseListo) {
+            alert('⚠️ Firebase no disponible. Usando modo local.');
+            return Promise.resolve({ local: true });
+        }
+        
+        return this.auth.signInWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                console.log('✅ Login exitoso:', userCredential.user.email);
+                return { success: true, user: userCredential.user };
+            })
+            .catch(error => {
+                console.error('❌ Error de login:', error.code);
+                let mensaje = 'Error de autenticación';
+                if (error.code === 'auth/user-not-found') mensaje = 'Usuario no encontrado';
+                else if (error.code === 'auth/wrong-password') mensaje = 'Contraseña incorrecta';
+                else if (error.code === 'auth/invalid-email') mensaje = 'Email inválido';
+                throw new Error(mensaje);
+            });
+    },
+    
+    // Cerrar sesión
+    cerrarSesionFirebase: function() {
+        if (!this.firebaseListo) {
+            // Modo local: limpiar localStorage
+            localStorage.removeItem('rayoshield_licencia');
+            localStorage.removeItem('rayoshield_usuario');
+            location.reload();
+            return;
+        }
+        
+        return this.auth.signOut().then(() => {
+            console.log('✅ Sesión cerrada');
+            location.reload();
+        });
+    },
+    
+    // Registrar nuevo trabajador (solo admin)
+    registrarTrabajadorAuth: function(email, password, datosTrabajador) {
+        if (!this.firebaseListo || !this.isAdmin) {
+            throw new Error('Solo administradores pueden registrar trabajadores');
+        }
+        
+        return this.auth.createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                const uid = userCredential.user.uid;
+                
+                // Guardar datos del trabajador en Firestore
+                return db.collection('trabajadores').doc(uid).set({
+                    ...datosTrabajador,
+                    userId: uid,
+                    email: email,
+                    fechaRegistro: new Date().toISOString(),
+                    estado: 'activo'
+                }).then(() => {
+                    console.log('✅ Trabajador registrado en Firebase');
+                    return { success: true, uid: uid };
+                });
+            })
+            .catch(error => {
+                console.error('❌ Error registrando trabajador:', error);
+                throw error;
+            });
+    },
+    
+    // Verificar si usuario actual es admin
+    verificarAdmin: function() {
+        if (!this.firebaseListo || !this.auth.currentUser) {
+            return Promise.resolve(false);
+        }
+        
+        return db.collection('admins').doc(this.auth.currentUser.uid).get()
+            .then(doc => {
+                this.isAdmin = doc.exists;
+                return this.isAdmin;
+            });
     },
         // ═══════════════════════════════════════════════════════════════
         // FIREBASE - SINCRONIZACIÓN
@@ -1955,23 +2049,31 @@ const app = {
     
     reiniciarEventosDashboard: function() {},
     
+    // Actualizar guardarEnHistorial para Firebase
     guardarEnHistorial: function() {
         var hist = this.obtenerHistorial();
         
-        var t = MultiUsuario.getTrabajadorActual();
-        var usuarioParaHistorial = t ? t.nombre : this.userData.nombre;
-        var tipoUsuario = t ? 'trabajador' : 'admin';
-        
-        hist.push({
+        var entrada = {
             examen: this.examenActual ? this.examenActual.titulo : 'Desconocido',
             norma: this.examenActual ? this.examenActual.norma : '',
             score: this.resultadoActual ? this.resultadoActual.score : 0,
             estado: this.resultadoActual ? this.resultadoActual.estado : '',
             fecha: this.resultadoActual ? this.resultadoActual.fecha : new Date().toISOString(),
-            usuario: usuarioParaHistorial,
-            tipoUsuario: tipoUsuario,
-            trabajadorId: t ? t.id : null
-        });
+            usuario: this.userData.nombre
+        };
+        
+        if (this.firebaseListo && this.auth.currentUser) {
+            // Guardar en Firestore
+            db.collection('resultados').add({
+                ...entrada,
+                trabajadorId: this.auth.currentUser.uid,
+                email: this.auth.currentUser.email,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(err => console.error('Error guardando en Firebase:', err));
+        }
+        
+        // También guardar localmente como respaldo
+        hist.push(entrada);
         localStorage.setItem('rayoshield_historial', JSON.stringify(hist));
     },
     
@@ -2123,6 +2225,7 @@ const app = {
         }
         this.cerrarModalTrabajador();
         this.renderTrabajadores();
+        
     },
     
     editarTrabajador: function(id) {
