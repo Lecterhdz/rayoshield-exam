@@ -1989,7 +1989,44 @@
                         <button onclick="app.volverHome()" style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:var(--font);">← Volver</button>
                         <span style="font-size:14px;font-weight:700;color:var(--ink);">🔑 Licencia y Planes</span>
                     </div>
-                
+                    <!-- ══════════════ LOGIN DE ADMINISTRADOR ══════════════ -->
+                    <div style="margin-top:28px;padding:24px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);">
+                        <div style="font-size:16px;font-weight:700;color:var(--ink);margin-bottom:15px;display:flex;align-items:center;gap:8px;">
+                            🔐 Acceso Administrativo
+                        </div>
+                        
+                        <div style="display:grid;gap:15px;max-width:400px;">
+                            <div>
+                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;">Email</label>
+                                <input type="email" id="admin-email" placeholder="admin@empresa.com" 
+                                    style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);">
+                            </div>
+                            <div>
+                                <label style="font-size:12px;color:var(--ink3);display:block;margin-bottom:8px;">Contraseña</label>
+                                <input type="password" id="admin-password" placeholder="••••••••" 
+                                    style="width:100%;padding:12px 14px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--ink);">
+                            </div>
+                            <button onclick="app.iniciarSesion(
+                                document.getElementById('admin-email').value,
+                                document.getElementById('admin-password').value
+                            ).then(() => {
+                                alert('✅ Sesión iniciada');
+                                location.reload();
+                            }).catch(err => alert('❌ ' + err.message));" 
+                            style="padding:12px 24px;background:var(--blue);color:white;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;">
+                                🔓 Iniciar Sesión
+                            </button>
+                            <button onclick="app.cerrarSesionFirebase()" 
+                                style="padding:12px 24px;background:var(--rose-l);color:var(--rose);border:1px solid var(--rose);border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;">
+                                🚪 Cerrar Sesión
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top:15px;padding:12px 14px;background:var(--amber-l);border-radius:var(--radius-sm);font-size:11px;color:var(--amber);">
+                            <strong>⚠️ Nota:</strong> Los trabajadores acceden mediante enlace único o código QR. 
+                            Los administradores usan email/contraseña.
+                        </div>
+                    </div>                
                     <!-- PLAN ACTUAL -->
                     <div class="card" style="margin-bottom:24px;">
                         <div class="card-body" style="padding:24px;">
