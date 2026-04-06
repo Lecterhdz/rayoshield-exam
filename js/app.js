@@ -322,7 +322,7 @@ const app = {
                 location.reload();
             });
         },
-    },    
+   
     mostrarPantalla: function(id) {
         var pantallasRestringidas = ['license-screen', 'trabajadores-screen', 'info-screen'];
         
@@ -2683,7 +2683,7 @@ const app = {
             return null;
         }
     }
-
+};
 // ═══════════════════════════════════════════════════════════════
 // OBJETO MULTI-USUARIO
 // ═══════════════════════════════════════════════════════════════
