@@ -2767,16 +2767,43 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
     
-    // Habilitar persistencia offline (opcional)
-    db.enablePersistence().catch(function(err) {
-        if (err.code == 'failed-precondition') {
-            console.log('⚠️ Persistencia no disponible (múltiples pestañas abiertas)');
-        } else if (err.code == 'unimplemented') {
-            console.log('⚠️ Navegador no soporta persistencia');
+    // Habilitar persistencia offline (opcional pero recomendado)
+    db.enablePersistence().catch(err => {
+        if (err.code === 'failed-precondition') {
+            console.warn('⚠️ Persistencia no disponible (múltiples pestañas)');
+        } else if (err.code === 'unimplemented') {
+            console.warn('⚠️ Navegador no soporta persistencia');
         }
     });
     
-    console.log('✅ Firebase inicializado correctamente');
+    // Escuchar cambios de autenticación
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            console.log('✅ Usuario autenticado:', user.email);
+            // Verificar si es admin
+            db.collection('admins').doc(user.uid).get().then(doc => {
+                if (doc.exists) {
+                    console.log('👑 Usuario es ADMIN');
+                    window.isAdmin = true;
+                } else {
+                    console.log('👤 Usuario es TRABAJADOR');
+                    window.isAdmin = false;
+                }
+                // Iniciar app después de verificar auth
+                if (typeof app !== 'undefined' && typeof app.init === 'function') {
+                    app.init();
+                }
+            });
+        } else {
+            console.log('🔓 Sin autenticación - Modo invitado/DEMO');
+            window.isAdmin = false;
+            if (typeof app !== 'undefined' && typeof app.init === 'function') {
+                app.init();
+            }
+        }
+    });
+    
+    console.log('✅ Firebase Producción inicializado');
     </script>
     <!-- Scripts -->
     <script src="js/exams.js"></script>
