@@ -1002,7 +1002,10 @@ const app = {
             this.eliminarExamenGuardado();
         }
     },
-    iniciarTimerCaso: function() {
+  iniciarTimerCaso: function() {
+        // Crear elemento del timer si no existe
+        this.crearTimerCaso();
+        
         // Si ya hay un timer activo, detenerlo primero
         if (this.timerCaso) {
             clearInterval(this.timerCaso);
@@ -1010,14 +1013,19 @@ const app = {
         }
         
         // Duración del caso en milisegundos (40 minutos por defecto)
-        const duracionMs = (this.casoActual?.tiempo_estimado ? 
-            parseInt(this.casoActual.tiempo_estimado) * 60 * 1000 : 
-            40 * 60 * 1000);
+        let duracionMinutos = 40;
+        if (this.casoActual && this.casoActual.tiempo_estimado) {
+            const match = this.casoActual.tiempo_estimado.match(/(\d+)/);
+            if (match) duracionMinutos = parseInt(match[1]);
+        }
         
+        const duracionMs = duracionMinutos * 60 * 1000;
         this.tiempoCasoInicio = Date.now();
         this.tiempoCasoRestante = duracionMs;
         
+        const timerEl = document.getElementById('caso-timer');
         const self = this;
+        
         this.timerCaso = setInterval(function() {
             self.tiempoCasoRestante = duracionMs - (Date.now() - self.tiempoCasoInicio);
             
@@ -1029,14 +1037,12 @@ const app = {
                 return;
             }
             
-            // Actualizar UI del timer
-            const timerEl = document.getElementById('caso-timer');
             if (timerEl) {
                 const minutos = Math.floor(self.tiempoCasoRestante / 60000);
                 const segundos = Math.floor((self.tiempoCasoRestante % 60000) / 1000);
                 timerEl.textContent = `⏱️ ${minutos}:${segundos < 10 ? '0' : ''}${segundos}`;
                 
-                if (self.tiempoCasoRestante <= 300000) { // 5 minutos o menos
+                if (self.tiempoCasoRestante <= 300000) {
                     timerEl.style.color = '#f44336';
                 } else {
                     timerEl.style.color = 'var(--ink3)';
@@ -1044,7 +1050,7 @@ const app = {
             }
         }, 1000);
         
-        console.log('⏱️ Timer de caso iniciado');
+        console.log('⏱️ Timer de caso iniciado -', duracionMinutos, 'minutos');
     },
     // ─────────────────────────────────────────────────────────────────────
     // DETENER TIMER DE CASO
@@ -1348,7 +1354,59 @@ const app = {
         this.mostrarPantalla('casos-master-screen');
         console.log('✅ Lista de casos mostrada, total:', casosList.children.length);
     },
+    // ─────────────────────────────────────────────────────────────────────
+    // VOLVER A LISTA DE CASOS
+    // ─────────────────────────────────────────────────────────────────────
+    volverAListaCasos: function() {
+        console.log('🔙 Volviendo a lista de casos');
+        
+        // Detener timer
+        if (this.timerCaso) {
+            clearInterval(this.timerCaso);
+            this.timerCaso = null;
+        }
+        
+        // Limpiar estado actual
+        this.casoActual = null;
+        this.respuestasCaso = {};
+        this.resultadoCaso = null;
+        
+        // Ocultar detalle y resultado
+        const casoDetalle = document.getElementById('caso-detalle');
+        const casoResultado = document.getElementById('caso-resultado');
+        const btnEnviar = document.getElementById('btn-enviar-caso');
+        const casosMainButtons = document.getElementById('casos-main-buttons');
+        
+        if (casoDetalle) casoDetalle.style.display = 'none';
+        if (casoResultado) casoResultado.style.display = 'none';
+        if (btnEnviar) btnEnviar.style.display = 'none';
+        if (casosMainButtons) casosMainButtons.style.display = 'block';
+        
+        // Regenerar la lista de casos
+        this.irACasosMaster();
+    },
     
+    // ─────────────────────────────────────────────────────────────────────
+    // CREAR ELEMENTO DEL TIMER (si no existe)
+    // ─────────────────────────────────────────────────────────────────────
+    crearTimerCaso: function() {
+        let timerEl = document.getElementById('caso-timer');
+        if (!timerEl) {
+            timerEl = document.createElement('div');
+            timerEl.id = 'caso-timer';
+            timerEl.style.cssText = 'text-align:center;font-size:24px;font-weight:bold;margin:15px 0;padding:10px;background:var(--bg);border-radius:10px;color:var(--ink3);';
+            timerEl.textContent = '⏱️ 40:00';
+            
+            const casoDetalle = document.getElementById('caso-detalle');
+            if (casoDetalle && casoDetalle.firstChild) {
+                casoDetalle.insertBefore(timerEl, casoDetalle.firstChild);
+            } else if (casoDetalle) {
+                casoDetalle.appendChild(timerEl);
+            }
+            console.log('✅ Timer creado');
+        }
+        return timerEl;
+    },    
     // ─────────────────────────────────────────────────────────────────────
     // CARGAR CASO MASTER - VERSIÓN CORREGIDA
     // ─────────────────────────────────────────────────────────────────────
