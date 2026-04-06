@@ -22,7 +22,13 @@ const app = {
 
     // SISTEMA MULTI-USUARIO
     trabajadorActual: null,   
-    
+    // ═══════════════════════════════════════════════════════════════
+    // FIREBASE - AGREGAR ESTO
+    // ═══════════════════════════════════════════════════════════════
+    db: null,  // Referencia a Firestore
+    firebaseListo: false,  // Indicador de conexión
+    sincronizacionActiva: false,  // Control de sincronización
+    //     
     // Timer Examen
     timerExamen: null,
     tiempoLimite: 30 * 60 * 1000,
