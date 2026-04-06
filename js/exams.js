@@ -691,7 +691,142 @@ const TIPOS_PREGUNTAS_AVANZADAS = {
     analisis_normativo: { descripcion: 'Identifica NOMs aplicables y artículos específicos', evaluacion: 'NOM correcta + artículo específico' },
     deteccion_inconsistencias: { descripcion: 'Encuentra contradicciones en testimonios/evidencia', evaluacion: 'Cada inconsistencia detectada suma puntos' }
 };
+// ─────────────────────────────────────────────────────────────────────────────
+// FUNCIONES DE ALEATORIZACIÓN (SHUFFLE)
+// ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * Mezcla un array (Fisher-Yates)
+ * @param {Array} array - Array a mezclar
+ * @returns {Array} - Nuevo array mezclado
+ */
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+/**
+ * Mezcla las opciones de una pregunta y guarda el mapeo
+ * @param {Object} pregunta - Pregunta original
+ * @returns {Object} - Pregunta con opciones mezcladas y mapeo de índices
+ */
+function shuffleOpciones(pregunta) {
+    if (!pregunta.opciones || !Array.isArray(pregunta.opciones)) {
+        return pregunta;
+    }
+    
+    // Crear array de opciones con su índice original
+    const opcionesConIndice = pregunta.opciones.map((opcion, idx) => ({
+        originalIndex: idx,
+        texto: opcion
+    }));
+    
+    // Mezclar
+    const shuffled = shuffleArray(opcionesConIndice);
+    
+    // Crear mapeo: nuevo índice -> índice original
+    const mapeo = {};
+    const opcionesMezcladas = [];
+    
+    shuffled.forEach((item, nuevoIdx) => {
+        opcionesMezcladas.push(item.texto);
+        mapeo[nuevoIdx] = item.originalIndex;
+    });
+    
+    // Encontrar el nuevo índice de la respuesta correcta
+    const correctaOriginal = pregunta.correcta_idx;
+    let nuevaCorrectaIdx = -1;
+    for (let nuevoIdx = 0; nuevoIdx < shuffled.length; nuevoIdx++) {
+        if (shuffled[nuevoIdx].originalIndex === correctaOriginal) {
+            nuevaCorrectaIdx = nuevoIdx;
+            break;
+        }
+    }
+    
+    return {
+        ...pregunta,
+        opciones: opcionesMezcladas,
+        correcta_idx: nuevaCorrectaIdx,
+        _shuffleMapeo: mapeo  // Guardar mapeo para depuración (opcional)
+    };
+}
+
+/**
+ * Mezcla completamente un examen (preguntas + opciones)
+ * @param {Object} examen - Examen original
+ * @param {Object} options - Opciones de mezcla
+ * @param {boolean} options.shufflePreguntas - Mezclar orden de preguntas (default: true)
+ * @param {boolean} options.shuffleOpciones - Mezclar orden de opciones (default: true)
+ * @param {number} options.seed - Semilla para reproducibilidad (opcional)
+ * @returns {Object} - Nuevo examen mezclado
+ */
+function mezclarExamen(examen, options = {}) {
+    if (!examen || !examen.preguntas) {
+        console.error('❌ Examen inválido para mezclar');
+        return examen;
+    }
+    
+    const {
+        shufflePreguntas = true,
+        shuffleOpciones = true
+    } = options;
+    
+    // Clonar examen para no modificar el original
+    const examenMezclado = JSON.parse(JSON.stringify(examen));
+    
+    // Guardar semilla para reproducibilidad (timestamp)
+    examenMezclado._semilla = Date.now();
+    examenMezclado._fechaMezcla = new Date().toISOString();
+    
+    // 1. Mezclar opciones de cada pregunta
+    if (shuffleOpciones) {
+        examenMezclado.preguntas = examenMezclado.preguntas.map(pregunta => 
+            shuffleOpciones(pregunta)
+        );
+    }
+    
+    // 2. Mezclar orden de preguntas
+    if (shufflePreguntas) {
+        examenMezclado.preguntas = shuffleArray(examenMezclado.preguntas);
+        // Reindexar IDs para referencia (opcional)
+        examenMezclado.preguntas.forEach((pregunta, idx) => {
+            pregunta._ordenOriginal = pregunta.id || idx;
+            pregunta.id = idx + 1;
+        });
+    }
+    
+    return examenMezclado;
+}
+
+/**
+ * Versión mejorada de cargarExamen CON ALEATORIZACIÓN
+ * Reemplaza la función original
+ */
+async function cargarExamenConShuffle(examId, options = {}) {
+    try {
+        const response = await fetch('data/exams/' + examId + '.json');
+        if (!response.ok) throw new Error('Examen no encontrado: ' + examId);
+        const examen = await response.json();
+        
+        // Aplicar mezcla automática
+        const examenMezclado = mezclarExamen(examen, options);
+        
+        console.log(`🎲 Examen "${examId}" mezclado - Preguntas: ${examenMezclado.preguntas.length}`);
+        return examenMezclado;
+    } catch (error) {
+        console.error('Error cargando examen:', error);
+        const examenDemo = obtenerExamenDemo(examId);
+        return mezclarExamen(examenDemo, options);
+    }
+}
+
+// Sobrescribir la función original para que use aleatorización por defecto
+const cargarExamenOriginal = window.cargarExamen || cargarExamen;
+window.cargarExamen = cargarExamenConShuffle;
 // ─────────────────────────────────────────────────────────────────────────────
 // EXPORTAR FUNCIONES PARA USO GLOBAL
 // ─────────────────────────────────────────────────────────────────────────────
