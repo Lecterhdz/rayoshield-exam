@@ -2909,6 +2909,13 @@
     });
     
     console.log('✅ Firebase Producción inicializado');
+        
+        // Función global para exportar historial (conecta con app)
+        if (typeof app !== 'undefined' && app.exportarHistorialPDF) {
+            window.exportarHistorialPDF = () => app.exportarHistorialPDF();
+        } else {
+            window.exportarHistorialPDF = () => alert('Función no disponible');
+        }
     </script>
     <!-- Scripts -->
     <script src="js/exams.js"></script>
