@@ -253,7 +253,7 @@ const app = {
     // IMPORTAR LICENCIA DESDE ARCHIVO .rshield (LADO TRABAJADOR)
     // Versión corregida - Sin optional chaining
     // =================================================================
-    importarLicenciaTrabajador = async function() {
+    importarLicenciaTrabajador: async function() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.rshield,.json';
