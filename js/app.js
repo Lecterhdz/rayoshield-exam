@@ -129,7 +129,126 @@ const app = {
         
         console.log('✅ Inicialización completa');
     },
+    // =================================================================
+    // NUEVA FUNCIONALIDAD: IMPORTAR EXCEL + GENERAR ZIP DE LICENCIAS
+    // =================================================================
+    importarExcelYGenerarLicencias: async function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.xlsx,.xls';
+        input.style.display = 'none';
 
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!confirm(`¿Procesar "${file.name}" y generar licencias para todos los trabajadores?`)) return;
+
+            try {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    const data = new Uint8Array(ev.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    if (rows.length === 0) {
+                        alert('❌ El Excel está vacío.');
+                        return;
+                    }
+
+                    const zip = new JSZip();
+                    let generados = 0;
+                    const errores = [];
+
+                    for (let i = 0; i < rows.length; i++) {
+                        const row = rows[i];
+
+                        const nombre = String(row['Nombre Completo'] || row['Nombre'] || '').trim();
+                        const curp = String(row['CURP'] || '').trim().toUpperCase();
+                        const puesto = String(row['Puesto'] || row['Cargo'] || '').trim();
+                        let numEmpleado = String(row['Número de Empleado'] || row['NumEmpleado'] || `EMP-${1000+i}`).trim();
+                        const email = String(row['Email'] || '').trim();
+                        const departamento = String(row['Departamento'] || '').trim();
+
+                        if (!nombre || !curp || !puesto) {
+                            errores.push(`Fila ${i+2}: Falta Nombre, CURP o Puesto`);
+                            continue;
+                        }
+
+                        const trabajador = {
+                            id: 'TRAB-' + Date.now().toString(36).toUpperCase() + i,
+                            nombre: nombre,
+                            curp: curp,
+                            puesto: puesto,
+                            numeroEmpleado: numEmpleado,
+                            email: email,
+                            departamento: departamento,
+                            fecha_registro: new Date().toISOString(),
+                            estado: 'activo'
+                        };
+
+                        // Guardar en MultiUsuario
+                        if (typeof MultiUsuario !== 'undefined') {
+                            MultiUsuario.addTrabajador(trabajador);
+                        }
+
+                        // Crear archivo .rshield
+                        const licenciaData = {
+                            tipo: "LICENCIA_TRABAJADOR",
+                            version: "3.1",
+                            licenciaId: `RSH-${Date.now().toString(36).toUpperCase()}`,
+                            empresa: this.empresaActual?.nombre || "Mi Empresa",
+                            trabajador: {
+                                id: trabajador.id,
+                                nombre: trabajador.nombre,
+                                curp: trabajador.curp,
+                                puesto: trabajador.puesto,
+                                numeroEmpleado: trabajador.numeroEmpleado
+                            },
+                            plan: this.licencia.tipo || "PROFESIONAL",
+                            fechaCreacion: new Date().toISOString(),
+                            validezHasta: new Date(Date.now() + 365*24*60*60*1000).toISOString(),
+                            claveActivacion: Math.random().toString(36).substring(2, 15).toUpperCase()
+                        };
+
+                        const jsonStr = JSON.stringify(licenciaData, null, 2);
+                        const filename = `${trabajador.nombre.replace(/[^a-zA-Z0-9áéíóúñ]/gi, '_')}_licencia.rshield`;
+
+                        zip.file(filename, jsonStr);
+                        generados++;
+                    }
+
+                    if (generados > 0) {
+                        const zipBlob = await zip.generateAsync({ type: "blob" });
+                        const url = URL.createObjectURL(zipBlob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `Licencias_RayoShield_${new Date().toISOString().slice(0,10)}.zip`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+
+                        alert(`✅ ¡Éxito!\n${generados} archivos de licencia generados.\nDescargando ZIP...`);
+                        this.renderTrabajadores();
+                    }
+
+                    if (errores.length > 0) {
+                        console.warn('Errores:', errores);
+                        alert(`⚠️ Se generaron ${generados} licencias.\n${errores.length} filas con errores.`);
+                    }
+                };
+
+                reader.readAsArrayBuffer(file);
+            } catch (err) {
+                console.error(err);
+                alert('❌ Error al procesar el Excel: ' + err.message);
+            }
+        };
+
+        input.click();
+    },
     // =================================================================
     // LICENCIA - FUNCIONES COMPLETAS
     // =================================================================
