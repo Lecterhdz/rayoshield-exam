@@ -251,6 +251,7 @@ const app = {
     },
     // =================================================================
     // IMPORTAR LICENCIA DESDE ARCHIVO .rshield (LADO TRABAJADOR)
+    // Versión corregida - Sin optional chaining
     // =================================================================
     app.importarLicenciaTrabajador = async function() {
         const input = document.createElement('input');
@@ -266,25 +267,27 @@ const app = {
                 const text = await file.text();
                 const licencia = JSON.parse(text);
     
-                // Validación básica del archivo
-                if (!licencia.tipo || licencia.tipo !== "LICENCIA_TRABAJADOR" || !licencia.trabajador) {
-                    alert('❌ Archivo de licencia inválido.');
+                // Validación básica
+                if (!licencia || licencia.tipo !== "LICENCIA_TRABAJADOR" || !licencia.trabajador) {
+                    alert('❌ Archivo de licencia inválido o corrupto.');
                     return;
                 }
     
                 if (!licencia.trabajador.nombre || !licencia.trabajador.curp) {
-                    alert('❌ El archivo no contiene datos completos del trabajador.');
+                    alert('❌ El archivo no contiene los datos completos del trabajador.');
                     return;
                 }
     
-                // Activar licencia / plan
+                // Activar el plan de la licencia
+                const planActivado = licencia.plan || 'PROFESIONAL';
+    
                 this.licencia = {
-                    tipo: licencia.plan || 'PROFESIONAL',
+                    tipo: planActivado,
                     clave: licencia.licenciaId || '',
                     clienteId: licencia.empresa || 'EMPRESA',
                     expiracion: licencia.validezHasta || null,
                     examenesRestantes: 9999,
-                    features: this.obtenerFeaturesPorTipo(licencia.plan || 'PROFESIONAL')
+                    features: this.obtenerFeaturesPorTipo(planActivado)
                 };
     
                 // Guardar datos del trabajador
@@ -300,27 +303,30 @@ const app = {
                     id: licencia.trabajador.id || 'TRAB-' + Date.now(),
                     nombre: licencia.trabajador.nombre,
                     curp: licencia.trabajador.curp,
-                    puesto: licencia.trabajador.puesto
+                    puesto: licencia.trabajador.puesto || ''
                 }));
     
                 this.guardarLicencia();
                 this.guardarDatosUsuario();
     
-                alert(`✅ ¡Licencia importada correctamente!\n\nBienvenido ${licencia.trabajador.nombre}\nPlan activado: ${licencia.plan || 'PROFESIONAL'}`);
+                alert(`✅ ¡Licencia importada correctamente!\n\n` +
+                      `Nombre: ${licencia.trabajador.nombre}\n` +
+                      `Plan activado: ${planActivado}\n\n` +
+                      `Ya puedes realizar los exámenes según el plan de tu empresa.`);
     
-                // Actualizar todo
+                // Actualizar interfaz
                 this.actualizarUI();
                 this.actualizarUIMenuPorRol();
                 this.mostrarPantalla('home-screen');
     
             } catch (err) {
-                console.error(err);
-                alert('❌ Error al leer el archivo de licencia.\nAsegúrate de que sea un archivo .rshield válido.');
+                console.error('Error al importar licencia:', err);
+                alert('❌ Error al leer el archivo.\n\nAsegúrate de que sea un archivo .rshield válido.');
             }
         };
     
         input.click();
-    };   
+    };
     // =================================================================
     // LICENCIA - FUNCIONES COMPLETAS
     // =================================================================
