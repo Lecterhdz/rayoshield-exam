@@ -253,7 +253,7 @@ const app = {
     // IMPORTAR LICENCIA DESDE ARCHIVO .rshield (LADO TRABAJADOR)
     // Versión corregida - Sin optional chaining
     // =================================================================
-    app.importarLicenciaTrabajador = async function() {
+    importarLicenciaTrabajador = async function() {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.rshield,.json';
@@ -1936,7 +1936,83 @@ cargarCasoMaster: async function(casoId) {
         this.actualizarSidebarModoIndicador();
         this.actualizarUIMenuPorRol();
     },
+    // =================================================================
+    // FUNCIONES FALTANTES PARA CASOS MASTER
+    // =================================================================
     
+    descargarCertificadoCaso: function() {
+        if (!this.resultadoCaso || !this.resultadoCaso.aprobado) {
+            alert('Solo para casos aprobados');
+            return;
+        }
+        
+        const t = this.obtenerTrabajadorActual();
+        const usuario = t || this.userData;
+        
+        // Crear certificado simple
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        const ctx = canvas.getContext('2d');
+        
+        // Fondo
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Borde decorativo
+        ctx.strokeStyle = '#1a56db';
+        ctx.lineWidth = 10;
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        
+        // Título
+        ctx.fillStyle = '#1a56db';
+        ctx.font = 'bold 28px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ RAYOSHIELD', canvas.width/2, 100);
+        
+        ctx.fillStyle = '#333';
+        ctx.font = '20px Arial';
+        ctx.fillText('CERTIFICADO DE APROBACIÓN', canvas.width/2, 160);
+        
+        ctx.font = '16px Arial';
+        ctx.fillStyle = '#666';
+        ctx.fillText('Caso de Investigación', canvas.width/2, 210);
+        
+        // Línea decorativa
+        ctx.beginPath();
+        ctx.moveTo(150, 240);
+        ctx.lineTo(canvas.width - 150, 240);
+        ctx.stroke();
+        
+        // Contenido
+        ctx.fillStyle = '#333';
+        ctx.font = '18px Arial';
+        ctx.fillText(`Otorgado a: ${usuario.nombre}`, canvas.width/2, 300);
+        
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#666';
+        ctx.fillText(`Caso: ${this.casoActual?.titulo || 'Caso Master'}`, canvas.width/2, 360);
+        ctx.fillText(`Puntaje: ${this.resultadoCaso?.porcentaje || 0}%`, canvas.width/2, 400);
+        ctx.fillText(`Fecha: ${new Date().toLocaleDateString('es-MX')}`, canvas.width/2, 440);
+        
+        // Sello
+        ctx.beginPath();
+        ctx.arc(canvas.width - 100, canvas.height - 80, 40, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#1a56db';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.fillStyle = '#1a56db';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText('VALIDEZ', canvas.width - 100, canvas.height - 85);
+        ctx.font = '10px Arial';
+        ctx.fillText('OFICIAL', canvas.width - 100, canvas.height - 65);
+        
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.download = `RayoShield_Caso_${usuario.nombre.replace(/\s/g, '_')}_${Date.now()}.png`;
+        a.href = url;
+        a.click();
+    },  
     actualizarPerfil: function() {
         const nombreEl = document.getElementById('perfil-nombre');
         if (nombreEl) nombreEl.textContent = this.userData.nombre || 'Usuario';
