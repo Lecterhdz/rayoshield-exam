@@ -1563,7 +1563,39 @@ const app = {
             alert('❌ Error generando certificado: ' + err.message);
         });
     },
-
+    descargarInsignia: function() {
+        if (!this.casoActual || !this.resultadoCaso) {
+            alert('❌ No hay insignia disponible');
+            return;
+        }
+        if (!this.resultadoCaso.aprobado) {
+            alert('⚠️ Debes aprobar el caso para obtener la insignia');
+            return;
+        }
+        
+        var self = this;
+        
+        var t = MultiUsuario.getTrabajadorActual();
+        var usuarioParaCertificado = t ? t : this.userData;
+        
+        if (typeof generarInsigniaPNG !== 'function') {
+            alert('❌ Error: Función de insignia no cargada. Recarga la página.');
+            console.error('generarInsigniaPNG no está definida');
+            return;
+        }
+        
+        generarInsigniaPNG(usuarioParaCertificado, this.casoActual, this.resultadoCaso).then(function(url) {
+            var a = document.createElement('a');
+            a.download = 'RayoShield_INSIGNIA_' + usuarioParaCertificado.nombre.replace(/\s/g, '_') + '_' + Date.now() + '.png';
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }).catch(function(err) {
+            console.error('Error generando insignia:', err);
+            alert('❌ Error generando insignia');
+        });
+    },
     // =================================================================
     // CASOS MASTER
     // =================================================================
